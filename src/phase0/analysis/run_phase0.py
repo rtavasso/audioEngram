@@ -431,9 +431,12 @@ def run_full_analysis(
             logger.info(f"Effective clusters: {len(effective_clusters)}/{n_clusters}")
             logger.info(f"Excluded mass (train): {cluster_stats['excluded_mass']:.1%}")
 
-            # Save cluster stats
+            # Save cluster stats (convert numpy types to native Python for JSON)
+            cluster_stats_json = {
+                k: (v.item() if hasattr(v, 'item') else v) for k, v in cluster_stats.items()
+            }
             with open(output_dir / f"{cond_name}_lag{lag}_cluster_stats.json", "w") as f:
-                json.dump(cluster_stats, f, indent=2)
+                json.dump(cluster_stats_json, f, indent=2)
 
             # Random baseline (permute on ALL train data)
             random_train_ids = permute_cluster_ids(train_cluster_ids, seed=config["seed"] + 1000)
