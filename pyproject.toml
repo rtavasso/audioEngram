@@ -1,0 +1,67 @@
+[project]
+name = "engram-audio-phase0"
+version = "0.1.0"
+description = "Phase 0: Audio latent structure analysis for conditional memory"
+requires-python = ">=3.10,<3.15"
+dependencies = [
+    # Core ML (GPU versions installed via PyTorch index, see [tool.uv] below)
+    "torch>=2.2.0,<2.10",
+    "torchaudio>=2.2.0,<2.10",
+    "numpy>=1.26,<2.3",
+    "scipy>=1.11.0,<2.0.0",
+    "scikit-learn>=1.3.0,<2.0.0",
+
+    # Data handling
+    "pandas>=2.0.0,<3.0.0",
+    "pyarrow>=14.0.0,<18.0.0",
+    "zarr>=2.16.0,<3.0.0",
+
+    # Visualization
+    "matplotlib>=3.7.0,<4.0.0",
+    "seaborn>=0.12.0,<1.0.0",
+
+    # Config and utilities
+    "pyyaml>=6.0,<7.0",
+    "tqdm>=4.48",
+
+    # Moshi dependencies (already in moshi/)
+    "safetensors>=0.4.0,<0.8.0",
+    "huggingface-hub>=0.24,<1.0.0",
+    "einops>=0.7,<0.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0,<9.0.0",
+    "pytest-cov>=4.0.0,<6.0.0",
+    "pyright>=1.1.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+
+# Configure uv to install PyTorch with CUDA support
+# Uses PyTorch's official CUDA 12.4 wheel index
+[tool.uv.sources]
+torch = { index = "pytorch-cu124" }
+torchaudio = { index = "pytorch-cu124" }
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true

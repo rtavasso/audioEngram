@@ -1,0 +1,1857 @@
+RUN_ID=20260201-210444-7587
+Started: 2026-02-01T21:04:44-08:00
+Task: Rigorously review the Phase 0 implementation in src/phase0/ and scripts/ against the specification in SPEC.md. Check for:
+
+1. **Critical Invariants** (from SPEC):
+   - No data leakage: PCA, VQ, normalization stats fit on train speakers only
+   - Consistent sample sets: Numerator/denominator use same filtered samples
+   - Correct indexing: Context windows end at t-L, length W
+   - VAE alignment: Frame rate = 12.5 Hz, latent dim = 512
+
+2. **Conditioning Schemes** (3 required):
+   - Condition 1: Mean-pool context → VQ(K=64)
+   - Condition 2: Flatten context → PCA(8) → VQ(K=256)
+   - Condition 3: PCA(8) → quartile binning
+
+3. **Metrics Implementation**:
+   - Variance ratio: SSE_within / SSE_total on same sample set
+   - Diagonal Gaussian entropy reduction
+   - Per-speaker statistics with CI
+   - Cross-speaker degradation
+
+4. **Confound Checks**:
+   - High-energy frames only
+   - Utterance-medial frames (pos_frac in [0.17, 0.83])
+   - Random cluster baseline (permuted IDs)
+
+5. **Decision Criteria**:
+   - Variance ratio threshold < 0.6
+   - Cross-speaker degradation < 20%
+   - Random baseline ≈ 1.0
+
+Report any deviations, missing functionality, or bugs. Be thorough.
+Codex command: codex
+
+OpenAI Codex v0.92.0 (research preview)
+--------
+workdir: /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio
+model: gpt-5.2
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: auto
+session id: 019c1cbd-2e9a-70b3-a270-4de2eb36167c
+--------
+user
+When finished with your task, produce a detailed report in Markdown with EXACT headings:
+
+# Summary
+# What changed
+- List files changed and describe the change in 1–3 bullets each.
+# Rationale
+# Risks / edge cases
+# Follow-ups
+
+Task:
+Rigorously review the Phase 0 implementation in src/phase0/ and scripts/ against the specification in SPEC.md. Check for:
+
+1. **Critical Invariants** (from SPEC):
+   - No data leakage: PCA, VQ, normalization stats fit on train speakers only
+   - Consistent sample sets: Numerator/denominator use same filtered samples
+   - Correct indexing: Context windows end at t-L, length W
+   - VAE alignment: Frame rate = 12.5 Hz, latent dim = 512
+
+2. **Conditioning Schemes** (3 required):
+   - Condition 1: Mean-pool context → VQ(K=64)
+   - Condition 2: Flatten context → PCA(8) → VQ(K=256)
+   - Condition 3: PCA(8) → quartile binning
+
+3. **Metrics Implementation**:
+   - Variance ratio: SSE_within / SSE_total on same sample set
+   - Diagonal Gaussian entropy reduction
+   - Per-speaker statistics with CI
+   - Cross-speaker degradation
+
+4. **Confound Checks**:
+   - High-energy frames only
+   - Utterance-medial frames (pos_frac in [0.17, 0.83])
+   - Random cluster baseline (permuted IDs)
+
+5. **Decision Criteria**:
+   - Variance ratio threshold < 0.6
+   - Cross-speaker degradation < 20%
+   - Random baseline ≈ 1.0
+
+Report any deviations, missing functionality, or bugs. Be thorough.
+mcp startup: no servers
+
+thinking
+**Planning for metrics checks**
+
+I'm checking various metrics functions, including confound checks and decision criteria. I need to prepare a report about deviations, missing elements, and bugs. We might run scripts or unit tests, but there's an approval policy to consider. I think a relevant script with a --help option could be helpful, although it might take some time. For now, I'll focus on static analysis and minimal checks like importing modules if possible and mention any limitations. Let's start with a plan and tool calls.
+Plan update
+  → Read SPEC and identify requirements
+  • Inventory Phase 0 code and scripts
+  • Review invariants and data flow
+  • Verify conditioning schemes implementation
+  • Verify metrics and confound checks
+  • Draft deviations and recommendations report
+exec
+/bin/bash -lc 'ls -la' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 82ms:
+total 308
+drwxrwxrwx 1 riley riley   4096 Feb  1 21:04 .
+drwxrwxrwx 1 riley riley   4096 Feb  1 18:42 ..
+drwxrwxrwx 1 riley riley   4096 Feb  1 21:04 .claude
+drwxrwxrwx 1 riley riley   4096 Feb  1 21:04 .codex
+drwxrwxrwx 1 riley riley   4096 Feb  1 20:40 .git
+drwxrwxrwx 1 riley riley   4096 Feb  1 21:01 .pytest_cache
+drwxrwxrwx 1 riley riley   4096 Feb  1 19:13 .venv
+-rwxrwxrwx 1 riley riley    373 Feb  1 19:15 CLAUDE.md
+-rwxrwxrwx 1 riley riley  30870 Feb  1 18:53 SPEC.md
+drwxrwxrwx 1 riley riley   4096 Feb  1 20:30 __pycache__
+drwxrwxrwx 1 riley riley   4096 Feb  1 20:48 configs
+-rwxrwxrwx 1 riley riley   9151 Feb  1 20:30 mimi_autoencoder.py
+drwxrwxrwx 1 riley riley   4096 Feb  1 19:27 moshi
+drwxrwxrwx 1 riley riley   4096 Feb  1 20:47 outputs
+-rwxrwxrwx 1 riley riley   1225 Feb  1 20:47 pyproject.toml
+drwxrwxrwx 1 riley riley   4096 Feb  1 20:56 scripts
+drwxrwxrwx 1 riley riley   4096 Feb  1 20:58 src
+drwxrwxrwx 1 riley riley   4096 Feb  1 21:01 tests
+-rwxrwxrwx 1 riley riley 460231 Feb  1 20:58 uv.lock
+exec
+/bin/bash -lc "sed -n '1,220p' SPEC.md" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 37ms:
+# Background
+
+# Conditional Memory for Continuous Audio Latent Dynamics: Technical Synopsis
+
+## Executive Summary
+
+This document provides the conceptual foundation for a research project investigating whether lookup-based memory mechanisms—successful in large language models—can improve autoregressive generation of continuous audio latents. The project tests a specific structural hypothesis about audio representations and is designed to fail fast if that hypothesis is false.
+
+---
+
+## Part I: The Problem We Are Trying to Solve
+
+### The State of Audio Generation
+
+Modern audio generation systems face a fundamental tension between two representation strategies.
+
+**Discrete token models** represent audio as sequences of codes from a learned codebook, typically using Residual Vector Quantization (RVQ). This makes audio "look like text" and allows direct application of language modeling techniques. The approach works well and powers systems like MusicGen, AudioLM, and Mimi. However, quantization is inherently lossy. Achieving high fidelity requires deep codebook hierarchies (8-32 levels), which increases computational cost and introduces complex dependencies between codebook levels. Modeling these dependencies requires architectural compromises like delay patterns or auxiliary RQ-Transformer heads.
+
+**Continuous latent models** represent audio in the latent space of a variational autoencoder, avoiding quantization entirely. The CALM paper demonstrates this approach can match or exceed discrete models in quality while being more computationally efficient. However, continuous latents are harder to model autoregressively. The model must predict a continuous vector at each step, and small errors accumulate over time, causing generated audio to drift off the training manifold. CALM addresses this through several stabilization techniques: injecting noise into the context during training, using a short-context transformer to preserve local detail, and replacing diffusion sampling with consistency models.
+
+
+thinking
+**Searching for Phase 0**
+
+I'm noticing that the SPEC document is lengthy, and I need to specifically look for sections related to Phase 0. It seems there was some truncation in the middle of the file—possibly due to the sed command I used, which printed part of the output that was truncated. The message says, "...8507 chars truncated..." indicating a tool limit on lines. I’ll need to search for the "Phase 0" section later using rg, and then open the relevant parts.
+exec
+/bin/bash -lc "rg -n \"Phase 0|variance ratio|Condition 1|Conditioning|VQ\\(|PCA\\(|quartile|12\\.5\" SPEC.md | head" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 86ms:
+77:### Phase 0: Testing for Structure (The Gatekeeper)
+96:- Within-cluster variance ratio falls below 0.6 (clusters explain >40% of dynamics variance)
+104:If Phase 0 passes, we implement a minimal version of the Engram mechanism for audio:
+132:## Part IV: Why Phase 0 Is Designed the Way It Is
+134:The Phase 0 specification is unusually detailed because every choice has consequences for the validity of the conclusions.
+140:1. **Mean-pooled context → VQ(K=64):** Extremely coarse. Averages away all temporal structure within the window. If this works, structure is very robust.
+142:2. **Flattened context → PCA(8) → VQ(K=256):** Preserves some temporal structure in the principal components. More informative keys, but still very low-dimensional.
+144:3. **PCA(8) → quartile binning:** Axis-aligned discretization. Tests whether learned (VQ) vs simple (binning) discretization matters.
+162:Crucially, we compute statistics *on the same sample set* for both numerator and denominator of the variance ratio. Filtering introduces subtle biases if not handled carefully.
+166:**Random cluster baseline:** We permute cluster assignments (preserving the size distribution) to verify that the variance ratio is actually measuring structure rather than filtering artifacts. This should yield a ratio near 1.0.
+exec
+/bin/bash -lc "sed -n '60,220p' SPEC.md" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 34ms:
+
+If audio latent dynamics are dominated by speaker-specific variation, or if the "patterns" are too continuous and context-dependent to discretize usefully, lookup will fail. This is not a theoretical concern—it is the *most likely outcome*.
+
+### What We Must Demonstrate
+
+For the project to proceed, we must establish that audio latents exhibit what we call *Type 2 structure*:
+
+**Type 1 structure** means the future is predictable from the past. All successful autoregressive models exploit Type 1 structure; it is necessary but not sufficient for our purposes.
+
+**Type 2 structure** means the *same prediction rule* applies across many different contexts. The mapping from "coarse description of recent dynamics" to "likely next dynamics" is stable across different speakers, different utterances, and different positions in an utterance.
+
+Language has extreme Type 2 structure because syntax and vocabulary are shared across speakers. Audio might have much weaker Type 2 structure because so much variation is individual.
+
+---
+
+## Part III: The Experimental Design
+
+### Phase 0: Testing for Structure (The Gatekeeper)
+
+Before building any models, we must determine whether the requisite structure exists. This is a pure data analysis task that can be completed in a few days with minimal compute.
+
+thinking
+**Researching specifications**
+
+I need to find more detailed specifications regarding the context windows, VAE alignment, and a frame rate of 12.5Hz with a latent dimension of 512. It's important to gather all this information to ensure I'm on the right track. I'll be searching within the related specifications to clarify these details and make sure I understand everything thoroughly. It's all about getting the right data!
+exec
+/bin/bash -lc "rg -n \"12\\.5|latent dim|512|frame rate|W=|context window|t-L|x_t - x_{t-1}|Δx|high-energy|pos_frac|0\\.17|0\\.83|SSE_within|entropy\" SPEC.md" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio exited 2 in 32ms:
+rg: regex parse error:
+    (?:12\.5|latent dim|512|frame rate|W=|context window|t-L|x_t - x_{t-1}|Δx|high-energy|pos_frac|0\.17|0\.83|SSE_within|entropy)
+                                                                      ^
+error: repetition quantifier expects a valid decimal
+
+thinking
+**Troubleshooting Ripgrep issues**
+
+I think I’ve encountered an error with Ripgrep related to the use of Δ. It looks like the issue stems from curly braces in the term x_{t-1}, where the program treats { as a quantifier. So, I need to escape those braces or just avoid using them altogether. For now, I’ll search using fixed strings with the -F option instead. Let's see if that solves the problem!
+exec
+/bin/bash -lc 'rg -nF "12.5" SPEC.md; rg -nF "latent" SPEC.md | head; rg -nF "512" SPEC.md; rg -nF "t-L" SPEC.md; rg -nF "pos_frac" SPEC.md; rg -nF "high-energy" SPEC.md; rg -nF "entropy" SPEC.md; rg -nF "SSE" SPEC.md' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 126ms:
+7:This document provides the conceptual foundation for a research project investigating whether lookup-based memory mechanisms—successful in large language models—can improve autoregressive generation of continuous audio latents. The project tests a specific structural hypothesis about audio representations and is designed to fail fast if that hypothesis is false.
+19:**Continuous latent models** represent audio in the latent space of a variational autoencoder, avoiding quantization entirely. The CALM paper demonstrates this approach can match or exceed discrete models in quality while being more computationally efficient. However, continuous latents are harder to model autoregressively. The model must predict a continuous vector at each step, and small errors accumulate over time, causing generated audio to drift off the training manifold. CALM addresses this through several stabilization techniques: injecting noise into the context during training, using a short-context transformer to preserve local detail, and replacing diffusion sampling with consistency models.
+33:This project asks whether the same principle applies to continuous audio latents:
+35:> **Do short-horizon audio latent dynamics exhibit reusable local structure that can be captured by a lookup mechanism, and if so, does exploiting this structure improve autoregressive modeling?**
+37:This is not a question about whether we can beat benchmarks by adding parameters. It is a question about the *nature* of audio representations—specifically, whether there exist recurring patterns in how audio latents evolve over short time horizons that are stable enough across speakers and contexts to be worth storing and retrieving rather than recomputing.
+47:In the latent space of a well-trained VAE, these regularities should manifest as *clusters of similar trajectories*. When the recent context looks like "mid-vowel transitioning toward a stop consonant," the distribution of likely next-frame dynamics should be relatively concentrated, regardless of which specific vowel or which specific speaker. If this clustering is strong enough, a lookup table indexed by coarsened context could retrieve a useful prior on next-step dynamics.
+49:This prior would not replace the continuous prediction—it would *augment* it. The transformer backbone would still model the full conditional distribution, but it would receive a hint about the likely region of latent space. This could reduce the entropy the backbone must model, improve stability during autoregressive rollout, and potentially allow the backbone to focus more capacity on longer-range structure.
+55:**Discrete, symbolic structure.** Words and phrases are categorical objects. The same phrase "Alexander the Great" is identical every time it appears, making it trivially indexable. Audio latents are continuous vectors with no natural discretization.
+59:**Stable keys.** In language, the context used to index memory (recent tokens) is discrete and doesn't drift. In audio generation, the context is *generated* latents, which may drift from the training distribution. A corrupted key retrieves an irrelevant or harmful prior.
+61:If audio latent dynamics are dominated by speaker-specific variation, or if the "patterns" are too continuous and context-dependent to discretize usefully, lookup will fail. This is not a theoretical concern—it is the *most likely outcome*.
+388:* pos_frac (t / T)  (for utterance position confound)
+455:* utterance_id, speaker_id, t, pos_frac, energy, split
+598:* utterance medial only (pos_frac in [0.17, 0.83]) and compare to initial/final
+170:**Confound slices:** We compute metrics separately on high-energy frames, utterance-medial frames, and other subsets to ensure structure is not an artifact of silence or prosodic boundaries.
+597:* high-energy only
+49:This prior would not replace the continuous prediction—it would *augment* it. The transformer backbone would still model the full conditional distribution, but it would receive a hint about the likely region of latent space. This could reduce the entropy the backbone must model, improve stability during autoregressive rollout, and potentially allow the backbone to focus more capacity on longer-range structure.
+258:- Day 3: Metrics and controls (variance ratio, entropy, random baseline)
+316:        entropy_diag_gauss.py
+574:### 8.3 Diagonal Gaussian entropy reduction
+576:Module: `metrics/entropy_diag_gauss.py`
+exec
+/bin/bash -lc "sed -n '220,760p' SPEC.md" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 38ms:
+- Continuous generative models (VAEs, diffusion, flow matching, consistency)
+- Audio generation (codec-based and latent-space approaches)
+
+The specific question—whether lookup-based memory helps continuous autoregressive modeling—has not been systematically tested. Audio is a good domain to test it because the structure is rich enough that memory might help but continuous enough that it might not.
+
+---
+
+## Part VII: What the Engineer Needs to Know
+
+### Core Task
+
+Implement Phase 0 exactly as specified. This is a data analysis pipeline, not a modeling task. The goal is to determine whether structure exists before committing to expensive training runs.
+
+### Critical Invariants
+
+1. **No data leakage.** All fitting (PCA, VQ, normalization statistics) uses only training speakers. Evaluation uses transforms only.
+
+2. **Consistent sample sets.** Variance ratio numerator and denominator must be computed on exactly the same samples after filtering.
+
+3. **Correct indexing.** Context windows must end at the right lag before the target. Off-by-one errors here invalidate everything. Write unit tests with hand-constructed data.
+exec
+/bin/bash -lc "rg -n \"6\\.1|Context indexing|lag L|x\\[end-W\" SPEC.md" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 36ms:
+451:* for lag L ∈ {1,2,4}, need t- L >= 1 and t-W-L >= 0
+470:### 6.1 Common: context extraction
+474:Given utterance latents x[T,D], time t, window W, lag L:
+477:* context frames are x[end-W : end]  (length W)
+exec
+/bin/bash -lc "sed -n '420,560p' SPEC.md" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+
+* VAE checkpoint path + expected sample rate + hop settings
+* list of utterances
+  Steps:
+
+1. load waveform
+2. resample to VAE sample rate (only if needed)
+3. run encoder → x[T, D]
+4. compute energy per frame:
+
+   * simplest: frame RMS of waveform using the same hop/window alignment as latents
+   * store energy[T]
+5. save to `latents.zarr`
+
+Acceptance checks:
+
+* assert no NaNs
+* record D, hop_sec, mean/std of x
+* verify frame rate ≈ expected (derive from timestamps)
+
+
+thinking
+**Updating implementation plans**
+
+I have explicit requirements now for context extraction and filtering. I'll also need to think about the VAE configuration, including frame rate and hop seconds based on the checkpoint, along with the latent dimension. 
+
+Next, I want to check the Phase 0 implementation to see if I can use checkpoint info instead of hardcoding. Then, I’ll need to inventory the Phase 0 code and scripts, so I’ll make a list of the files and update my plan accordingly.
+Plan update
+  ✓ Read SPEC and identify requirements
+  → Inventory Phase 0 code and scripts
+  • Review invariants and data flow
+  • Verify conditioning schemes implementation
+  • Verify metrics and confound checks
+  • Draft deviations and recommendations report
+exec
+/bin/bash -lc 'find src/phase0 -maxdepth 4 -type f -print | sort' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 81ms:
+src/phase0/__init__.py
+src/phase0/__pycache__/__init__.cpython-312.pyc
+src/phase0/analysis/__init__.py
+src/phase0/analysis/plots.py
+src/phase0/analysis/report.py
+src/phase0/analysis/run_phase0.py
+src/phase0/clustering/__init__.py
+src/phase0/clustering/__pycache__/__init__.cpython-312.pyc
+src/phase0/clustering/__pycache__/baselines.cpython-312.pyc
+src/phase0/clustering/__pycache__/pca.cpython-312.pyc
+src/phase0/clustering/__pycache__/quantile.cpython-312.pyc
+src/phase0/clustering/__pycache__/vq.cpython-312.pyc
+src/phase0/clustering/baselines.py
+src/phase0/clustering/pca.py
+src/phase0/clustering/quantile.py
+src/phase0/clustering/vq.py
+src/phase0/data/__init__.py
+src/phase0/data/io.py
+src/phase0/data/librispeech.py
+src/phase0/data/splits.py
+
+thinking
+**Evaluating scripts directory**
+
+I'm thinking that the __pycache__ directory is being tracked but seems irrelevant for my needs right now. I want to focus on inspecting the scripts directory instead. It feels like a better use of my time, looking into what’s actually important for my task. I’m curious to see what I'll find there and how it will help with my current objectives. Okay, let's dive in and take a closer look!
+exec
+/bin/bash -lc 'find scripts -maxdepth 2 -type f -print | sort' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 34ms:
+scripts/00_download_librispeech.sh
+scripts/01_make_speaker_splits.py
+scripts/02_infer_latents.py
+scripts/03_build_phase0_dataset.py
+scripts/04_fit_conditioning.py
+scripts/05_eval_metrics.py
+scripts/06_make_report.py
+
+thinking
+**Inventorying tests**
+
+I’m thinking about tests we need to check, specifically for unit tests related to indexing and variance ratio. I should make a plan to read through those tests carefully. I want to ensure we're covering everything necessary, so an inventory of tests seems like a smart move. This way, I can confirm that we have all the pertinent tests accounted for and ready to evaluate. Let's see what we've got!
+exec
+/bin/bash -lc 'find tests -maxdepth 2 -type f -print | sort' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 34ms:
+tests/__pycache__/test_indexing.cpython-312-pytest-9.0.2.pyc
+tests/__pycache__/test_reproducibility.cpython-312-pytest-9.0.2.pyc
+tests/__pycache__/test_variance_ratio.cpython-312-pytest-9.0.2.pyc
+tests/test_indexing.py
+tests/test_reproducibility.py
+tests/test_variance_ratio.py
+
+thinking
+**Checking subdirectories for AGENTS**
+
+I need to check if there are any AGENTS files in the subdirectories. I think the best way to do this is by using a command like "find AGENTS.md." This seems straightforward enough, but I want to make sure I double-check that it will actually locate all instances. So, I’ll run that and see if my assumptions hold up! Let's make sure I cover all my bases.
+exec
+/bin/bash -lc 'find .. -name AGENTS.md -print' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio exited 124 in 10.01s:
+
+
+thinking
+**Considering file searching**
+
+It seems like I'm trying to use a search command that might be too broad and could take a long time due to large window paths. So, I think I'll restrict the search to just the repository by using `find . -name AGENTS.md`. That should make the search more efficient and hopefully avoid any timeouts. It's all about finding that balance in my commands!
+exec
+/bin/bash -lc 'find . -name AGENTS.md -print' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 9.87s:
+
+
+thinking
+**Reviewing update plan**
+
+I think we need to review our process and then update the plan based on inventory completion. Once inventory is done, I'll use update_plan. It's important to consider that inventory includes listing directories. After that, I should focus on reviewing invariants and data flow, then update the plan accordingly. I feel like I'm on the right track here, just need to keep everything organized!
+Plan update
+  ✓ Read SPEC and identify requirements
+  ✓ Inventory Phase 0 code and scripts
+  → Review invariants and data flow
+  • Verify conditioning schemes implementation
+  • Verify metrics and confound checks
+  • Draft deviations and recommendations report
+exec
+/bin/bash -lc "sed -n '1,240p' src/phase0/analysis/run_phase0.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 33ms:
+"""
+Main orchestrator for Phase 0 analysis.
+
+Runs all conditions × lags × slices and computes all metrics.
+"""
+
+import json
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+import pandas as pd
+import yaml
+
+from ..data.io import LatentStore, load_frames_index
+from ..features.context import get_context_mean, get_context_flat, get_valid_frame_range
+from ..features.normalization import (
+    compute_delta,
+    compute_normalization_stats,
+    normalize_delta,
+exec
+/bin/bash -lc "sed -n '240,520p' src/phase0/analysis/run_phase0.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 34ms:
+    random_train_ids = permute_cluster_ids(train_cluster_ids, seed=seed + 1000)
+    random_vr = compute_variance_ratio(train_deltas_norm, random_train_ids, effective_clusters)
+    results["random_baseline_variance_ratio"] = random_vr["variance_ratio"]
+
+    return results
+
+
+def run_full_analysis(
+    config_path: str | Path,
+    output_dir: Optional[str | Path] = None,
+) -> dict:
+    """
+    Run the complete Phase 0 analysis.
+
+    Args:
+        config_path: Path to phase0.yaml config
+        output_dir: Optional output directory override
+
+    Returns:
+        Dict with all metrics
+
+
+
+
+
+thinking
+**Checking dataset script logic**
+
+I'm reviewing the `03_build_phase0_dataset` script and its data input/output. If `t` is the frame index starting at 0, using `x[t] - x[t-1]` for `t >= 1` looks good. The context specifies that I need `t - L >= 1` and `t - W - L >= 0`, meaning `t` should be at least `W + L` and `L + 1`. I'm realizing the code condition needs to ensure these requirements for computing deltas correctly. The slice context adds a layer of complexity too!
+thinking
+**Clarifying delta computation**
+
+I need to confirm that they compute the delta at time `t` using `x[t] - x[t-1]`, so `t` must be at least 1. The context ends at `t - L`, meaning the last frame index is `end - 1 = t - L - 1`. If `L >= 1`, then ensuring `t - L >= 1` results in `end >= 1`, but I'm wondering if that condition is really necessary. For cases where `end` equals 0, it doesn't validate, particularly if `W` might be zero. I should check how `collect_features_and_deltas` ensures consistency in the samples it collects.
+thinking
+**Examining feature collection logic**
+
+It seems that `train_feat_mean` and `train_deltas` correspond to mean features, while `train_feat_flat` is collected separately and ignores deltas. For the `pca_vq` and `pca_quartile` conditions, they use `train_feat_flat` but rely on `train_deltas` from the initial mean run. This could create mismatches in sample sets, especially since the second collection may skip frames differently due to errors. This may result in `train_feat_flat` having a different length than `train_deltas`, potentially leading to shape mismatches in `fit_pca`. I need to address that!
+thinking
+**Assessing PCA fitting and feature consistency**
+
+I realized that `fit_pca` operates only on `train_features`, and later, they normalize `train_deltas_norm` and compute the variance ratio using `train_cluster_ids` tied to `train_features`. Since the lengths of `cluster_ids` and `train_features` must match, any mismatch could cause issues. They probably yield the same number because `get_context_flat` uses the same range. However, to avoid risks from potential discrepancies, it would be more efficient to compute both mean and flat features in a single pass to ensure consistency. Also, normalization stats for `train_deltas` are computed after slicing but before cluster filtering!
+thinking
+**Evaluating normalization and baseline calculations**
+
+The spec suggests that normalization should be computed over training speakers using the same subset for evaluation, so it makes sense to apply it to all eligible frames before cluster filtering. However, it seems they compute metrics per lag and slice, which might not align with the spec's expectation for a global approach. Specifically, it states to compute global median energy and μ/σ over Δx from training speakers.
+
+Also, the random baseline uses permuted IDs while maintaining histograms, computing the variance ratio using original effective clusters, but it’s only applied to training data. This raises questions about evaluation metrics being neglected, so I need to verify the formulas used for cross-speaker degradation and other metrics! I'll check the scripts to clarify.
+exec
+/bin/bash -lc "sed -n '1,220p' scripts/02_infer_latents.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 33ms:
+#!/usr/bin/env python3
+"""
+Extract continuous latents from audio using Mimi autoencoder.
+
+Usage:
+    uv run python scripts/02_infer_latents.py [--config configs/phase0.yaml] [--device cuda]
+"""
+
+import argparse
+import sys
+from pathlib import Path
+
+# Add src and project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root / "src"))
+sys.path.insert(0, str(project_root))
+
+import yaml
+import torch
+
+exec
+/bin/bash -lc 'cat configs/phase0.yaml' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+# Phase 0 Configuration: Audio Latent Structure Analysis
+# ===========================================================================
+# This config controls the data analysis pipeline to determine whether
+# audio latents exhibit reusable local structure suitable for conditional
+# memory mechanisms.
+
+data:
+  librispeech_path: ./data/LibriSpeech
+  subset: train-clean-100
+  min_duration_sec: 3.0
+
+vae:
+  sample_rate: 24000
+  frame_rate: 12.5
+  latent_dim: 512
+  frame_size: 1920  # samples per latent frame
+
+splits:
+  n_train_speakers: 200
+  n_eval_speakers: 51
+
+thinking
+**Considering configurations and data splits**
+
+I'm looking at the configuration settings, like sample_rate, frame_rate, latent_dim, and frame_size, which are hardcoded. The spec mentions deriving these from checkpoints, but it might be fine if we ensure they match. I also need to ensure that the context window and lags match the specifications without any leakage during PCA and k-means fitting, so training should be done only on training speakers. I'll verify the scripts to check how the splits are generated.
+exec
+/bin/bash -lc "sed -n '1,260p' scripts/01_make_speaker_splits.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 33ms:
+#!/usr/bin/env python3
+"""
+Create speaker and utterance splits for Phase 0 analysis.
+
+Usage:
+    uv run python scripts/01_make_speaker_splits.py [--config configs/phase0.yaml]
+"""
+
+import argparse
+import sys
+from pathlib import Path
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+import yaml
+
+from phase0.data.librispeech import get_speaker_ids, get_utterances
+from phase0.data.splits import (
+    create_speaker_splits,
+
+thinking
+**Investigating speaker splits**
+
+I’m looking into speaker splits right now. The function create_utterance_splits seems to use a holdout fraction for k-means validation, but then I notice that run_phase0 doesn’t use this; it only focuses on frame splits for training and evaluation. I need to make sure the splits are using the speaker splits for training and evaluation too. To confirm this, I'll inspect the data splits in the source file located at src/phase0/data/splits.py.
+exec
+/bin/bash -lc "sed -n '1,260p' src/phase0/data/splits.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 32ms:
+"""
+Speaker and utterance split management.
+
+Creates reproducible train/eval splits for Phase 0 analysis.
+"""
+
+import json
+import random
+from pathlib import Path
+from dataclasses import dataclass
+
+from .librispeech import UtteranceInfo
+
+
+@dataclass
+class SplitInfo:
+    """Information about data splits."""
+
+    train_speakers: list[int]
+    eval_speakers: list[int]
+
+thinking
+**Evaluating k-means fit**
+
+I'm considering the speaker split, which is effective for ensuring no leakage. However, it seems that the k-means training/validation holdout isn’t being utilized. The spec might suggest that k-means should only fit on the training speakers, making validation optional rather than necessary. Now, I should check the script `03_build_phase0_dataset.py` to confirm how it builds the frames index and whether it identifies high-energy segments effectively.
+exec
+/bin/bash -lc "sed -n '1,260p' scripts/03_build_phase0_dataset.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+#!/usr/bin/env python3
+"""
+Build the Phase 0 frame index from extracted latents.
+
+Usage:
+    uv run python scripts/03_build_phase0_dataset.py [--config configs/phase0.yaml]
+"""
+
+import argparse
+import sys
+from pathlib import Path
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+import numpy as np
+import pandas as pd
+import yaml
+
+from phase0.data.io import load_latents_index, load_latents_zarr, save_frames_index, get_zarr_utterance_ids
+exec
+/bin/bash -lc "sed -n '1,260p' src/phase0/vae/infer_latents.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+"""
+Batch latent extraction using Mimi autoencoder.
+
+Runs VAE encoder on audio files and saves continuous latents.
+"""
+
+import sys
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+import torch
+from tqdm import tqdm
+
+# Add project root to path for imports
+_project_root = Path(__file__).parent.parent.parent.parent
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
+
+from phase0.data.librispeech import UtteranceInfo, load_audio
+
+thinking
+**Checking indexing and delta computation**
+
+I’m looking at the permutation, which is [T',D]. It seems like I should compute the delta next, and that part feels good. I also need to check the features/context.py for indexing. It’s essential to make sure that the windows end at t-lag and that the length W is correct. I want to make sure everything aligns properly for accurate results!
+exec
+/bin/bash -lc "sed -n '1,220p' src/phase0/features/context.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 34ms:
+"""
+Context window extraction for conditioning.
+
+Given utterance latents x[T, D], extracts context windows for target frames.
+The context window ends at t-L and has length W, where:
+- t is the target frame index
+- L is the lag (1, 2, or 4 frames)
+- W is the window size (8 frames)
+"""
+
+import numpy as np
+
+
+def get_context_mean(
+    x: np.ndarray,
+    t: int,
+    window_size: int,
+    lag: int,
+) -> np.ndarray:
+    """
+
+thinking
+**Analyzing model consistency**
+
+I'm looking at the run_full_analysis and seeing that norm_stats are computed separately for each lag and slice. This way, the evaluation slice uses stats from the training slice, which prevents leakage. However, there might be potential leakage with collect_features_and_deltas, as it uses latent_store and frames list from eval. If train and eval frames share utterances, it shouldn’t be a problem if split by speaker. I’ll make sure to apply cluster filtering in compute_variance_ratio and use the same included data. I'll also check metrics/variance_ratio.py.
+exec
+/bin/bash -lc "sed -n '1,260p' src/phase0/metrics/variance_ratio.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+"""
+Variance ratio metric for evaluating cluster quality.
+
+The variance ratio measures how much within-cluster variance is reduced
+relative to total variance. Lower is better (clusters explain more variance).
+
+variance_ratio = SSE_within / SSE_total
+
+Target: < 0.6 (clusters explain >40% of variance)
+"""
+
+import numpy as np
+from typing import Optional
+
+
+def compute_total_sse(
+    deltas: np.ndarray,
+) -> float:
+    """
+    Compute total sum of squared errors from global mean.
+exec
+/bin/bash -lc "sed -n '1,260p' src/phase0/features/normalization.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 34ms:
+"""
+Delta normalization for target variable.
+
+Computes velocity (Δx = x[t] - x[t-1]) and normalizes globally.
+"""
+
+import json
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+
+
+@dataclass
+class NormalizationStats:
+    """Global normalization statistics for delta computation."""
+
+    mu: np.ndarray  # [D] mean
+    sigma: np.ndarray  # [D] std
+
+thinking
+**Clarifying computation methods**
+
+I see that the specification suggests computing on all eligible frames before cluster filtering, which isn’t a strict requirement but could still influence the SSE a bit. There's also no leakage for normalization since it uses the training data only. However, I run into a problem where `compute_normalization_stats` is called on `train_deltas` for every lag and slice, which might lead to inconsistencies. I’ll check the data IO latents store to ensure the train speaker is the only one used for fitting.
+exec
+/bin/bash -lc "sed -n '1,320p' src/phase0/data/io.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 36ms:
+"""
+I/O utilities for zarr and parquet storage.
+
+Handles saving and loading latent arrays and index tables.
+"""
+
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+import pandas as pd
+import zarr
+
+
+def save_latents_zarr(
+    latents: np.ndarray,
+    energy: np.ndarray,
+    timestamps: np.ndarray,
+    speaker_id: int,
+    utterance_id: str,
+
+thinking
+**Reviewing clustering implementation**
+
+I'm looking at the specifications, which say to filter clusters with a count of 100 or more. Also, I need to report what fraction of data is in the excluded clusters, but it doesn't seem that part is implemented yet. There's a function called get_effective_clusters that returns a list, but it looks like I haven't computed the mass. I should check the clustering/vq.py file for more details.
+exec
+/bin/bash -lc "sed -n '1,260p' src/phase0/clustering/vq.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 36ms:
+"""
+K-means vector quantization for context clustering.
+
+Fits k-means on training data and assigns cluster IDs.
+"""
+
+import pickle
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+from sklearn.cluster import KMeans
+
+
+@dataclass
+class ClusterModel:
+    """K-means clustering model with metadata."""
+
+    centroids: np.ndarray  # [K, D]
+
+thinking
+**Reviewing compute cluster stats**
+
+I need to take a look at the compute_cluster_stats function, because it exists but isn't being used in run_phase0. This is problematic since it means I'm missing excluded mass and cluster size distribution, which are necessary for the report. I should also check clustering/quantile.py to see if there are any details about binning and hashing that I might need to consider. It's important to ensure I have all the right information for accurate reporting!
+exec
+/bin/bash -lc "sed -n '1,260p' src/phase0/clustering/quantile.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+"""
+Quartile binning for axis-aligned discretization.
+
+Bins each PCA dimension into quartiles and hashes to bin IDs.
+"""
+
+import pickle
+from dataclasses import dataclass
+from pathlib import Path
+
+import numpy as np
+
+
+@dataclass
+class QuartileBinModel:
+    """Quartile binning model with edge values."""
+
+    edges: np.ndarray  # [n_dims, 3] quartile edges (25%, 50%, 75%) per dimension
+    n_dims: int
+    n_train_samples: int
+
+thinking
+**Reviewing compute options**
+
+I'm wondering about the compute_cluster_stats function—it might be resource-heavy, but it seems it isn't actively used. I'm pleased to see no leakage, as quartile edges are computed on the training PCA, which is a good sign. Now it’s time to look into the indexing tests that exist. I think I should check out the tests/test_indexing.py file so I can gather more information about it. Let's see what insights I can find there!
+exec
+/bin/bash -lc "sed -n '1,220p' tests/test_indexing.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 33ms:
+"""
+Tests for context window indexing.
+
+Verifies that context extraction returns correct slices using hand-constructed data.
+"""
+
+import numpy as np
+import pytest
+
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from phase0.features.context import (
+    get_context_mean,
+    get_context_flat,
+    get_valid_frame_range,
+    extract_context_features,
+)
+
+exec
+/bin/bash -lc "sed -n '1,260p' scripts/04_fit_conditioning.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 30ms:
+#!/usr/bin/env python3
+"""
+Fit conditioning models (PCA, k-means, quartile bins) on training data.
+
+Usage:
+    uv run python scripts/04_fit_conditioning.py [--config configs/phase0.yaml]
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+import numpy as np
+import yaml
+from tqdm import tqdm
+
+
+thinking
+**Analyzing script functionality**
+
+I see that this script fits conditioning models and saves statistics, which is great! However, there's a potential issue: it collects mean and flat stats separately. That could lead to a mismatch. Plus, it computes normalization stats, but I’m not sure those are used later in the process. It seems like 05_eval_metrics might be doing something with run_full_analysis, so I should take a closer look there!
+exec
+/bin/bash -lc "sed -n '1,320p' scripts/05_eval_metrics.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 30ms:
+#!/usr/bin/env python3
+"""
+Evaluate all metrics on train and eval splits.
+
+Usage:
+    uv run python scripts/05_eval_metrics.py [--config configs/phase0.yaml]
+"""
+
+import argparse
+import sys
+from pathlib import Path
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+import yaml
+
+from phase0.analysis.run_phase0 import run_full_analysis
+from phase0.utils.logging import setup_logging
+from phase0.utils.seed import set_seed
+
+thinking
+**Inspecting report function**
+
+I'm planning to take a quick look at the 06_make_report function, as it uses the analysis/report component. I want to make sure everything is set up correctly so that I can effectively generate the report. It's important to ensure I'm following the right steps in the process, and I’m curious if there are any specific elements I should pay more attention to during my inspection. I'll go ahead and check it out!
+exec
+/bin/bash -lc "sed -n '1,260p' scripts/06_make_report.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 33ms:
+#!/usr/bin/env python3
+"""
+Generate Phase 0 analysis report with decision and visualizations.
+
+Usage:
+    uv run python scripts/06_make_report.py [--config configs/phase0.yaml]
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+import numpy as np
+import yaml
+
+from phase0.analysis.report import generate_report, make_decision
+
+thinking
+**Evaluating report generation**
+
+I'm noticing that the report generated doesn't save per-speaker data in run_phase0, which feels like a missing specification. The report uses `train.speaker_mean` and standard deviation, but it doesn't include confidence intervals (CI). I wonder if the aggregate speaker metrics might include CI? It seems worthwhile to inspect the speaker_stats.py to clarify this and ensure accuracy in the report. This detail is crucial for meaningful analysis!
+exec
+/bin/bash -lc "sed -n '1,320p' src/phase0/metrics/speaker_stats.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 36ms:
+"""
+Per-speaker statistics for cross-speaker analysis.
+
+Computes metrics per speaker and aggregates to detect speaker-specific effects.
+"""
+
+import numpy as np
+from typing import Optional
+from scipy import stats
+
+from .variance_ratio import compute_variance_ratio
+from .entropy import compute_entropy_reduction
+
+
+def compute_speaker_level_metrics(
+    deltas: np.ndarray,
+    cluster_ids: np.ndarray,
+    speaker_ids: np.ndarray,
+    effective_clusters: Optional[np.ndarray] = None,
+    min_samples_per_speaker: int = 50,
+exec
+/bin/bash -lc "sed -n '1,260p' src/phase0/metrics/entropy.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 37ms:
+"""
+Diagonal Gaussian entropy for evaluating cluster quality.
+
+Computes entropy reduction under diagonal Gaussian assumption.
+H ∝ (1/2) Σ_d log(σ_d^2)
+"""
+
+import numpy as np
+from typing import Optional
+
+
+def compute_diagonal_gaussian_entropy(
+    data: np.ndarray,
+    min_var: float = 1e-10,
+) -> float:
+    """
+    Compute diagonal Gaussian entropy (up to constant).
+
+    H ∝ (1/2) Σ_d log(σ_d^2)
+
+
+
+
+
+
+thinking
+**Considering entropy reduction**
+
+I’m working through the entropy reduction formula: it involves using (H_uncond - H_cond) / abs(H_uncond). The specification notes that H could be positive or negative, especially if variances are less than 1. Their method of using an absolute denominator results in a signless ratio, which might lead to inconsistency. It’s also worth noting that in certain conditions, if counts for clusters are zero, those clusters are not included in the weighted sum. This affects the total count but allows for accounting only clusters with sufficient data.
+thinking
+**Evaluating cluster samples**
+
+I’m diving into how clusters with just one sample affect entropy calculations. While h_cond rightly excludes those samples, h_uncond still includes them, which creates a mismatch in the sample sets for entropy reduction. The spec doesn’t seem to address this sample set invariance directly. There’s also concern over the bias introduced by dropping clusters with less than two samples; it raises questions about how to treat variance for small counts. Luckily, if effective clusters are set to a minimum of 100 samples, that concern should ease a bit, but I still need to flag this mismatch!
+thinking
+**Examining reduction and VR**
+
+I should highlight that dividing by abs(h_uncond) means if h_uncond is negative, the absolute value will flip the sign. Now, I can confirm that sample sets for VR are consistent. When checking cross-speaker degradation, the decision criterion says it should be under 20%. They calculate the relative degradation with means, but this might not align with the specification; perhaps it would be more effective to use overall VR from all eval samples versus the training data. The random baseline for VR uses permuted IDs while maintaining effective clusters, which seems appropriate.
+thinking
+**Reviewing VR computation and checks**
+
+They only compute the variance ratio (VR) but not entropy, so it's time to check confound checks. They have different slices: all, high energy, and utterance medial. Their apply_slice_filter seems to cover those categories well, utilizing `frames["is_high_energy"]` based on a median threshold. However, the spec mentions comparing to initial and final frames for pos_frac, which isn’t implemented yet. While the random baseline and high-energy frames are handled, there should be consistency in sample sets for the numerator/denominator. Lastly, the VAE alignment needs to come from a checkpoint, but recording and storing from the model would be a better approach.
+thinking
+**Reviewing report and PCA implementation**
+
+It looks like the results report doesn’t store some crucial data, which I should note. When checking the PCA and other stats, I see that they’re fitting only on training speakers during phase 0, which is good practice. However, I need to ensure that splits are done properly by speaker rather than utterance, and it seems they are. Additionally, the conditioning schemes appear correctly implemented, but I want to verify the PCA settings correlate with the spec requirements on flattened contexts. Lastly, I see that metrics implementation is mostly done, though there are a couple of concerns about potential mismatch in sample sets.
+exec
+/bin/bash -lc "sed -n '1,320p' src/phase0/analysis/report.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 34ms:
+"""
+Report generation for Phase 0 analysis.
+
+Creates decision matrix and summary paragraph.
+"""
+
+import json
+from pathlib import Path
+from typing import Optional
+
+import pandas as pd
+
+
+def make_decision(
+    metrics: dict | list,
+    variance_ratio_threshold: float = 0.6,
+    cross_speaker_degradation_max: float = 0.20,
+    random_baseline_tolerance: float = 0.05,
+) -> dict:
+    """
+
+
+
+
+
+thinking
+**Evaluating decision logic**
+
+I’m looking into the decision logic that uses train variance ratio for a lag of 1, but it doesn't check the evaluation variance ratio threshold. This is puzzling because it seems like the spec expects both train and eval variance ratios to be considered. If the evaluation ratio is larger, does that still count? It's ambiguous whether to interpret the gating as an overall measure or individual ones, which complicates my analysis.
+thinking
+**Reviewing decision criteria**
+
+I'm analyzing the decision criteria stating that the within-cluster variance ratio should fall below 0.6. I wonder if it applies to the evaluation set instead, but ideally, it should include held-out speakers. It seems the confound robustness only uses the training slice without checking the evaluation set, which feels wrong too. The random baseline check only gives warnings, but the spec says it should yield a ratio near 1.0, meaning it could fail rather than just warn. It appears that the decision process might have some inconsistencies.
+thinking
+**Analyzing data leakage invariants**
+
+I’m looking at the invariants around "no data leakage," which states that PCA, VQ, and normalization stats should fit only on training speakers. However, I notice that run_phase0 computes features and deltas from both training and evaluation frames. It seems the normalization stats, while derived from training deltas, are still specific to certain slices and lags. In script 04_fit_conditioning, they separate frame filtering but don’t apply the slice. I’m realizing they might unintentionally refit models every run instead of reusing them, which feels against the intended process.
+thinking
+**Examining model fitting in run_phase0**
+
+In run_phase0, I see that separate models are currently being fitted for each slice, which means clustering is trained on different sample sets each time. This is a significant deviation! It implies that the confound check isn't effectively isolating the slice's effect, as the clusters will differ (like fitting on high energy vs. all samples). The spec implies that the same clusters should be used for comparison, which is crucial. It's also concerning that normalization stats are computed per slice, potentially distorting comparisons. Overall, this feels messy and deviates from the intended design.
+thinking
+**Assessing clustering and metrics issues**
+
+I’m analyzing the effective clusters defined per slice, which seem to hide structural differences, particularly because the high-energy slice has different cluster counts. This violates the confound check’s intent and consistent sample sets across slices. Clustering is fit only on high-energy contexts, yet the spec implies that structure should remain when excluding silence. The acceptance tests suggest using the same clustering for all frames and only filtering evaluations later. This approach seems to deviate from the intended design, so I’ll note it as critical. Additionally, assessing random cluster baselines and other metrics needs to be thorough.
+exec
+/bin/bash -lc "sed -n '1,260p' src/phase0/clustering/pca.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 39ms:
+"""
+PCA projection for dimensionality reduction.
+
+Fits PCA on training data and projects to lower dimensions.
+"""
+
+import pickle
+from dataclasses import dataclass
+from pathlib import Path
+
+import numpy as np
+from sklearn.decomposition import PCA
+
+
+@dataclass
+class PCAModel:
+    """PCA model with metadata."""
+
+    components: np.ndarray  # [n_components, D]
+    mean: np.ndarray  # [D]
+exec
+/bin/bash -lc 'cat scripts/00_download_librispeech.sh' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+#!/bin/bash
+# Download LibriSpeech train-clean-100 subset
+# Source: https://www.openslr.org/12/
+
+set -e
+
+DATA_DIR="${1:-./data}"
+SUBSET="train-clean-100"
+URL="https://www.openslr.org/resources/12/${SUBSET}.tar.gz"
+
+echo "Downloading LibriSpeech ${SUBSET}..."
+echo "Data directory: ${DATA_DIR}"
+
+# Create data directory
+mkdir -p "${DATA_DIR}"
+cd "${DATA_DIR}"
+
+# Download if not exists
+if [ ! -f "${SUBSET}.tar.gz" ]; then
+    echo "Downloading from ${URL}..."
+
+
+
+
+
+thinking
+**Checking data integrity**
+
+I need to ensure there's no data leakage during training. Essentially, PCA, VQ, and normalization stats should only fit on training speakers. I wonder if an eval speaker could accidentally appear in the training data—hopefully not! Next, I'll check for consistent sample sets during run_phase0 for PCA conditions. I’m cautious about potential mismatches, as differing array lengths would signal a serious bug. I plan to verify this using a small dataset or inspecting the code closely to ensure consistency. Both loops should produce the same lengths, but I'll be thorough!
+thinking
+**Assessing potential bugs**
+
+I’m thinking about potential exceptions caused by memory issues. While it seems unlikely, it could still indicate a brittleness in the system, so I’d label it as a potential bug. In the `collect_features_and_deltas`, when the mode is "flat," it calls `get_context_flat`. In `run_full_analysis`, it uses “flat” mode, which seems fine since it defaults correctly. However, there are restrictive checks on `t` that might not be necessary. It seems the verification around `t` could be more optimal! And regarding the VAE alignment, I notice it uses Mimi even though the spec mentions CALM VAE.
+thinking
+**Reviewing VAE alignment details**
+
+The prompt mentions "VAE alignment" with a frame rate of 12.5 Hz and a latent dimension of 512, which matches the Mimi autoencoder. However, the spec calls for a CALM speech VAE, creating a potential mismatch. I need to check if the spec has been updated, as it specifically emphasizes CALM. Using Mimi might be okay if it’s a stand-in, but the requirement states CALM. I also see there’s a file called `mimi_autoencoder.py`, which may indicate a wrapper. Regardless, there’s no data leakage since the autoencoder uses only training data for energy calculations.
+thinking
+**Examining script dependencies**
+
+I need to check the `scripts/04_fit_conditioning` and how it relates to `run_phase0`, especially since inconsistencies might arise. In the actual workflow, the user might run `04_fit_conditioning` and then `05_eval_metrics`. However, `05` utilizes `run_phase0` and ignores saved models and stats, making `04` somewhat redundant, aside from plotting. 
+
+There's the issue that `06_make_report` depends on files created by `04_fit_conditioning`, so to generate the necessary plots, running `04` is required. Yet, there's a mismatch because metrics generated in `05` differ from plots derived from `04`, especially concerning cluster sizes used for different slices.
+thinking
+**Identifying report inconsistencies**
+
+I see that the report and decisions might combine inconsistent cluster size plots based on all frames with metrics that could be specific to slice cluster fits—definitely a mismatch that must be reported. Additionally, `04` saves `norm_stats_lag{lag}.json`, while `run_phase0` saves `norm_stats_lag{lag}_{slice}.json`, which aren’t being utilized, indicating another redundancy. Next, I plan to check `phase0/analysis/plots.py` to see how it handles cluster sizes, particularly regarding log-scale expectations. I'll do a quick scan to clarify things!
+exec
+/bin/bash -lc "sed -n '1,260p' src/phase0/analysis/plots.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 32ms:
+"""
+Visualization utilities for Phase 0 analysis.
+
+Creates diagnostic plots for cluster quality and structure analysis.
+"""
+
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def plot_cluster_sizes(
+    cluster_sizes: np.ndarray,
+    output_path: str | Path,
+    title: str = "Cluster Size Distribution",
+    min_size_line: Optional[int] = 100,
+) -> None:
+    """
+exec
+/bin/bash -lc "sed -n '260,520p' src/phase0/analysis/plots.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 34ms:
+    fig.suptitle(title, fontsize=14)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150)
+    plt.close()
+
+
+def create_all_plots(
+    metrics: list,
+    cluster_data: dict,
+    output_dir: str | Path,
+) -> None:
+    """
+    Create all diagnostic plots.
+
+    Args:
+        metrics: List of metric results
+        cluster_data: Dict with cluster_sizes, cluster_means, etc.
+        output_dir: Directory to save plots
+    """
+    output_dir = Path(output_dir)
+
+thinking
+**Checking confidence metrics**
+
+I’ve noticed that the confidence curve isn’t used anywhere, and that seems like a key element that’s missing. I need to ensure I check the metrics and assess the reproducibility test to see if there's anything I can learn from it. There’s a lot to consider, especially how this might impact the overall analysis and its reliability. I’ll dive into those details to clarify what's needed!
+exec
+/bin/bash -lc "sed -n '1,240p' tests/test_reproducibility.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 33ms:
+"""
+Tests for reproducibility across runs.
+
+Verifies that same seed produces identical results.
+"""
+
+import numpy as np
+import pytest
+
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from phase0.utils.seed import set_seed, get_rng
+from phase0.clustering.vq import fit_kmeans, assign_clusters
+from phase0.clustering.pca import fit_pca, project_pca
+from phase0.clustering.baselines import permute_cluster_ids, create_random_clusters
+
+
+class TestSeedReproducibility:
+exec
+/bin/bash -lc "sed -n '1,260p' tests/test_variance_ratio.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 34ms:
+"""
+Tests for variance ratio metric computation.
+
+Verifies computation with synthetic clusters of known variance.
+"""
+
+import numpy as np
+import pytest
+
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from phase0.metrics.variance_ratio import (
+    compute_total_sse,
+    compute_within_cluster_sse,
+    compute_variance_ratio,
+    compute_variance_ratio_per_speaker,
+    compute_variance_explained,
+)
+
+thinking
+**Inspecting clusters**
+
+I'm thinking about finding the baseline and checking the `create_random_clusters` function. I should look into the `clustering/baselines.py` file to see how everything is structured. This could help me understand the function better and what kind of clustering methods I'm dealing with. I’m curious about the implementation details, and I think analyzing the code is a good next step to fully grasp how the clustering works. Let's dive into it!
+exec
+/bin/bash -lc "sed -n '1,240p' src/phase0/clustering/baselines.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 32ms:
+"""
+Baseline clustering methods for control experiments.
+
+Provides random cluster assignments that preserve cluster size distribution.
+"""
+
+import numpy as np
+
+
+def create_random_clusters(
+    n_samples: int,
+    k: int,
+    seed: int = 42,
+) -> np.ndarray:
+    """
+    Create random cluster assignments.
+
+    Args:
+        n_samples: Number of samples
+        k: Number of clusters
+
+thinking
+**Verifying configurations**
+
+I’m confirming that the permutation is the correct baseline. Now, I need to check for any leakage in scripts/04, and yes, it seems clear there. Next, I’ll look into the other modules, specifically features like energy and metrics. I want to make sure the energy computation of the median is accurate as well. I’m on it to ensure everything is functioning properly!
+exec
+/bin/bash -lc "sed -n '1,200p' src/phase0/features/energy.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 33ms:
+"""
+Frame energy utilities for confound analysis.
+
+Computes energy thresholds and flags for high-energy frame filtering.
+"""
+
+import numpy as np
+
+
+def compute_median_energy(
+    all_energies: list[np.ndarray],
+) -> float:
+    """
+    Compute global median energy across all frames.
+
+    Args:
+        all_energies: List of energy arrays, one per utterance
+
+    Returns:
+        Median energy value
+exec
+/bin/bash -lc 'cat src/phase0/utils/seed.py' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+"""
+Reproducibility utilities.
+
+Provides consistent seeding across all random number generators.
+"""
+
+import random
+
+import numpy as np
+
+
+def set_seed(seed: int) -> None:
+    """
+    Set random seed for reproducibility.
+
+    Sets seed for:
+    - Python random module
+    - NumPy
+    - PyTorch (if available)
+
+
+
+
+
+
+thinking
+**Evaluating cluster and speaker metrics**
+
+I’m considering the implications of filtering based on counts less than 2 and how that relates to effective clusters during training and evaluation. Some clusters in evaluation may have fewer than 2 samples, which could cause sample-set mismatches and potentially invalidate entropy reduction. Also, the speaker-level metrics filter out those with fewer than 50 samples, resulting in differences between training and evaluation speaker sets. This could negatively affect aggregating means, and I should document this even though I won’t output it.
+thinking
+**Analyzing speaker metrics and thresholds**
+
+I'm noticing that `analysis/run_phase0.py` returns a results list but lacks per-speaker metrics, which prevents plotting speaker distribution. Meanwhile, `analysis/report.py` doesn't include entropy metrics or any slice results beyond train VR in high energy and medial segments. I’m finding issues with how cross-speaker degradation is measured and reported, especially using absolute values when negative degradation should be possible. This could result in false failures. We need to report these bugs, including the inconsistency in variance ratio checks.
+thinking
+**Investigating random baselines and PCA issues**
+
+I’m seeing deviations in the random baseline check, which uses a tolerance of 0.05 but only issues a warning — that feels like a bug. Now, checking `analysis/run_phase0.py`, I find it uses permuted cluster IDs without recomputing effective clusters, which seems unnecessary. There’s a potential major bug related to PCA calculations, as features flattened in `train_features` might not match due to sample mismatches. I should consider a log scan or quick synthetic data checks and note this. The prompt asks for a rigorous review against the specification!
+thinking
+**Reviewing data invariants and scripts**
+
+I need to check critical invariants like conditioning schemes, metrics implementation, confound checks, and decision criteria, noting any deviations or bugs. It's crucial to verify that there’s no data leakage, ensuring normalization statistics fit only on train speakers. I've noted that `scripts/04_fit_conditioning` computes normalization stats from train deltas while `run_phase0` recomputes them. Additionally, I’ll check how speaker splits are set and ensure no mixing occurs in `scripts/02_infer_latents.py`. I also want to confirm the reporting functions and their configurations. Lastly, I'll look for all mentions of the specified invariants.
+thinking
+**Inspecting PCA and VAE alignment**
+
+I’m planning to use `rg` to find instances of "train" used in the PCA/VQ sections, but I realize we've already examined that. I also want to check for the "VAE alignment," specifically looking for mentions of a frame rate of 12.5 and a latent dimension of 512, which might be located in `mimi_autoencoder`. I'll inspect this quickly to ensure I cover all bases and don't miss any relevant details.
+exec
+/bin/bash -lc "sed -n '1,260p' mimi_autoencoder.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+"""
+Mimi Autoencoder - Continuous latent audio codec extracted from Moshi.
+
+This module provides the Mimi encoder/decoder operating on continuous
+representations, bypassing the RVQ quantization layer.
+
+Usage:
+    from mimi_autoencoder import MimiAutoencoder, load_mimi_autoencoder
+
+    # Load pretrained model
+    autoencoder = load_mimi_autoencoder(device='cuda')
+
+    # Encode audio to continuous latent
+    latent = autoencoder.encode(wav)  # [B, 1, T] -> [B, 512, T']
+
+    # Decode back to audio
+    recon = autoencoder.decode(latent)  # [B, 512, T'] -> [B, 1, T]
+
+Specs:
+    - Input: 24 kHz mono audio
+
+
+thinking
+**Evaluating module specs**
+
+I’m looking at the module specs outlined in the docstring, noting it uses the moshiko checkpoint by default, which seems stable. In the 02_infer_latents, the checkpoint is optional and pulls from HF. I'm trying to see if `LatentStore` employs `autoencoder.frame_size`, but it doesn’t seem to. I should check functions in src/phase0/analysis and see if they violate any invariants. Additionally, I'm examining `scripts/04_fit_conditioning`, which uses train frames but lacks kmeans validation holdout. The stats variable from the previous branch is always used; however, for `pca_quartile`, 'cluster_sizes' key is missing, which could cause issues with plotting.
+thinking
+**Reviewing cluster size requirements**
+
+I’m seeing that the spec needs a cluster size histogram for training and per cluster, which is currently missing for quartiles. It’s also notable that `06_make_report` only loads stats for lag1 and doesn't implement required plots, like "per-cluster variance vs size" or "2D PCA scatter of cluster mean Δx." There are functions in `analysis/plots.py`, but they’re not utilized, leading to missing outputs. For the Phase0 data pipeline, the script `03_build_phase0_dataset` loads energy for each utterance, but I need to figure out how it retrieves `utterance_id`, as `get_zarr_utterance_ids` isn't used. I’ll also check `phase0/data/librispeech.py` to confirm it uses the LibriSpeech subset correctly.
+exec
+/bin/bash -lc "sed -n '1,320p' src/phase0/data/librispeech.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 37ms:
+"""
+LibriSpeech data loading utilities.
+
+Handles parsing the LibriSpeech directory structure and loading audio files.
+"""
+
+import os
+from pathlib import Path
+from dataclasses import dataclass
+from typing import Optional
+
+import torch
+import torchaudio
+
+
+@dataclass
+class UtteranceInfo:
+    """Information about a single utterance."""
+
+    utterance_id: str
+
+thinking
+**Verifying configuration details**
+
+I need to verify the configuration for "VAE alignment" at 12.5 Hz and "latent dim" of 512. It feels important to ensure everything is set properly. I'll check for any other references to `frame_rate` and latent dim to avoid any misunderstandings. Maybe I'll use rg to search for "frame_rate" in the src/phase0. It's crucial to be thorough here and not miss anything!
+exec
+/bin/bash -lc "rg -n \"frame_rate|latent_dim|sample_rate|12\\.5|512\" src/phase0 scripts | head -n 50" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 113ms:
+scripts/02_infer_latents.py:71:    logger.info(f"Sample rate: {autoencoder.sample_rate} Hz")
+scripts/02_infer_latents.py:72:    logger.info(f"Frame rate: {autoencoder.frame_rate} Hz")
+scripts/02_infer_latents.py:73:    logger.info(f"Latent dim: {autoencoder.latent_dim}")
+scripts/02_infer_latents.py:77:    assert autoencoder.sample_rate == config["vae"]["sample_rate"]
+scripts/02_infer_latents.py:78:    assert autoencoder.frame_rate == config["vae"]["frame_rate"]
+scripts/02_infer_latents.py:79:    assert autoencoder.latent_dim == config["vae"]["latent_dim"]
+scripts/02_infer_latents.py:120:        expected_frame_rate=config["vae"]["frame_rate"],
+scripts/02_infer_latents.py:121:        expected_dim=config["vae"]["latent_dim"],
+scripts/02_infer_latents.py:131:    if stats['mean_frame_rate']:
+scripts/02_infer_latents.py:132:        logger.info(f"Mean frame rate: {stats['mean_frame_rate']:.2f} Hz")
+src/phase0/vae/infer_latents.py:70:    waveform, sr = load_audio(utterance.audio_path, target_sr=autoencoder.sample_rate)
+src/phase0/vae/infer_latents.py:89:    timestamps = np.arange(n_frames, dtype=np.float32) / autoencoder.frame_rate
+src/phase0/vae/infer_latents.py:93:    assert latents.shape[1] == autoencoder.latent_dim
+src/phase0/vae/infer_latents.py:160:    expected_frame_rate: float = 12.5,
+src/phase0/vae/infer_latents.py:161:    expected_dim: int = 512,
+src/phase0/vae/infer_latents.py:168:        expected_frame_rate: Expected frame rate
+src/phase0/vae/infer_latents.py:181:        "frame_rates": [],
+src/phase0/vae/infer_latents.py:199:            frame_rate = 1.0 / np.mean(np.diff(timestamps))
+src/phase0/vae/infer_latents.py:200:            stats["frame_rates"].append(frame_rate)
+src/phase0/vae/infer_latents.py:204:    if stats["frame_rates"]:
+
+
+
+
+
+thinking
+**Identifying script conflicts**
+
+I need to ensure that scripts include lag and possibly slice. It seems that there's a critical bug in my scripts that could affect reproducibility — especially since `run_phase0` overwrites outputs. I notice `run_full_analysis` uses the same conditioning directory as `04_fit_conditioning`, which could lead to overwriting models like the PCA and bin model, causing mismatches. However, since `run_phase0` and `04_fit_conditioning` save with different file names regarding lag, they might coexist without conflict. I'll need to double-check that to be sure!
+thinking
+**Examining script functionality**
+
+It looks like `run_phase0` will overwrite previous models across lags and slices, representing only the final loop's model. While this isn't critical for `05_eval_metrics` since those models aren’t used later, it could affect debugging and plots. Also, `scripts/06_make_report` pulls stats, not models, so maybe it's not a major issue, but it feels like a bug for recordkeeping. Additionally, I noticed `run_condition` doesn't save the cluster model or stats, impacting replicability. We should also check if the config dict is being passed correctly in the report generation script!
+thinking
+**Evaluating confound slices**
+
+I need to examine the confound slices more closely. For high energy, it uses `is_high_energy` but relies on `frames["energy"] > median_energy`, which specifies "above median" not including it. Next, I should look at the `pos_frac` calculated as t/n_frames. I wonder if n_frames could be zero? Probably not. Also, the calculation for cross-speaker degradation uses relative differences, but the decision applies an absolute degradation threshold, which seems like a bug. I should also ensure the variance ratio on Δx_norm is properly computed, focusing on effective cluster filtering.
+thinking
+**Checking report specifications**
+
+The specifications mention reporting per speaker statistics, so using the mean for variance is acceptable. In `analysis/run_phase0`, I see that `results["train"]["variance_ratio"] = train_vr["variance_ratio"]`, which involves deltas and cluster IDs. However, it computes metrics for speakers and aggregates them. My concern is with how cross-speaker degradation is calculated; it's based on means rather than sample-level variance ratios. That might be okay but should be clarified. Lastly, `phase0/analysis/run_phase0` collects both `train_feat_mean` and `train_feat_flat` for each slice, which feels a bit redundant!
+thinking
+**Reviewing invariants for scripts**
+
+I identify key invariants, including "No data leakage," "Consistent sample sets," "Correct indexing," and "VAE configuration," which we've covered. To be thorough, I should take a look at `scripts/01` and `scripts/02` next. There’s a potential risk of violating "No data leakage" if speaker splits are based on inconsistent IDs from a subset. Okay, to ensure everything works, I might run tests using `pytest -q` to confirm that all tests pass. Let's proceed with that!
+exec
+/bin/bash -lc 'pytest -q' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 8.07s:
+============================= test session starts ==============================
+platform linux -- Python 3.12.9, pytest-9.0.1, pluggy-1.5.0
+rootdir: /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.12.1, cov-7.0.0
+collected 31 items
+
+tests/test_indexing.py .........                                         [ 29%]
+tests/test_reproducibility.py ............                               [ 67%]
+tests/test_variance_ratio.py ..........                                  [100%]
+
+=============================== warnings summary ===============================
+../../../../../../../home/riley/miniconda3/lib/python3.12/site-packages/joblib/_multiprocessing_helpers.py:44
+  /home/riley/miniconda3/lib/python3.12/site-packages/joblib/_multiprocessing_helpers.py:44: UserWarning: [Errno 13] Permission denied.  joblib will operate in serial mode
+    warnings.warn("%s.  joblib will operate in serial mode" % (e,))
+
+tests/test_reproducibility.py::TestSeedReproducibility::test_numpy_reproducibility
+  /home/riley/miniconda3/lib/python3.12/site-packages/torch/cuda/__init__.py:182: UserWarning: CUDA initialization: Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 304: OS call failed or operation not supported on this OS (Triggered internally at /pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+    return torch._C._cuda_getDeviceCount() > 0
+Plan update
+  ✓ Read SPEC and identify requirements
+  ✓ Inventory Phase 0 code and scripts
+  ✓ Review invariants and data flow
+  → Verify conditioning schemes implementation
+  • Verify metrics and confound checks
+  • Draft deviations and recommendations report
+Plan update
+  ✓ Read SPEC and identify requirements
+  ✓ Inventory Phase 0 code and scripts
+  ✓ Review invariants and data flow
+  ✓ Verify conditioning schemes implementation
+  → Verify metrics and confound checks
+  • Draft deviations and recommendations report
+
+
+
+
+
+thinking
+**Verifying metrics and checks**
+
+I'm verifying various metrics and confound checks now. So far, I've looked at things like VR, entropy, speaker stats, decision criteria, and confound slices. I need to ensure that the metrics for cross-speaker degradation and the random baseline are correctly computed, along with making sure the sample set is consistent for metric definitions. I also need to check if the "Diagonal Gaussian entropy reduction" matches the specifications. I'll pay close attention to the formulas used for variances and unconditional checks.
+thinking
+**Evaluating normalization stats**
+
+I'm checking the normalization stats, and I realized they were computed on all train deltas instead of a filtered set by cluster. After filtering, variances might not equal 1, so h_uncond could be positive or negative. If the variance is greater than 1, the log is positive; if less than 1, it's negative, which could lead to a negative sum. Using absolute values might help, but the specifications require a ratio, which could introduce a deviation worth highlighting. There are also issues with per-speaker statistics that we need to address.
+thinking
+**Checking confound metrics**
+
+I'm now doing confound checks for high-energy frames and utterance-medial frames. The specification indicates that metrics should be computed on subsets using the same clustering model instead of per slice, which we've flagged. Additionally, the random cluster baseline is currently computed only on the training set, so it should also include evaluation. Metrics need specifying for each slice, and I should ensure the utterance-medial frames are compared to initial and final frames. Lastly, I'll verify the variance ratio calculation method for consistency.
+thinking
+**Calculating speaker metrics**
+
+I'm looking into the computation of speaker-level metrics now. The process filters to effective clusters and sets a minimum of 50 samples per speaker, but the specification doesn’t mention this threshold. Also, compute_cross_speaker_degradation uses a mean across speakers without considering sample counts, which might not align with the spec's preferences. It seems treating each speaker equally is fine, but we might want to aggregate data differently. I’ll also note that make_decision relies on train variance ratios and confound data, so we should highlight the potential mismatch.
+thinking
+**Reviewing cluster computations**
+
+I'm going through the loop for clusters_to_use, and I noticed it loops unnecessarily for large n_clusters, which could create a big overhead. But if effective_clusters are used, they only derive those with a count of at least 100, minimizing the loop size, which is good. However, compute_entropy_reduction isn't passing effective_clusters to compute_per_cluster_entropy. I need to ensure the variance ratio and cross-speaker degradation thresholds are checked properly. Finally, I’ll check for data leakage and make sure memory usage is manageable throughout the process.
+Plan update
+  ✓ Read SPEC and identify requirements
+  ✓ Inventory Phase 0 code and scripts
+  ✓ Review invariants and data flow
+  ✓ Verify conditioning schemes implementation
+  ✓ Verify metrics and confound checks
+  → Draft deviations and recommendations report
+
+
+
+
+
+thinking
+**Compiling the final report**
+
+I need to craft a report in Markdown format with precise headings. It should cover details like deviations, missing items, bugs, and edge cases. Since we didn't change files, the "What changed" section will indicate none. 
+
+For critical invariants, I want to evaluate stability against data leakage, which seems fine for PCA, k-means, quartile edges, and normalization. Although the VAE config is concerning. I'll ensure to detail consistent sample sets and indexing checks as well in the report!
+thinking
+**Reviewing index and alignment issues**
+
+I’m examining the frames index, which uses max_lag—sounds good so far!
+
+For the VAE alignment, it’s hardcoded and asserting with Mimi, but some outputs are missing. The conditioning schemes are implemented, yet outputs like distances are absent. The script for fitting conditioning currently doesn’t match expectations. 
+
+Metrics seem mostly alright, but decision evaluations are incorrect. Also, confound checks seem to have implementation issues regarding comparisons. Overall, I need to clarify and detail these points further in the report.
+thinking
+**Analyzing decision criteria and reporting issues**
+
+I've noticed that the decision criteria are implemented in the report, but they rely on train VR instead of eval metrics, which is a concern. The confound check also uses train data without ensuring structural consistency across eval. 
+
+The run_phase0 saves models that may be overwritten, and there are missing required plots. Additionally, the metrics table lacks some columns, and the random cluster baseline isn’t utilized. There’s inconsistency in the script that affects plot generation too, which needs addressing. Overall, I have quite a few details to clarify in the final report!
+thinking
+**Crafting the risks and follow-ups section**
+
+I'm preparing the "Risks / Edge Cases" section, which will touch on sample mismatches, per-slice refitting, and potential entropy sign issues. I’ll also mention challenges related to large quartile bins, memory performance, and any joblib warnings.
+
+For the "Follow-Ups," I'll suggest solutions like unifying sample collections, storing frame indices, and properly aligning features. It's essential to ensure consistency in evaluations and fix the decision-making process by using eval metrics. 
+
+Additionally, I’ll note that tests pass and mention relevant warnings while ensuring to cite specific files in the report. In the "Rationale," I’ll clarify the reasons and state that there were no modifications made.
+thinking
+**Finalizing the summary**
+
+I need to create a summary highlighting the overall findings. The indexing looks good, and there’s mostly no leakage, but there are some significant deviations, such as refitting per slice and the absence of excluded mass and per-speaker confidence intervals in the outputs. The decision logic also needs to be corrected.
+
+I'll verify if the `src/phase0/analysis/run_phase0.py` only uses training speakers for fitting, which seems fine. Now, I can finalize step 6 of the plan, marking it as completed.
+Plan update
+  ✓ Read SPEC and identify requirements
+  ✓ Inventory Phase 0 code and scripts
+  ✓ Review invariants and data flow
+  ✓ Verify conditioning schemes implementation
+  ✓ Verify metrics and confound checks
+  ✓ Draft deviations and recommendations report
+codex
+# Summary
+
+Phase 0 is mostly structurally aligned with `SPEC.md` (speaker-based splits, correct context indexing with unit tests, required conditioning methods present), but there are several **spec-breaking gaps** that can invalidate conclusions: confound slices currently **refit clustering per slice**, key reporting fields (notably **excluded mass** and **per-speaker CI outputs**) are missing, the **decision criteria logic** is not faithful to the spec (train-only checks, random baseline only a warning, `abs()` on degradation), and parts of the metrics pipeline have subtle sample-set and stability issues (entropy reduction denominator/sign, potential feature/target misalignment risk for PCA conditions).
+
+# What changed
+
+- No files changed.
+
+# Rationale
+
+You asked for a rigorous audit of `src/phase0/` and `scripts/` against `SPEC.md`, specifically around invariants, conditioning, metrics, confounds, and decision criteria. This report calls out where the implementation matches the spec and where it deviates in ways that could cause false “pass/fail” outcomes or misleading variance-ratio/entropy results.
+
+# Risks / edge cases
+
+## 1) Critical invariants (SPEC “must-haves”)
+
+### 1.1 No data leakage (PCA/VQ/norm stats fit on train speakers only)
+
+**Mostly OK**, but with a spec-adjacent concern:
+
+- Speaker splits are correctly constructed and used:
+  - `scripts/01_make_speaker_splits.py` + `src/phase0/data/splits.py` create speaker-based train/eval splits.
+  - `scripts/03_build_phase0_dataset.py` sets `split` by speaker ID.
+  - `src/phase0/analysis/run_phase0.py` fits PCA/k-means/quartiles and normalization stats using only `frames[split=="train"]`.
+
+**Deviation from SPEC intent (VAE config sourcing):**
+- SPEC requires VAE sample rate / hop / frame rate / latent dim to come from the checkpoint, not from “assumptions”.
+- `scripts/02_infer_latents.py` reads these from the Mimi model, but then **asserts they match** `configs/phase0.yaml` (which hardcodes 24kHz, 12.5Hz, 512). That’s a sanity check, but the pipeline is still *config-driven*, not “checkpoint-as-source-of-truth”.
+  - Risk: swapping checkpoints requires manual config edits; if assertions are removed later, you could silently misalign temporal semantics.
+
+### 1.2 Consistent sample sets (numerator/denominator computed on same filtered samples)
+
+**Variance ratio (VR) is correct**:
+- `src/phase0/metrics/variance_ratio.py` explicitly filters once (effective clusters) and computes `SSE_total` and `SSE_within` on the same filtered sample set.
+
+**But there are two important consistency risks elsewhere:**
+
+1) **Potential feature/target misalignment risk for PCA conditions (Condition 2/3)**  
+   In `src/phase0/analysis/run_phase0.py`, features for mean and flat are collected via *separate passes*:
+   - `train_feat_mean, train_deltas, ... = collect_features_and_deltas(..., mode="mean")`
+   - `train_feat_flat, _, _, _ = collect_features_and_deltas(..., mode="flat")`
+   Then PCA conditions use `train_feat_flat` but still use `train_deltas` from the *mean* pass.
+   - If either pass drops/keeps frames differently (exception paths, missing utterances, etc.), cluster IDs won’t correspond to the deltas being scored.
+   - This is spec-critical because it can silently corrupt metrics while still producing “reasonable” numbers.
+
+2) **Entropy reduction can violate “same sample set” due to small per-cluster counts**
+   - `src/phase0/metrics/entropy.py` drops clusters with `<2` samples inside `compute_per_cluster_entropy`, which changes the effective sample set for conditional entropy while unconditional entropy uses all filtered samples.
+   - Effective clusters are defined by train counts ≥100, but eval can still have low counts for some “effective” clusters, so this can occur on eval.
+
+### 1.3 Correct indexing (context windows end at `t-L`, length `W`)
+
+**Good / matches SPEC exactly**:
+- `src/phase0/features/context.py` implements:
+  - `end = t - lag`
+  - `context = x[end-W : end]`
+- `tests/test_indexing.py` provides hand-constructed off-by-one coverage (explicitly requested by SPEC).
+
+### 1.4 VAE alignment (frame rate = 12.5 Hz, latent dim = 512)
+
+**Operationally aligned (Mimi is 12.5Hz/512)**, but with the “checkpoint-vs-config source-of-truth” caveat above:
+- `mimi_autoencoder.py` documents and exposes the 12.5Hz/512 properties.
+- `scripts/02_infer_latents.py` asserts these equal config values.
+
+---
+
+## 2) Conditioning schemes (3 required)
+
+The three required schemes are implemented via `configs/phase0.yaml` and `src/phase0/analysis/run_phase0.py`:
+
+- Condition 1: mean-pool → kmeans K=64 (`mean_pool_vq`, `k=64`)
+- Condition 2: flatten → PCA(8) → kmeans K=256 (`pca_vq`, `pca_dim=8`, `k=256`)
+- Condition 3: flatten → PCA(8) → quartile binning (`pca_quartile`, `pca_dim=8`)
+
+**Deviations / missing aspects:**
+
+- **Assignment distances (“confidence proxy”) are computed but not used or reported**:
+  - `assign_clusters()` returns distances, but `run_phase0.py` discards them (no confidence curve, no “keep top-q%” analysis).
+  - SPEC explicitly requests distance/confidence analysis as a “mandatory extra diagnostic”.
+
+- **Quartile bin “discard <100 samples” is not implemented as an explicit artifact step**:
+  - You *do* filter bins through `effective_clusters` for metrics, which is equivalent for VR, but you don’t report excluded mass or bin stats in the Phase 0 outputs.
+
+- `scripts/04_fit_conditioning.py` does not match SPEC’s CLI shape:
+  - SPEC expects `04_fit_conditioning.py --cond ...` to fit a single condition; current script fits all at once (not fatal, but it diverges from spec’d workflow).
+
+---
+
+## 3) Metrics implementation
+
+### 3.1 Variance ratio
+
+**Correct formula and sample-set handling:**
+- `variance_ratio = SSE_within / SSE_total` computed on the same filtered set in `src/phase0/metrics/variance_ratio.py`.
+
+**Missing spec-required reporting:**
+- SPEC requires excluded-mass reporting and effective-cluster accounting.
+- `src/phase0/clustering/vq.py` already has `compute_cluster_stats()` (including `excluded_mass`), but `src/phase0/analysis/run_phase0.py` does not record:
+  - excluded mass (train/eval)
+  - cluster size histograms (train)
+  - fraction excluded threshold check (>10% warning/fail)
+
+### 3.2 Diagonal Gaussian entropy reduction
+
+**Implemented, but with two spec-relevant issues:**
+- Formula denominator differs from SPEC:
+  - SPEC: `(H - H_cond) / H`
+  - Code: `(H - H_cond) / abs(H)` in `src/phase0/metrics/entropy.py`
+  - This changes meaning when `H` is negative (possible after normalization/filtering) and is not what SPEC states.
+- Potential sample-set mismatch for conditional entropy as noted in 1.2.
+
+### 3.3 Per-speaker statistics with CI
+
+**Partially implemented but not surfaced:**
+- `src/phase0/metrics/speaker_stats.py` computes per-speaker metrics and a 95% CI for variance ratio in `aggregate_speaker_metrics()`.
+- `src/phase0/analysis/run_phase0.py` **does not store CI bounds** (it only stores mean/std).
+- `scripts/06_make_report.py` explicitly notes per-speaker detail isn’t available (“we don’t have per-speaker data here”).
+
+### 3.4 Cross-speaker degradation
+
+Implemented as relative degradation using **speaker-mean** VR:
+- `compute_cross_speaker_degradation()` returns `(eval_mean - train_mean)/train_mean`.
+
+**Decision logic bug risk (see below):**
+- `src/phase0/analysis/report.py` uses `abs(degradation) > max` which can incorrectly fail if eval is *better* (negative degradation with large magnitude).
+
+---
+
+## 4) Confound checks
+
+Required confounds from the prompt:
+
+- High-energy frames only:
+  - `scripts/03_build_phase0_dataset.py` computes global median energy on train speakers only and sets `is_high_energy`.
+  - `src/phase0/analysis/run_phase0.py` slices by `is_high_energy`.
+
+- Utterance-medial frames only (`pos_frac in [0.17, 0.83]`):
+  - Implemented in `apply_slice_filter()`.
+
+- Random cluster baseline (permuted IDs):
+  - Implemented in `run_condition()` via `permute_cluster_ids()`.
+
+**Major spec deviation: confound slices currently refit the clustering model per slice**
+- In `src/phase0/analysis/run_phase0.py`, for each `slice_name`, you:
+  1) filter frames to that slice
+  2) collect features from that subset
+  3) fit PCA/kmeans/bins on that subset
+
+SPEC’s intent for confounds is “hold the conditioning/clustering fixed, then measure metrics on subsets” so you can say structure *persists* under confound removal rather than “structure exists when you refit clusters on that confound”. Refitting can hide failures (the clusterer adapts to the slice), undermining the gatekeeping purpose.
+
+**Missing slice requested by SPEC’s implementation plan:**
+- SPEC asks to compare medial to initial/final; implementation only has medial (no explicit initial/final slices).
+
+**Random baseline computed only on train**
+- `run_condition()` only computes `random_baseline_variance_ratio` for train IDs, not eval.
+
+---
+
+## 5) Decision criteria (gatekeeping)
+
+Decision logic in `src/phase0/analysis/report.py` deviates in several important ways:
+
+- **Uses train VR only** for the primary threshold check:
+  - SPEC’s gate is about reusable structure and cross-speaker transfer; the natural “gate” should prioritize eval/held-out speakers (or require both train and eval < threshold).
+- **Confound robustness checks use train-only VR**, not eval.
+- **Random baseline ≈ 1.0 is only a warning**, not a fail condition:
+  - SPEC acceptance tests say if you see ~0.9 systematically you likely have a bug/filter artifact; this should be treated as a hard failure or at least block “pass”.
+- **Uses `abs(degradation)`**, which can fail if eval improves substantially (negative degradation with large magnitude).
+
+---
+
+## Additional implementation bugs / inconsistencies worth flagging
+
+- Model artifact overwrites in `src/phase0/analysis/run_phase0.py`:
+  - PCA/bin models are saved as `{condition_name}_pca.pkl` and `{condition_name}_bins.pkl` with **no lag/slice in filename**, and are overwritten repeatedly across the nested loops.
+- Pipeline duplication / inconsistency between scripts:
+  - `scripts/04_fit_conditioning.py` computes cluster stats (excluded mass, cluster sizes) but `scripts/05_eval_metrics.py` calls `run_full_analysis()` which refits models and does not consume `04`’s artifacts.
+  - `scripts/06_make_report.py` plots cluster sizes from `04`’s stats JSON, but the metrics come from `05`/`run_phase0.py`, so plots and metrics can describe **different fitted models** (especially given the per-slice refitting issue).
+- Missing “mandatory extra diagnostics” from SPEC:
+  - No confidence-vs-variance-ratio curve is generated or saved.
+  - No per-cluster variance vs size plot.
+  - No 2D PCA scatter of cluster-mean Δx plot.
+
+---
+
+## Validation note
+
+- All tests pass (`pytest`): indexing, reproducibility, variance ratio (31 tests).
+- These tests do **not** cover the biggest spec risks above (slice refitting, excluded-mass reporting, decision criteria correctness, entropy formula/sample-set alignment, mean/flat collection alignment).
+
+# Follow-ups
+
+Highest-impact fixes to become SPEC-compliant (in order):
+
+1) In `src/phase0/analysis/run_phase0.py`, fit conditioning (PCA/VQ/bins) **once per lag on all train frames**, assign cluster IDs for all frames, then compute metrics on `all/high_energy/medial` by **filtering the sample set**, not refitting clusters per slice.
+2) Make feature/delta collection single-pass so Condition 2/3 features cannot misalign with deltas (store and reuse `(utterance_id, t)` frame keys).
+3) Record and report excluded-mass (train/eval) and effective cluster counts per condition/lag, and fail/flag if excluded mass >10% as SPEC describes.
+4) Surface per-speaker distributions and CI bounds in `metrics.json`/`tables.csv`, and generate the per-speaker plot from actual per-speaker values.
+5) Fix entropy reduction to match SPEC formula exactly and ensure unconditional/conditional entropies are computed on identical sample sets.
+6) Fix `make_decision()` to:
+   - gate primarily on eval (held-out speakers) or require both train+eval < 0.6
+   - treat random baseline deviations as failure (or at least block pass)
+   - remove `abs()` on degradation (only penalize worse eval)
+7) Add the SPEC-mandated plots and confidence diagnostics using `src/phase0/analysis/plots.py` (functions exist but aren’t wired into the report).
+tokens used
+108,194
+# Summary
+
+Phase 0 is mostly structurally aligned with `SPEC.md` (speaker-based splits, correct context indexing with unit tests, required conditioning methods present), but there are several **spec-breaking gaps** that can invalidate conclusions: confound slices currently **refit clustering per slice**, key reporting fields (notably **excluded mass** and **per-speaker CI outputs**) are missing, the **decision criteria logic** is not faithful to the spec (train-only checks, random baseline only a warning, `abs()` on degradation), and parts of the metrics pipeline have subtle sample-set and stability issues (entropy reduction denominator/sign, potential feature/target misalignment risk for PCA conditions).
+
+# What changed
+
+- No files changed.
+
+# Rationale
+
+You asked for a rigorous audit of `src/phase0/` and `scripts/` against `SPEC.md`, specifically around invariants, conditioning, metrics, confounds, and decision criteria. This report calls out where the implementation matches the spec and where it deviates in ways that could cause false “pass/fail” outcomes or misleading variance-ratio/entropy results.
+
+# Risks / edge cases
+
+## 1) Critical invariants (SPEC “must-haves”)
+
+### 1.1 No data leakage (PCA/VQ/norm stats fit on train speakers only)
+
+**Mostly OK**, but with a spec-adjacent concern:
+
+- Speaker splits are correctly constructed and used:
+  - `scripts/01_make_speaker_splits.py` + `src/phase0/data/splits.py` create speaker-based train/eval splits.
+  - `scripts/03_build_phase0_dataset.py` sets `split` by speaker ID.
+  - `src/phase0/analysis/run_phase0.py` fits PCA/k-means/quartiles and normalization stats using only `frames[split=="train"]`.
+
+**Deviation from SPEC intent (VAE config sourcing):**
+- SPEC requires VAE sample rate / hop / frame rate / latent dim to come from the checkpoint, not from “assumptions”.
+- `scripts/02_infer_latents.py` reads these from the Mimi model, but then **asserts they match** `configs/phase0.yaml` (which hardcodes 24kHz, 12.5Hz, 512). That’s a sanity check, but the pipeline is still *config-driven*, not “checkpoint-as-source-of-truth”.
+  - Risk: swapping checkpoints requires manual config edits; if assertions are removed later, you could silently misalign temporal semantics.
+
+### 1.2 Consistent sample sets (numerator/denominator computed on same filtered samples)
+
+**Variance ratio (VR) is correct**:
+- `src/phase0/metrics/variance_ratio.py` explicitly filters once (effective clusters) and computes `SSE_total` and `SSE_within` on the same filtered sample set.
+
+**But there are two important consistency risks elsewhere:**
+
+1) **Potential feature/target misalignment risk for PCA conditions (Condition 2/3)**  
+   In `src/phase0/analysis/run_phase0.py`, features for mean and flat are collected via *separate passes*:
+   - `train_feat_mean, train_deltas, ... = collect_features_and_deltas(..., mode="mean")`
+   - `train_feat_flat, _, _, _ = collect_features_and_deltas(..., mode="flat")`
+   Then PCA conditions use `train_feat_flat` but still use `train_deltas` from the *mean* pass.
+   - If either pass drops/keeps frames differently (exception paths, missing utterances, etc.), cluster IDs won’t correspond to the deltas being scored.
+   - This is spec-critical because it can silently corrupt metrics while still producing “reasonable” numbers.
+
+2) **Entropy reduction can violate “same sample set” due to small per-cluster counts**
+   - `src/phase0/metrics/entropy.py` drops clusters with `<2` samples inside `compute_per_cluster_entropy`, which changes the effective sample set for conditional entropy while unconditional entropy uses all filtered samples.
+   - Effective clusters are defined by train counts ≥100, but eval can still have low counts for some “effective” clusters, so this can occur on eval.
+
+### 1.3 Correct indexing (context windows end at `t-L`, length `W`)
+
+**Good / matches SPEC exactly**:
+- `src/phase0/features/context.py` implements:
+  - `end = t - lag`
+  - `context = x[end-W : end]`
+- `tests/test_indexing.py` provides hand-constructed off-by-one coverage (explicitly requested by SPEC).
+
+### 1.4 VAE alignment (frame rate = 12.5 Hz, latent dim = 512)
+
+**Operationally aligned (Mimi is 12.5Hz/512)**, but with the “checkpoint-vs-config source-of-truth” caveat above:
+- `mimi_autoencoder.py` documents and exposes the 12.5Hz/512 properties.
+- `scripts/02_infer_latents.py` asserts these equal config values.
+
+---
+
+## 2) Conditioning schemes (3 required)
+
+The three required schemes are implemented via `configs/phase0.yaml` and `src/phase0/analysis/run_phase0.py`:
+
+- Condition 1: mean-pool → kmeans K=64 (`mean_pool_vq`, `k=64`)
+- Condition 2: flatten → PCA(8) → kmeans K=256 (`pca_vq`, `pca_dim=8`, `k=256`)
+- Condition 3: flatten → PCA(8) → quartile binning (`pca_quartile`, `pca_dim=8`)
+
+**Deviations / missing aspects:**
+
+- **Assignment distances (“confidence proxy”) are computed but not used or reported**:
+  - `assign_clusters()` returns distances, but `run_phase0.py` discards them (no confidence curve, no “keep top-q%” analysis).
+  - SPEC explicitly requests distance/confidence analysis as a “mandatory extra diagnostic”.
+
+- **Quartile bin “discard <100 samples” is not implemented as an explicit artifact step**:
+  - You *do* filter bins through `effective_clusters` for metrics, which is equivalent for VR, but you don’t report excluded mass or bin stats in the Phase 0 outputs.
+
+- `scripts/04_fit_conditioning.py` does not match SPEC’s CLI shape:
+  - SPEC expects `04_fit_conditioning.py --cond ...` to fit a single condition; current script fits all at once (not fatal, but it diverges from spec’d workflow).
+
+---
+
+## 3) Metrics implementation
+
+### 3.1 Variance ratio
+
+**Correct formula and sample-set handling:**
+- `variance_ratio = SSE_within / SSE_total` computed on the same filtered set in `src/phase0/metrics/variance_ratio.py`.
+
+**Missing spec-required reporting:**
+- SPEC requires excluded-mass reporting and effective-cluster accounting.
+- `src/phase0/clustering/vq.py` already has `compute_cluster_stats()` (including `excluded_mass`), but `src/phase0/analysis/run_phase0.py` does not record:
+  - excluded mass (train/eval)
+  - cluster size histograms (train)
+  - fraction excluded threshold check (>10% warning/fail)
+
+### 3.2 Diagonal Gaussian entropy reduction
+
+**Implemented, but with two spec-relevant issues:**
+- Formula denominator differs from SPEC:
+  - SPEC: `(H - H_cond) / H`
+  - Code: `(H - H_cond) / abs(H)` in `src/phase0/metrics/entropy.py`
+  - This changes meaning when `H` is negative (possible after normalization/filtering) and is not what SPEC states.
+- Potential sample-set mismatch for conditional entropy as noted in 1.2.
+
+### 3.3 Per-speaker statistics with CI
+
+**Partially implemented but not surfaced:**
+- `src/phase0/metrics/speaker_stats.py` computes per-speaker metrics and a 95% CI for variance ratio in `aggregate_speaker_metrics()`.
+- `src/phase0/analysis/run_phase0.py` **does not store CI bounds** (it only stores mean/std).
+- `scripts/06_make_report.py` explicitly notes per-speaker detail isn’t available (“we don’t have per-speaker data here”).
+
+### 3.4 Cross-speaker degradation
+
+Implemented as relative degradation using **speaker-mean** VR:
+- `compute_cross_speaker_degradation()` returns `(eval_mean - train_mean)/train_mean`.
+
+**Decision logic bug risk (see below):**
+- `src/phase0/analysis/report.py` uses `abs(degradation) > max` which can incorrectly fail if eval is *better* (negative degradation with large magnitude).
+
+---
+
+## 4) Confound checks
+
+Required confounds from the prompt:
+
+- High-energy frames only:
+  - `scripts/03_build_phase0_dataset.py` computes global median energy on train speakers only and sets `is_high_energy`.
+  - `src/phase0/analysis/run_phase0.py` slices by `is_high_energy`.
+
+- Utterance-medial frames only (`pos_frac in [0.17, 0.83]`):
+  - Implemented in `apply_slice_filter()`.
+
+- Random cluster baseline (permuted IDs):
+  - Implemented in `run_condition()` via `permute_cluster_ids()`.
+
+**Major spec deviation: confound slices currently refit the clustering model per slice**
+- In `src/phase0/analysis/run_phase0.py`, for each `slice_name`, you:
+  1) filter frames to that slice
+  2) collect features from that subset
+  3) fit PCA/kmeans/bins on that subset
+
+SPEC’s intent for confounds is “hold the conditioning/clustering fixed, then measure metrics on subsets” so you can say structure *persists* under confound removal rather than “structure exists when you refit clusters on that confound”. Refitting can hide failures (the clusterer adapts to the slice), undermining the gatekeeping purpose.
+
+**Missing slice requested by SPEC’s implementation plan:**
+- SPEC asks to compare medial to initial/final; implementation only has medial (no explicit initial/final slices).
+
+**Random baseline computed only on train**
+- `run_condition()` only computes `random_baseline_variance_ratio` for train IDs, not eval.
+
+---
+
+## 5) Decision criteria (gatekeeping)
+
+Decision logic in `src/phase0/analysis/report.py` deviates in several important ways:
+
+- **Uses train VR only** for the primary threshold check:
+  - SPEC’s gate is about reusable structure and cross-speaker transfer; the natural “gate” should prioritize eval/held-out speakers (or require both train and eval < threshold).
+- **Confound robustness checks use train-only VR**, not eval.
+- **Random baseline ≈ 1.0 is only a warning**, not a fail condition:
+  - SPEC acceptance tests say if you see ~0.9 systematically you likely have a bug/filter artifact; this should be treated as a hard failure or at least block “pass”.
+- **Uses `abs(degradation)`**, which can fail if eval improves substantially (negative degradation with large magnitude).
+
+---
+
+## Additional implementation bugs / inconsistencies worth flagging
+
+- Model artifact overwrites in `src/phase0/analysis/run_phase0.py`:
+  - PCA/bin models are saved as `{condition_name}_pca.pkl` and `{condition_name}_bins.pkl` with **no lag/slice in filename**, and are overwritten repeatedly across the nested loops.
+- Pipeline duplication / inconsistency between scripts:
+  - `scripts/04_fit_conditioning.py` computes cluster stats (excluded mass, cluster sizes) but `scripts/05_eval_metrics.py` calls `run_full_analysis()` which refits models and does not consume `04`’s artifacts.
+  - `scripts/06_make_report.py` plots cluster sizes from `04`’s stats JSON, but the metrics come from `05`/`run_phase0.py`, so plots and metrics can describe **different fitted models** (especially given the per-slice refitting issue).
+- Missing “mandatory extra diagnostics” from SPEC:
+  - No confidence-vs-variance-ratio curve is generated or saved.
+  - No per-cluster variance vs size plot.
+  - No 2D PCA scatter of cluster-mean Δx plot.
+
+---
+
+## Validation note
+
+- All tests pass (`pytest`): indexing, reproducibility, variance ratio (31 tests).
+- These tests do **not** cover the biggest spec risks above (slice refitting, excluded-mass reporting, decision criteria correctness, entropy formula/sample-set alignment, mean/flat collection alignment).
+
+# Follow-ups
+
+Highest-impact fixes to become SPEC-compliant (in order):
+
+1) In `src/phase0/analysis/run_phase0.py`, fit conditioning (PCA/VQ/bins) **once per lag on all train frames**, assign cluster IDs for all frames, then compute metrics on `all/high_energy/medial` by **filtering the sample set**, not refitting clusters per slice.
+2) Make feature/delta collection single-pass so Condition 2/3 features cannot misalign with deltas (store and reuse `(utterance_id, t)` frame keys).
+3) Record and report excluded-mass (train/eval) and effective cluster counts per condition/lag, and fail/flag if excluded mass >10% as SPEC describes.
+4) Surface per-speaker distributions and CI bounds in `metrics.json`/`tables.csv`, and generate the per-speaker plot from actual per-speaker values.
+5) Fix entropy reduction to match SPEC formula exactly and ensure unconditional/conditional entropies are computed on identical sample sets.
+6) Fix `make_decision()` to:
+   - gate primarily on eval (held-out speakers) or require both train+eval < 0.6
+   - treat random baseline deviations as failure (or at least block pass)
+   - remove `abs()` on degradation (only penalize worse eval)
+7) Add the SPEC-mandated plots and confidence diagnostics using `src/phase0/analysis/plots.py` (functions exist but aren’t wired into the report).
+
+Finished: 2026-02-01T21:16:56-08:00
+Exit code: 0

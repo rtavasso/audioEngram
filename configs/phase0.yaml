@@ -1,0 +1,67 @@
+# Phase 0 Configuration: Audio Latent Structure Analysis
+# ===========================================================================
+# This config controls the data analysis pipeline to determine whether
+# audio latents exhibit reusable local structure suitable for conditional
+# memory mechanisms.
+
+data:
+  librispeech_path: ./data/LibriSpeech
+  subset: train-clean-100
+  min_duration_sec: 3.0
+
+vae:
+  sample_rate: 24000
+  frame_rate: 12.5
+  latent_dim: 512
+  frame_size: 1920  # samples per latent frame
+
+splits:
+  n_train_speakers: 200
+  n_eval_speakers: 51
+  seed: 42
+  utt_holdout_frac: 0.1  # 10% utterance holdout within train for k-means validation
+
+context:
+  window_size: 8  # frames (W in the spec)
+  lags: [1, 2, 4]  # frames to skip between context end and target (L in spec)
+
+clustering:
+  conditions:
+    - name: mean_vq64
+      type: mean_pool_vq
+      k: 64
+    - name: pca8_vq256
+      type: pca_vq
+      pca_dim: 8
+      k: 256
+    - name: pca8_quartile
+      type: pca_quartile
+      pca_dim: 8
+  min_cluster_size: 100  # minimum samples per cluster to include
+
+metrics:
+  variance_ratio_threshold: 0.6  # target: ratio < 0.6 means clusters explain >40% variance
+  cross_speaker_degradation_max: 0.20  # max acceptable degradation on held-out speakers
+
+# Confound slices for robustness checks
+slices:
+  - name: all
+    filter: null
+  - name: high_energy
+    filter: energy_above_median
+  - name: utterance_medial
+    filter: pos_frac_0.17_0.83
+
+# Output paths
+output:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: ./outputs/phase0/latents_index.parquet
+  frames_index: ./outputs/phase0/phase0_frames.parquet
+  splits_dir: ./outputs/phase0/splits
+  conditioning_dir: ./outputs/phase0/conditioning
+  metrics_file: ./outputs/phase0/metrics.json
+  tables_file: ./outputs/phase0/tables.csv
+  plots_dir: ./outputs/phase0/plots
+
+# Global seed for reproducibility
+seed: 42
