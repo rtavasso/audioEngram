@@ -26,17 +26,56 @@ def _make_regime_latents(t: int, d: int, seed: int) -> tuple[np.ndarray, np.ndar
     """
     Create a synthetic latent sequence where context predicts next-step delta.
 
-    Regime alternates in blocks; within each regime, the delta in dim0 has a
-    consistent sign, plus small noise on all dims.
+    We build a regime signal s(t) that is visible in the mean-pooled context
+    and drives a predictable delta component, while keeping most other dims
+    as small noise.
+
+    This is designed so `mean_pool_vq` with K=2 can reliably recover regimes.
     """
     rng = np.random.default_rng(seed)
     x = np.zeros((t, d), dtype=np.float32)
+
+    block = 8
+    ramp = 4  # soften regime transitions so "marker" dims don't spike deltas
+    # Keep one dimension for the driven delta; make the remaining marker dims
+    # dominate mean-pooled context so K=2 clustering is easy.
+    marker_dims = min(6, max(1, d - 1))
+    marker_amp = 6.0
+    driven_dim = marker_dims if marker_dims < d else (d - 1)
+    driven_step = 3.0
+
+    def s(i: int) -> float:
+        b = i // block
+        base = 1.0 if (b % 2) == 0 else -1.0
+        if ramp <= 0:
+            return base
+        r = i % block
+        if r == 0:
+            prev = 1.0 if ((b - 1) % 2) == 0 else -1.0
+            return prev
+        if r < ramp:
+            prev = 1.0 if ((b - 1) % 2) == 0 else -1.0
+            alpha = r / ramp
+            return (1.0 - alpha) * prev + alpha * base
+        return base
+
+    # Initialize with small noise
+    x[0] = rng.normal(0.0, 0.01, size=d).astype(np.float32)
+    x[0, :marker_dims] += marker_amp * s(0)
+
     for i in range(1, t):
-        regime = (i // 8) % 2
-        v0 = 1.0 if regime == 0 else -1.0
-        delta = rng.normal(0.0, 0.05, size=d).astype(np.float32)
-        delta[0] += v0
-        x[i] = x[i - 1] + delta
+        si = s(i)
+        # Marker dims: regime-visible but (mostly) stationary
+        x[i, :marker_dims] = marker_amp * si
+
+        # Driven dim: predictable delta conditioned on regime signal
+        x[i, driven_dim] = x[i - 1, driven_dim] + driven_step * si + float(rng.normal(0.0, 0.01))
+
+        # Remaining dims: small noise random walk
+        for j in range(d):
+            if j < marker_dims or j == driven_dim:
+                continue
+            x[i, j] = x[i - 1, j] + float(rng.normal(0.0, 0.01))
 
     energy = np.ones((t,), dtype=np.float32)
     timestamps = np.arange(t, dtype=np.float32) / 12.5

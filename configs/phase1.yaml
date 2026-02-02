@@ -1,0 +1,64 @@
+# Phase 1 Configuration: Predictor Baseline on Mimi Latents
+# ============================================================================
+# Primary: lagged-context predictability of Δx at horizons k (lag)
+# Secondary: rollout-context corruption gap diagnostic
+#
+# Inputs are Phase 0 artifacts:
+# - outputs/phase0/latents.zarr
+# - outputs/phase0/phase0_frames.parquet
+# - outputs/phase0/splits (for eval-speaker rollout sampling)
+
+data:
+  # Phase 0 outputs (inputs to Phase 1)
+  latents_dir: ./outputs/phase0/latents.zarr
+  frames_index: ./outputs/phase0/phase0_frames.parquet
+  splits_dir: ./outputs/phase0/splits
+
+context:
+  window_size: 8
+  horizons_k: [1, 2, 4, 8]
+
+model:
+  # Mixture Density Network (diagonal Gaussian mixture)
+  n_components: 8
+  hidden_dim: 1024
+  n_hidden_layers: 2
+  dropout: 0.0
+  min_log_sigma: -7.0
+  max_log_sigma: 2.0
+
+train:
+  device: auto  # auto|cpu|cuda
+  seed: 42
+  batch_size: 256
+  num_workers: 0
+  max_steps: 25000
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+  log_every: 200
+  eval_every: 2000
+  save_every: 5000
+
+  # Streaming/shuffle controls (parquet scan order is near-utterance-grouped)
+  max_train_samples: null   # optional hard cap for debugging
+  max_eval_samples: 200000  # keep eval bounded by default
+  shuffle_buffer: 8192
+
+metrics:
+  # NLL is reported in nats per frame; also include nats/dim.
+  eps_dnll_stop: 0.005  # optional early stop threshold (|ΔNLL| < eps) if enabled
+  enable_early_stop: false
+
+rollout:
+  enabled: true
+  n_eval_utterances: 16
+  max_frames_per_utterance: 2000
+  sample_from_mixture: false  # if false, uses mixture mean for Δx̂
+
+output:
+  out_dir: ./outputs/phase1
+  checkpoints_dir: ./outputs/phase1/checkpoints
+  metrics_file: ./outputs/phase1/metrics.json
+  tables_file: ./outputs/phase1/tables.csv
+
