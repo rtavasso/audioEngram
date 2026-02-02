@@ -133,17 +133,37 @@ def save_frames_index(
     frames.to_parquet(str(output_path), index=False)
 
 
-def load_frames_index(index_path: str | Path) -> pd.DataFrame:
+def load_frames_index(
+    index_path: str | Path,
+    columns: Optional[list[str]] = None,
+    filters: Optional[list] = None,
+) -> pd.DataFrame:
     """
     Load phase0 frame index from parquet.
 
     Args:
         index_path: Path to parquet file
+        columns: Optional list of columns to load
+        filters: Optional parquet filters (pyarrow engine)
 
     Returns:
         DataFrame with frame metadata
     """
-    return pd.read_parquet(str(index_path))
+    read_kwargs = {}
+    if columns is not None:
+        read_kwargs["columns"] = columns
+    if filters is not None:
+        read_kwargs["filters"] = filters
+
+    try:
+        return pd.read_parquet(str(index_path), **read_kwargs)
+    except TypeError:
+        # Some pandas/engine combos don't support `filters`.
+        # If filters were requested, fail loudly so callers can fall back.
+        if filters is not None:
+            raise
+        read_kwargs.pop("filters", None)
+        return pd.read_parquet(str(index_path), **read_kwargs)
 
 
 class LatentStore:

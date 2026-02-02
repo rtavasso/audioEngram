@@ -4,7 +4,8 @@
       "Bash(xargs cat:*)",
       "Bash(uv run:*)",
       "Bash(python3:*)",
-      "Skill(codex)"
+      "Skill(codex)",
+      "Bash(bash:*)"
     ]
   }
 }

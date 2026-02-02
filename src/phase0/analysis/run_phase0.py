@@ -47,51 +47,60 @@ from ..utils.seed import set_seed
 from ..utils.logging import get_logger
 
 
+def _optimize_frames_df(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Reduce memory footprint of the frames index DataFrame.
+
+    Notes:
+    - utterance_id repeats heavily; categorical encoding can save GBs on large datasets.
+    - Downcast numeric columns where safe.
+    """
+    if "utterance_id" in df.columns and df["utterance_id"].dtype != "category":
+        df["utterance_id"] = df["utterance_id"].astype("category")
+    if "speaker_id" in df.columns:
+        df["speaker_id"] = df["speaker_id"].astype(np.int32, copy=False)
+    if "t" in df.columns:
+        df["t"] = df["t"].astype(np.int32, copy=False)
+    if "pos_frac" in df.columns:
+        df["pos_frac"] = df["pos_frac"].astype(np.float32, copy=False)
+    if "is_high_energy" in df.columns:
+        df["is_high_energy"] = df["is_high_energy"].astype(bool, copy=False)
+    return df
+
+
 def load_config(config_path: str | Path) -> dict:
     """Load configuration from YAML file."""
     with open(config_path) as f:
         return yaml.safe_load(f)
 
 
-def apply_slice_mask(
+def get_slice_mask(
     slice_name: str,
-    frame_keys: list[tuple[str, int]],
-    frames_df: pd.DataFrame,
+    is_high_energy: np.ndarray,
+    pos_frac: np.ndarray,
 ) -> np.ndarray:
     """
-    Get boolean mask for frames matching a slice.
+    Get boolean mask for a slice using per-sample metadata.
 
     Args:
         slice_name: Name of slice (all, high_energy, utterance_medial)
-        frame_keys: List of (utterance_id, t) tuples
-        frames_df: DataFrame with frame metadata
+        is_high_energy: Boolean array [N] marking high-energy frames
+        pos_frac: Float array [N] position fraction within utterance
 
     Returns:
         Boolean mask array
     """
-    # Build lookup from frame keys
-    key_to_idx = {k: i for i, k in enumerate(frame_keys)}
-    mask = np.zeros(len(frame_keys), dtype=bool)
-
+    n = len(pos_frac)
     if slice_name == "all":
-        mask[:] = True
-        return mask
+        return np.ones(n, dtype=bool)
 
-    # Filter frames_df by slice
     if slice_name == "high_energy":
-        filtered = frames_df[frames_df["is_high_energy"]]
-    elif slice_name == "utterance_medial":
-        filtered = frames_df[(frames_df["pos_frac"] >= 0.17) & (frames_df["pos_frac"] <= 0.83)]
-    else:
-        raise ValueError(f"Unknown slice: {slice_name}")
+        return is_high_energy.astype(bool, copy=False)
 
-    # Mark matching frames
-    for _, row in filtered.iterrows():
-        key = (row["utterance_id"], row["t"])
-        if key in key_to_idx:
-            mask[key_to_idx[key]] = True
+    if slice_name == "utterance_medial":
+        return (pos_frac >= 0.17) & (pos_frac <= 0.83)
 
-    return mask
+    raise ValueError(f"Unknown slice: {slice_name}")
 
 
 def collect_all_features_and_deltas(
@@ -120,41 +129,57 @@ def collect_all_features_and_deltas(
     features_flat_list = []
     deltas_list = []
     speaker_ids_list = []
+    is_high_energy_list = []
+    pos_frac_list = []
     frame_keys = []
 
-    # Group by utterance for efficient access
-    for utt_id, utt_frames in frames.groupby("utterance_id"):
-        if utt_id not in latent_store:
+    current_utt_id: Optional[str] = None
+    current_latents: Optional[np.ndarray] = None
+
+    # Iterate in DataFrame order (avoids expensive groupby on multi-million-row frames tables).
+    for row in frames.itertuples(index=False):
+        utt_id = str(row.utterance_id)
+        t = int(row.t)
+        speaker_id = int(row.speaker_id)
+
+        if t < window_size + lag or t < 1:
             continue
 
-        x = latent_store.get_latents(utt_id)
-
-        for _, row in utt_frames.iterrows():
-            t = row["t"]
-            speaker_id = row["speaker_id"]
-
-            # Check valid range
-            if t < window_size + lag or t < 1:
+        if current_utt_id != utt_id:
+            if utt_id not in latent_store:
+                current_utt_id = None
+                current_latents = None
                 continue
 
             try:
-                # Get BOTH features in same iteration to ensure alignment
-                feat_mean = get_context_mean(x, t, window_size, lag)
-                feat_flat = get_context_flat(x, t, window_size, lag)
-                delta = compute_delta(x, t)
-
-                features_mean_list.append(feat_mean)
-                features_flat_list.append(feat_flat)
-                deltas_list.append(delta)
-                speaker_ids_list.append(speaker_id)
-                frame_keys.append((utt_id, t))
-
+                current_latents = latent_store.get_latents(utt_id)
+                current_utt_id = utt_id
             except Exception as e:
-                logger.warning(f"Error processing {utt_id}:{t}: {e}")
+                logger.warning(f"Could not load latents for {utt_id}: {e}")
+                current_utt_id = None
+                current_latents = None
                 continue
 
-            if max_samples and len(features_mean_list) >= max_samples:
-                break
+        try:
+            x = current_latents
+            if x is None:
+                continue
+
+            feat_mean = get_context_mean(x, t, window_size, lag)
+            feat_flat = get_context_flat(x, t, window_size, lag)
+            delta = compute_delta(x, t)
+
+            features_mean_list.append(feat_mean)
+            features_flat_list.append(feat_flat)
+            deltas_list.append(delta)
+            speaker_ids_list.append(speaker_id)
+            is_high_energy_list.append(bool(row.is_high_energy))
+            pos_frac_list.append(float(row.pos_frac))
+            frame_keys.append((utt_id, t))
+
+        except Exception as e:
+            logger.warning(f"Error processing {utt_id}:{t}: {e}")
+            continue
 
         if max_samples and len(features_mean_list) >= max_samples:
             break
@@ -164,6 +189,8 @@ def collect_all_features_and_deltas(
         "features_flat": np.array(features_flat_list, dtype=np.float32),
         "deltas": np.array(deltas_list, dtype=np.float32),
         "speaker_ids": np.array(speaker_ids_list, dtype=np.int32),
+        "is_high_energy": np.array(is_high_energy_list, dtype=bool),
+        "pos_frac": np.array(pos_frac_list, dtype=np.float32),
         "frame_keys": frame_keys,
     }
 
@@ -352,11 +379,35 @@ def run_full_analysis(
     # Load data
     logger.info("Loading data...")
     latent_store = LatentStore(config["output"]["latents_dir"])
-    frames = load_frames_index(config["output"]["frames_index"])
+    frames_index_path = config["output"]["frames_index"]
+    frame_columns = ["utterance_id", "speaker_id", "t", "pos_frac", "is_high_energy", "split"]
 
-    # Split into train/eval
-    train_frames = frames[frames["split"] == "train"]
-    eval_frames = frames[frames["split"] == "eval"]
+    # Prefer parquet predicate pushdown to avoid loading both splits into memory at once.
+    try:
+        train_frames = load_frames_index(
+            frames_index_path,
+            columns=frame_columns,
+            filters=[[("split", "==", "train")]],
+        )
+        eval_frames = load_frames_index(
+            frames_index_path,
+            columns=frame_columns,
+            filters=[[("split", "==", "eval")]],
+        )
+    except Exception:
+        frames = load_frames_index(frames_index_path, columns=frame_columns)
+        train_frames = frames[frames["split"] == "train"]
+        eval_frames = frames[frames["split"] == "eval"]
+        del frames
+
+    # Split is constant per DataFrame from here on; drop it to save memory.
+    if "split" in train_frames.columns:
+        train_frames = train_frames.drop(columns=["split"])
+    if "split" in eval_frames.columns:
+        eval_frames = eval_frames.drop(columns=["split"])
+
+    train_frames = _optimize_frames_df(train_frames)
+    eval_frames = _optimize_frames_df(eval_frames)
 
     logger.info(f"Train frames: {len(train_frames)}, Eval frames: {len(eval_frames)}")
 
@@ -449,8 +500,12 @@ def run_full_analysis(
                 logger.info(f"  Slice: {slice_name}")
 
                 # Get slice masks
-                train_slice_mask = apply_slice_mask(slice_name, train_data["frame_keys"], train_frames)
-                eval_slice_mask = apply_slice_mask(slice_name, eval_data["frame_keys"], eval_frames)
+                train_slice_mask = get_slice_mask(
+                    slice_name, train_data["is_high_energy"], train_data["pos_frac"]
+                )
+                eval_slice_mask = get_slice_mask(
+                    slice_name, eval_data["is_high_energy"], eval_data["pos_frac"]
+                )
 
                 if train_slice_mask.sum() == 0 or eval_slice_mask.sum() == 0:
                     logger.warning(f"    Empty slice, skipping")

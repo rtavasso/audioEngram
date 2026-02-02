@@ -1,0 +1,970 @@
+RUN_ID=20260201-231146-12611
+Started: 2026-02-01T23:11:46-08:00
+Task: Review the memory usage in scripts/04_fit_conditioning.py and scripts/05_eval_metrics.py and their dependencies in src/phase0/. Identify any remaining memory bottlenecks that could cause OOM on a 12GB Colab instance when processing 100K+ samples. Look specifically at: 1) Large array allocations 2) Data collection loops that accumulate in memory 3) PCA fitting on high-dimensional data 4) Any broadcast operations that create large intermediate arrays. Produce a detailed report with specific line numbers and memory estimates.
+Codex command: codex
+
+OpenAI Codex v0.92.0 (research preview)
+--------
+workdir: /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio
+model: gpt-5.2
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: auto
+session id: 019c1d31-8006-7403-a881-3708a700c2d5
+--------
+user
+When finished with your task, produce a detailed report in Markdown with EXACT headings:
+
+# Summary
+# What changed
+- List files changed and describe the change in 1–3 bullets each.
+# Rationale
+# Risks / edge cases
+# Follow-ups
+
+Task:
+Review the memory usage in scripts/04_fit_conditioning.py and scripts/05_eval_metrics.py and their dependencies in src/phase0/. Identify any remaining memory bottlenecks that could cause OOM on a 12GB Colab instance when processing 100K+ samples. Look specifically at: 1) Large array allocations 2) Data collection loops that accumulate in memory 3) PCA fitting on high-dimensional data 4) Any broadcast operations that create large intermediate arrays. Produce a detailed report with specific line numbers and memory estimates.
+mcp startup: no servers
+
+
+thinking
+**Inspecting Code and Memory**
+
+I need to inspect the code and report back with specific headings, including line numbers and memory estimates. I'll be using tools like the shell to view files, focusing on memory usage without modifying any code. I'll utilize tools like rg, sed, and nl to get the line numbers and explore scripts and src/phase0 dependencies. I might need to derive formulas based on typical sizes for memory. My plan is to inspect scripts, dependencies, compute memory estimates, and write the report.
+thinking
+**Starting with Shell Commands**
+
+I’m beginning by using shell commands to inspect the repository structure. This will help me get a clear overview of what’s inside. I want to make sure I understand how everything is organized before diving deeper. I’ll check for important files and directories, keeping an eye on anything that might be significant for the analysis later. I think this initial inspection will set a solid foundation for the next steps. Let’s go ahead and explore!
+Plan update
+  → Scan scripts for allocations
+  • Trace src/phase0 dependencies
+  • Estimate memory for 100K+
+  • Write Markdown report
+exec
+/bin/bash -lc 'ls -R' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 433ms:
+.:
+CLAUDE.md
+README.md
+SPEC.md
+__pycache__
+configs
+mimi_autoencoder.py
+moshi
+outputs
+pyproject.toml
+scripts
+src
+tests
+uv.lock
+
+./__pycache__:
+mimi_autoencoder.cpython-312.pyc
+
+./configs:
+phase0.yaml
+
+thinking
+**Inspecting scripts and dependencies**
+
+I need to check the scripts: 04_fit_conditioning.py and 05_eval_metrics.py. I’ll use nl -ba to display line numbers, but it might be a lot to look at, so I might use sed -n '1,200p' to limit the output. I'll leverage rg to locate the imports in those scripts. I'll also take a look at dependencies in src/phase0/, like clustering and pca.py, as well as metrics. Finally, I'll compute memory usage while I'm at it.
+exec
+/bin/bash -lc "nl -ba scripts/04_fit_conditioning.py | sed -n '1,260p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 37ms:
+     1	#!/usr/bin/env python3
+     2	"""
+     3	Fit conditioning models (PCA, k-means, quartile bins) on training data.
+     4	
+     5	Usage:
+     6	    uv run python scripts/04_fit_conditioning.py [--config configs/phase0.yaml]
+     7	"""
+     8	
+     9	import argparse
+    10	import json
+    11	import sys
+    12	from pathlib import Path
+    13	
+    14	# Add src to path
+    15	sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+    16	
+    17	import numpy as np
+    18	import yaml
+    19	from tqdm import tqdm
+    20	
+exec
+/bin/bash -lc "nl -ba scripts/05_eval_metrics.py | sed -n '1,320p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 27ms:
+     1	#!/usr/bin/env python3
+     2	"""
+     3	Evaluate all metrics on train and eval splits.
+     4	
+     5	Usage:
+     6	    uv run python scripts/05_eval_metrics.py [--config configs/phase0.yaml]
+     7	"""
+     8	
+     9	import argparse
+    10	import sys
+    11	from pathlib import Path
+    12	
+    13	# Add src to path
+    14	sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+    15	
+    16	import yaml
+    17	
+    18	from phase0.analysis.run_phase0 import run_full_analysis
+    19	from phase0.utils.logging import setup_logging
+    20	from phase0.utils.seed import set_seed
+exec
+/bin/bash -lc "rg -n \"from src\\.phase0|phase0\" scripts/04_fit_conditioning.py scripts/05_eval_metrics.py" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 62ms:
+scripts/05_eval_metrics.py:6:    uv run python scripts/05_eval_metrics.py [--config configs/phase0.yaml]
+scripts/05_eval_metrics.py:18:from phase0.analysis.run_phase0 import run_full_analysis
+scripts/05_eval_metrics.py:19:from phase0.utils.logging import setup_logging
+scripts/05_eval_metrics.py:20:from phase0.utils.seed import set_seed
+scripts/05_eval_metrics.py:28:        default="configs/phase0.yaml",
+scripts/04_fit_conditioning.py:6:    uv run python scripts/04_fit_conditioning.py [--config configs/phase0.yaml]
+scripts/04_fit_conditioning.py:21:from phase0.data.io import LatentStore, load_frames_index
+scripts/04_fit_conditioning.py:22:from phase0.features.context import get_context_mean, get_context_flat
+scripts/04_fit_conditioning.py:23:from phase0.features.normalization import compute_delta, compute_normalization_stats
+scripts/04_fit_conditioning.py:24:from phase0.clustering.vq import fit_kmeans, assign_clusters, compute_cluster_stats
+scripts/04_fit_conditioning.py:25:from phase0.clustering.pca import fit_pca, project_pca, compute_pca_stats
+scripts/04_fit_conditioning.py:26:from phase0.clustering.quantile import fit_quartile_bins, assign_quartile_bins, compute_quartile_stats
+scripts/04_fit_conditioning.py:27:from phase0.utils.logging import setup_logging
+scripts/04_fit_conditioning.py:28:from phase0.utils.seed import set_seed
+scripts/04_fit_conditioning.py:93:        default="configs/phase0.yaml",
+exec
+/bin/bash -lc "nl -ba src/phase0/data/io.py | sed -n '1,260p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 35ms:
+     1	"""
+     2	I/O utilities for zarr and parquet storage.
+     3	
+     4	Handles saving and loading latent arrays and index tables.
+     5	"""
+     6	
+     7	from pathlib import Path
+     8	from typing import Optional
+     9	
+    10	import numpy as np
+    11	import pandas as pd
+    12	import zarr
+    13	
+    14	
+    15	def save_latents_zarr(
+    16	    latents: np.ndarray,
+    17	    energy: np.ndarray,
+    18	    timestamps: np.ndarray,
+    19	    speaker_id: int,
+    20	    utterance_id: str,
+exec
+/bin/bash -lc "nl -ba src/phase0/features/context.py | sed -n '1,260p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+     1	"""
+     2	Context window extraction for conditioning.
+     3	
+     4	Given utterance latents x[T, D], extracts context windows for target frames.
+     5	The context window ends at t-L and has length W, where:
+     6	- t is the target frame index
+     7	- L is the lag (1, 2, or 4 frames)
+     8	- W is the window size (8 frames)
+     9	"""
+    10	
+    11	import numpy as np
+    12	
+    13	
+    14	def get_context_mean(
+    15	    x: np.ndarray,
+    16	    t: int,
+    17	    window_size: int,
+    18	    lag: int,
+    19	) -> np.ndarray:
+    20	    """
+exec
+/bin/bash -lc "nl -ba src/phase0/clustering/pca.py | sed -n '1,260p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+     1	"""
+     2	PCA projection for dimensionality reduction.
+     3	
+     4	Fits PCA on training data and projects to lower dimensions.
+     5	"""
+     6	
+     7	import pickle
+     8	from dataclasses import dataclass
+     9	from pathlib import Path
+    10	
+    11	import numpy as np
+    12	from sklearn.decomposition import PCA
+    13	
+    14	
+    15	@dataclass
+    16	class PCAModel:
+    17	    """PCA model with metadata."""
+    18	
+    19	    components: np.ndarray  # [n_components, D]
+    20	    mean: np.ndarray  # [D]
+exec
+/bin/bash -lc "nl -ba src/phase0/clustering/vq.py | sed -n '1,340p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 33ms:
+     1	"""
+     2	K-means vector quantization for context clustering.
+     3	
+     4	Fits k-means on training data and assigns cluster IDs.
+     5	"""
+     6	
+     7	import pickle
+     8	from dataclasses import dataclass
+     9	from pathlib import Path
+    10	from typing import Optional
+    11	
+    12	import numpy as np
+    13	from sklearn.cluster import KMeans
+    14	
+    15	
+    16	@dataclass
+    17	class ClusterModel:
+    18	    """K-means clustering model with metadata."""
+    19	
+    20	    centroids: np.ndarray  # [K, D]
+exec
+/bin/bash -lc "nl -ba src/phase0/metrics/variance_ratio.py | sed -n '1,260p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+     1	"""
+     2	Variance ratio metric for evaluating cluster quality.
+     3	
+     4	The variance ratio measures how much within-cluster variance is reduced
+     5	relative to total variance. Lower is better (clusters explain more variance).
+     6	
+     7	variance_ratio = SSE_within / SSE_total
+     8	
+     9	Target: < 0.6 (clusters explain >40% of variance)
+    10	"""
+    11	
+    12	import numpy as np
+    13	from typing import Optional
+    14	
+    15	
+    16	def compute_total_sse(
+    17	    deltas: np.ndarray,
+    18	) -> float:
+    19	    """
+    20	    Compute total sum of squared errors from global mean.
+exec
+/bin/bash -lc "nl -ba src/phase0/analysis/run_phase0.py | sed -n '1,340p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+     1	"""
+     2	Main orchestrator for Phase 0 analysis.
+     3	
+     4	Runs all conditions × lags × slices and computes all metrics.
+     5	
+     6	CRITICAL: Conditioning models (PCA, k-means, quartile bins) are fit ONCE per lag
+     7	on ALL train frames. Confound slices then evaluate using the same models but
+     8	filtering the sample set. This ensures confound checks test whether structure
+     9	*persists* under subset selection, not whether structure can be *rediscovered*.
+    10	"""
+    11	
+    12	import json
+    13	from pathlib import Path
+    14	from typing import Optional
+    15	
+    16	import numpy as np
+    17	import pandas as pd
+    18	import yaml
+    19	
+    20	from ..data.io import LatentStore, load_frames_index
+exec
+/bin/bash -lc "nl -ba src/phase0/metrics/speaker_stats.py | sed -n '1,320p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+     1	"""
+     2	Per-speaker statistics for cross-speaker analysis.
+     3	
+     4	Computes metrics per speaker and aggregates to detect speaker-specific effects.
+     5	"""
+     6	
+     7	import numpy as np
+     8	from typing import Optional
+     9	from scipy import stats
+    10	
+    11	from .variance_ratio import compute_variance_ratio
+    12	from .entropy import compute_entropy_reduction
+    13	
+    14	
+    15	def compute_speaker_level_metrics(
+    16	    deltas: np.ndarray,
+    17	    cluster_ids: np.ndarray,
+    18	    speaker_ids: np.ndarray,
+    19	    effective_clusters: Optional[np.ndarray] = None,
+    20	    min_samples_per_speaker: int = 50,
+exec
+/bin/bash -lc "nl -ba src/phase0/features/normalization.py | sed -n '1,260p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+     1	"""
+     2	Delta normalization for target variable.
+     3	
+     4	Computes velocity (Δx = x[t] - x[t-1]) and normalizes globally.
+     5	"""
+     6	
+     7	import json
+     8	from dataclasses import dataclass
+     9	from pathlib import Path
+    10	from typing import Optional
+    11	
+    12	import numpy as np
+    13	
+    14	
+    15	@dataclass
+    16	class NormalizationStats:
+    17	    """Global normalization statistics for delta computation."""
+    18	
+    19	    mu: np.ndarray  # [D] mean
+    20	    sigma: np.ndarray  # [D] std
+exec
+/bin/bash -lc "nl -ba src/phase0/metrics/entropy.py | sed -n '1,260p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+     1	"""
+     2	Diagonal Gaussian entropy for evaluating cluster quality.
+     3	
+     4	Computes entropy reduction under diagonal Gaussian assumption.
+     5	H ∝ (1/2) Σ_d log(σ_d^2)
+     6	"""
+     7	
+     8	import numpy as np
+     9	from typing import Optional
+    10	
+    11	
+    12	def compute_diagonal_gaussian_entropy(
+    13	    data: np.ndarray,
+    14	    min_var: float = 1e-10,
+    15	) -> float:
+    16	    """
+    17	    Compute diagonal Gaussian entropy (up to constant).
+    18	
+    19	    H ∝ (1/2) Σ_d log(σ_d^2)
+    20	
+exec
+/bin/bash -lc "nl -ba src/phase0/analysis/run_phase0.py | sed -n '90,260p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 30ms:
+    90	        key = (row["utterance_id"], row["t"])
+    91	        if key in key_to_idx:
+    92	            mask[key_to_idx[key]] = True
+    93	
+    94	    return mask
+    95	
+    96	
+    97	def collect_all_features_and_deltas(
+    98	    frames: pd.DataFrame,
+    99	    latent_store: LatentStore,
+   100	    window_size: int,
+   101	    lag: int,
+   102	    max_samples: Optional[int] = None,
+   103	) -> dict:
+   104	    """
+   105	    Collect BOTH mean and flat features in a single pass to ensure alignment.
+   106	
+   107	    This is critical: features and deltas must correspond to the same frames.
+   108	
+   109	    Returns:
+
+thinking
+**Continuing the analysis**
+
+I need to complete the run_full_analysis related to memory aspects. I'm curious whether all the training and evaluation features are collected simultaneously. It’s one of those details that could make a significant difference in understanding the overall effectiveness. Let’s keep digging into this; I want to get it right and cover all angles! There’s likely a lot more to uncover in this area.
+exec
+/bin/bash -lc "nl -ba src/phase0/analysis/run_phase0.py | sed -n '260,520p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+   260	    else:
+   261	        raise ValueError(f"Unknown condition type: {cond_type}")
+   262	
+   263	
+   264	def compute_slice_metrics(
+   265	    deltas_norm: np.ndarray,
+   266	    cluster_ids: np.ndarray,
+   267	    speaker_ids: np.ndarray,
+   268	    effective_clusters: np.ndarray,
+   269	    slice_mask: np.ndarray,
+   270	) -> dict:
+   271	    """
+   272	    Compute metrics on a slice of the data.
+   273	
+   274	    Args:
+   275	        deltas_norm: Normalized deltas [N, D]
+   276	        cluster_ids: Cluster assignments [N]
+   277	        speaker_ids: Speaker IDs [N]
+   278	        effective_clusters: Array of effective cluster IDs
+   279	        slice_mask: Boolean mask for slice [N]
+
+thinking
+**Considering memory and lines**
+
+I need to think about how to manage the lines beyond 520 for saving tables and such. It seems like the memory hotspots might occur earlier than that. I should focus on ensuring we can open the full remainder of the lines starting from 520 onwards for a better organization. Let’s make sure everything is clear and well-managed!
+exec
+/bin/bash -lc "nl -ba src/phase0/analysis/run_phase0.py | sed -n '520,760p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 32ms:
+   520	            "train_entropy_reduction": r["train"]["entropy_reduction"],
+   521	            "eval_entropy_reduction": r["eval"]["entropy_reduction"],
+   522	            "cross_speaker_degradation": r["cross_speaker_degradation"],
+   523	            "random_baseline": r["random_baseline_variance_ratio"],
+   524	            "random_baseline_eval": r["random_baseline_eval_variance_ratio"],
+   525	            "n_effective_clusters": r["n_effective_clusters"],
+   526	            "train_n_samples": r["train"]["n_samples"],
+   527	            "eval_n_samples": r["eval"]["n_samples"],
+   528	            "train_excluded_mass": r["train"]["excluded_mass"],
+   529	            "eval_excluded_mass": r["eval"]["excluded_mass"],
+   530	            "train_speaker_ci_lower": r["train"]["speaker_ci_lower"],
+   531	            "train_speaker_ci_upper": r["train"]["speaker_ci_upper"],
+   532	        })
+   533	
+   534	    df = pd.DataFrame(rows)
+   535	    df.to_csv(config["output"]["tables_file"], index=False)
+   536	
+   537	    logger.info(f"\nResults saved to {metrics_path}")
+   538	    return {"results": all_results, "table": df}
+exec
+/bin/bash -lc "nl -ba src/phase0/analysis/run_phase0.py | sed -n '370,460p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+   370	    all_results = []
+   371	
+   372	    for lag in lags:
+   373	        logger.info(f"\n{'='*50}")
+   374	        logger.info(f"Processing lag={lag}")
+   375	        logger.info("=" * 50)
+   376	
+   377	        # Step 1: Collect ALL features and deltas for this lag (single pass)
+   378	        logger.info("Collecting train features...")
+   379	        train_data = collect_all_features_and_deltas(
+   380	            train_frames, latent_store, window_size, lag, max_samples=max_samples
+   381	        )
+   382	        logger.info(f"Train samples: {len(train_data['deltas'])}")
+   383	
+   384	        logger.info("Collecting eval features...")
+   385	        eval_data = collect_all_features_and_deltas(
+   386	            eval_frames, latent_store, window_size, lag, max_samples=max_samples
+   387	        )
+   388	        logger.info(f"Eval samples: {len(eval_data['deltas'])}")
+   389	
+
+thinking
+**Evaluating memory requirements**
+
+I'm thinking about how the `collect_all_features_and_deltas` function builds lists for mean and flat features, deltas, speaker IDs, and frame keys. With over 100K samples, each list holds arrays and final numpy arrays, like `features_mean` and `features_flat`, which could lead to out-of-memory (OOM) issues if dimensions are too large. I need to estimate the value for D, possibly checking the configuration or the VAE to see if it’s around 64. Let's take a look at `configs/phase0.yaml`.
+exec
+/bin/bash -lc 'cat configs/phase0.yaml' in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 29ms:
+# Phase 0 Configuration: Audio Latent Structure Analysis
+# ===========================================================================
+# This config controls the data analysis pipeline to determine whether
+# audio latents exhibit reusable local structure suitable for conditional
+# memory mechanisms.
+
+data:
+  librispeech_path: ./data/LibriSpeech
+  subset: train-clean-100
+  min_duration_sec: 3.0
+
+vae:
+  sample_rate: 24000
+  frame_rate: 12.5
+  latent_dim: 512
+  frame_size: 1920  # samples per latent frame
+
+splits:
+  n_train_speakers: 200
+  n_eval_speakers: 51
+
+
+
+thinking
+**Evaluating memory usage**
+
+I’m looking at how numpy’s subtract function utilizes float32 for results, while my feature list collects feat_mean as float64. When I convert this to a float32 array, there’s a concern about memory usage during collection. Each sample may be float64, which could lead to high overhead. If I have around 100,000 arrays, this could mean considerable memory usage due to individual array overhead. It seems I might peak around 3.2GB when factoring in all elements.
+thinking
+**Assessing memory limits**
+
+I'm examining the memory needed for simultaneously training and evaluating, and it could exceed 12GB largely because of PCA copies. Each row might allocate a delta array of float32, which adds up. The calculation around assigning clusters involves broadcasting, which retains the float32 format. When I look at the mean vector quantization (vq) with large batch sizes, the memory required soars up to 1.31GB! If I use a smaller batch size like 1,000, I can reduce the memory footprint significantly.
+thinking
+**Calculating PCA memory usage**
+
+I’m calculating memory requirements for PCA-based vector quantization. With D set to 8 and K at 256, the differences calculate to 20.48 million floats, which is about 82MB, and that seems manageable. Now, for pca_quartile, I wonder if assign_quartile_bins will also involve broadcasting. I think it’s important to inspect the quantile aspect to ensure I’m fully accounting for how memory might change. Let’s see how that plays out.
+exec
+/bin/bash -lc "nl -ba src/phase0/clustering/quantile.py | sed -n '1,320p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 31ms:
+     1	"""
+     2	Quartile binning for axis-aligned discretization.
+     3	
+     4	Bins each PCA dimension into quartiles and hashes to bin IDs.
+     5	"""
+     6	
+     7	import pickle
+     8	from dataclasses import dataclass
+     9	from pathlib import Path
+    10	
+    11	import numpy as np
+    12	
+    13	
+    14	@dataclass
+    15	class QuartileBinModel:
+    16	    """Quartile binning model with edge values."""
+    17	
+    18	    edges: np.ndarray  # [n_dims, 3] quartile edges (25%, 50%, 75%) per dimension
+    19	    n_dims: int
+    20	    n_train_samples: int
+
+
+thinking
+**Analyzing memory usage**
+
+I'm focusing on the user's request to review memory usage in specific scripts and dependencies. They mentioned that using PCA on large arrays can lead to out-of-memory (OOM) issues, especially on a 12GB Colab instance. I'll examine large array allocations, memory accumulation in data collection loops, PCA fitting with high-dimensional data, and broadcast operations that create large intermediate arrays. My goal is to produce a detailed markdown report with specific line numbers and memory estimates, without making any code changes. I'll use D=512, W=8, and N=100K for size calculations.
+thinking
+**Inspecting memory hotspots**
+
+I’m looking into scripts 04 and 05, along with their dependencies like run_phase0, which seem to have significant memory issues compared to script 05. In script 04, features_mean and features_flat are collected separately, resulting in a double pass, and models are fitted sequentially but retain both arrays in memory at once, which is problematic. Also, the assign_clusters function causes a huge broadcast difference using a batch size of 10,000 and K up to 64. I need to check if the baseline permute_cluster_ids allocates a copy of cluster_ids.
+exec
+/bin/bash -lc "nl -ba src/phase0/clustering/baselines.py | sed -n '1,200p'" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 35ms:
+     1	"""
+     2	Baseline clustering methods for control experiments.
+     3	
+     4	Provides random cluster assignments that preserve cluster size distribution.
+     5	"""
+     6	
+     7	import numpy as np
+     8	
+     9	
+    10	def create_random_clusters(
+    11	    n_samples: int,
+    12	    k: int,
+    13	    seed: int = 42,
+    14	) -> np.ndarray:
+    15	    """
+    16	    Create random cluster assignments.
+    17	
+    18	    Args:
+    19	        n_samples: Number of samples
+    20	        k: Number of clusters
+
+
+
+
+
+
+
+thinking
+**Evaluating PCA and KMeans behavior**
+
+I’m looking into how PCA works when `copy=True`. It copies the input data, which likely means float32 might stay float32 during centering, but they might choose to center in float64 for numerical accuracy. Sklearn PCA centralizes the data, which can mean allocating a copy of size N*D—so for float32, it could be around 1.53 GiB, or 3.06 GiB if float64 is used. KMeans also fits floating numbers in float64. Plus, I'm considering how broadcasting works in the PCA process and the resulting array sizes as well!
+thinking
+**Analyzing memory allocation in PCA**
+
+I’m calculating the memory implications for features and centered arrays, which is around 1.53GB each. When performing the dot product on these, it seems that the return should also be float32, but there’s a possibility it could get cast to float64 when using np.dot. So, I anticipate that during project_pca's peak, the total allocation could reach about 3.06GB including the output. For the normalization step, subtracting mu from deltas will create additional allocations, possibly leading up to 400MB for both training and evaluation phases, and certain computations might demand even more.
+thinking
+**Analyzing memory overhead in slicing**
+
+When applying the slice mask, I noticed that the `key_to_idx` dictionary gets built based on the length of the `frame_keys` list. For N=100k, that could mean around 50MB just for this dictionary, which is created twice for training and evaluation per condition. Each call to `apply_slice_mask` builds this dictionary, leading to significant overhead. While the dictionary's impact is minor compared to larger arrays, it’s still notable, especially given the memory usage from the tuples and their overhead. So, I should focus on the main bottlenecks before anything.
+thinking
+**Assessing memory usage in scripts**
+
+I need to point out that the `scripts/04_fit_conditioning` collects features twice during the run_phase0, which impacts memory. I’ll provide line numbers and some estimates for clarity. It could also be useful to check earlier scripts like `03_builds_dataset`, although that isn’t strictly necessary. Key functions to highlight include `collect_all_features_and_deltas`, `project_pca`, `assign_clusters`, and the PCA fit function. Notably, `get_context_flat` uses flattening that could lead to significant memory usage at around 16KB per sample for 100k samples, totaling about 1.6GB. Also, `collect_all_features_and_deltas` and `collect_train_features` could cause OOM issues when using list accumulation. We should compute peak memory estimates during feature collection to evaluate all the peaks and potential overages.
+thinking
+**Calculating memory usage in feature collection**
+
+I need to address how lists convert to np.array, which leads to both the old and new arrays existing simultaneously. The peak memory could be around 3.1GB for just flat features. Then I see that copying means extra peaks, as mean features and deltas add about 614MB combined. Also, `assign_clusters` and other calculations can cause OOM issues due to their significant memory usage, particularly with intermediate arrays being created. Cumulatively, it’s quite possible to reach 8-10GB when considering all outputs! I need to provide precise memory calculations for clarity.
+thinking
+**Identifying memory bottlenecks**
+
+In the run_full_analysis, I notice it retains both train_data["deltas"] and train_deltas_norm, adding about 190MB. This extends to distances and cluster ids, but these aren't too large. The PCA process may double memory needs, reaching a peak of 3-6 GiB. If samples exceed 100k, this could lead to OOM errors, particularly during PCA fitting and cluster assignment. It’s also essential to highlight scripts and line numbers for clarity and pinpoint any excessive copies made in memory. We may need to compute memory for larger sample sizes too!
+thinking
+**Identifying memory bottlenecks and dependencies**
+
+I'm reviewing various scripts to pinpoint memory bottlenecks that could lead to OOM on a 12GB Colab instance. Lines in several scripts, like `run_phase0` and `collect_all_features_and_deltas`, show simultaneous storage of train and eval data. Others, such as `fit_pca` and `assign_clusters`, use large intermediate arrays. The frames index from `script 03_build_phase0_dataset` could also be hefty with potential millions of rows. I need to summarize these findings for the report and ensure I provide the exact line numbers and markdown format as requested!
+Plan update
+  ✓ Scan scripts for allocations
+  → Trace src/phase0 dependencies
+  • Estimate memory for 100K+
+  • Write Markdown report
+exec
+/bin/bash -lc "python - <<'PY'
+import math
+GiB=1024**3
+MiB=1024**2
+N=100_000
+D=512
+W=8
+flat=W*D
+sizes={
+ 'feat_mean_f32':N*D*4,
+ 'feat_mean_f64':N*D*8,
+ 'feat_flat_f32':N*flat*4,
+ 'feat_flat_f64':N*flat*8,
+ 'deltas_f32':N*D*4,
+ 'bins_per_dim_int32':N*8*4,
+ 'diff_assign_clusters_mean_batch10k':10_000*64*512*4,
+ 'diff_assign_clusters_mean_batch1k':1_000*64*512*4,
+ 'mask_bool_N':N*1,
+}
+for k,v in sizes.items():
+    print(f\"{k:28s} {v/MiB:10.1f} MiB  ({v/GiB:5.2f} GiB)\")
+PY" in /mnt/c/Users/Riley/Desktop/a-tier-corp/engramAudio succeeded in 86ms:
+feat_mean_f32                     195.3 MiB  ( 0.19 GiB)
+feat_mean_f64                     390.6 MiB  ( 0.38 GiB)
+feat_flat_f32                    1562.5 MiB  ( 1.53 GiB)
+feat_flat_f64                    3125.0 MiB  ( 3.05 GiB)
+deltas_f32                        195.3 MiB  ( 0.19 GiB)
+bins_per_dim_int32                  3.1 MiB  ( 0.00 GiB)
+diff_assign_clusters_mean_batch10k     1250.0 MiB  ( 1.22 GiB)
+diff_assign_clusters_mean_batch1k      125.0 MiB  ( 0.12 GiB)
+mask_bool_N                         0.1 MiB  ( 0.00 GiB)
+
+thinking
+**Updating plan progress**
+
+I've computed the sizes, so now I need to update the plan. Step 2 is completed and I'm working on step 3. It's good to see progress being made! Keeping clear track of these steps helps ensure everything stays organized. I'll make sure to note any changes or adjustments along the way, so as I finish up step 3, I can move forward smoothly. Time to get focused on the next task!
+Plan update
+  ✓ Scan scripts for allocations
+  ✓ Trace src/phase0 dependencies
+  → Estimate memory for 100K+
+  • Write Markdown report
+
+
+
+
+
+thinking
+**Estimating memory usage**
+
+I'm focusing on memory estimates for various bottleneck scenarios, also noting stack peaks. For the `run_full_analysis`, it keeps both `train_data` and `eval_data` in memory at the same time. With 100k each, the base features take around 1.92GB per split, totaling about 3.84GB for two splits. When I include normalizations and PCA conditions, the peak memory usage could reach around 10-12GB, approaching limits. It's a lot to consider!
+thinking
+**Analyzing memory overhead**
+
+I need to account for other overheads where list arrays in `collect_all_features_and_deltas` might peak at 3-4GB, leading to overall estimates exceeding 12GB. The function `fit_condition_models` applies KMeans, which is small, but `fit_kmeans` on `train_features_mean` may allocate additional memory. While collecting `feat_flat`, both `feat_mean` and deltas are present, totaling around 3.4GB. Additionally, since mean computation returns float64, it could double memory use in feature lists. I'll specify relevant line numbers for clarity.
+thinking
+**Reviewing computational efficiency**
+
+When working with specific functions like `assign_clusters` and `compute_total_sse`, it’s clear they create large intermediate arrays, especially with the delta normalization and mean calculations. The `diff` expressions can grow quite large, so I could consider using `sklearn.metrics.pairwise_distances_argmin_min` instead, though that wasn't requested.
+
+I also have some helpful follow-up suggestions: using incremental PCA for batch processing, switching to memmap or zarr for efficient memory use, pre-allocating arrays, and enforcing float32 to prevent float64 temporary size increases. Keeping my options open helps!
+thinking
+**Optimizing memory and performance**
+
+I realize that flattening always creates copies, but context slices might not be contiguous. Using `ravel` could improve this since it might not copy, and I could preallocate flat output as needed. For `assign_clusters`, I could reduce the batch size for mean_vq or apply the squared distance formula to avoid generating large 3D differences, which would save memory significantly.
+
+Also, for `compute_variance_ratio`, I want to avoid allocating large arrays by using stable and incremental formulas. Lastly, I should consider merging frame keys only once and being selective about collecting features needed for PCA conditions.
+thinking
+**Creating a detailed report**
+
+The user's task is to identify remaining bottlenecks, and they want a "detailed report" with specific line numbers and memory estimates. I think including a table-like bullet list could be effective. I should structure it with sections like "Rationale" to clarify my points. Since there are no files changed, I'll provide an update plan, noting that step 3 is completed and step 4 is currently in progress. I'll make sure to keep everything organized and clear!
+Plan update
+  ✓ Scan scripts for allocations
+  ✓ Trace src/phase0 dependencies
+  ✓ Estimate memory for 100K+
+  → Write Markdown report
+Plan update
+  ✓ Scan scripts for allocations
+  ✓ Trace src/phase0 dependencies
+  ✓ Estimate memory for 100K+
+  ✓ Write Markdown report
+codex
+# Summary
+
+A 12GB Colab OOM is still plausible at 100K+ samples primarily due to (a) storing multiple large `[N, W*D]` feature matrices in RAM at once, (b) list→`np.array(...)` materialization peaks during feature collection, (c) PCA fit/transform creating full-size centered copies, and (d) the current `assign_clusters()` broadcast (`[batch, K, D]`) which is *especially* large for `mean_pool_vq` (D=512) even with batching.
+
+Assumptions for estimates below (from `configs/phase0.yaml`): latent dim `D=512`, context window `W=8` so flattened dim `W*D=4096`, and float32 unless noted.
+
+---
+
+# What changed
+
+- No files changed (analysis only).
+
+---
+
+# Rationale
+
+## 1) Large array allocations (persistent)
+
+### Flat context features are inherently large
+- `scripts/04_fit_conditioning.py:148-151` collects `feat_flat` as a full dense array.
+- `src/phase0/analysis/run_phase0.py:162-168` stores both `features_mean` and `features_flat` (and deltas) in RAM.
+
+Memory for **N=100,000**:
+- `features_flat` float32 `[N, 4096]`: **~1562.5 MiB (1.53 GiB)**.
+- `features_mean` float32 `[N, 512]`: **~195.3 MiB**.
+- `deltas` float32 `[N, 512]`: **~195.3 MiB**.
+
+So per split (train *or* eval) in `run_phase0.collect_all_features_and_deltas()` you’re at roughly:
+- **~1.53 GiB + 0.19 GiB + 0.19 GiB ≈ 1.91 GiB** (plus Python/pandas overhead).
+
+### `run_full_analysis()` holds train and eval arrays simultaneously
+- `src/phase0/analysis/run_phase0.py:379-388` collects and retains both `train_data` and `eval_data` concurrently.
+
+If train and eval are each ~100K samples, just these persistent arrays are roughly:
+- **~1.91 GiB (train) + ~1.91 GiB (eval) ≈ 3.82 GiB**, before normalization, PCA, clustering, slicing copies, etc.
+
+### Normalization produces additional full-size arrays
+- `src/phase0/analysis/run_phase0.py:395-396` calls `normalize_delta()` for both splits.
+- `src/phase0/features/normalization.py:102` does `(delta - mu) / sigma` which typically allocates at least one full intermediate plus the output.
+
+For **each** split:
+- `train_deltas_norm` float32 `[N, 512]`: **~195.3 MiB** (same for eval).
+So add **~390.6 MiB** persistent across both splits (and often more transient during the operation).
+
+## 2) Data collection loops that accumulate in memory (and spike at materialization)
+
+### Lists of per-sample arrays + final stacked arrays => peak ~2× (or worse)
+- `scripts/04_fit_conditioning.py:40-85` accumulates `features_list`, `deltas_list`, then converts to `np.array(...)`.
+- `src/phase0/analysis/run_phase0.py:119-168` does the same but for **both** mean and flat features, plus deltas.
+
+Key peak behavior:
+- Each sample’s `feat_flat` is created as a standalone numpy array (`flatten()`), stored in a Python list, and then copied again into a contiguous `[N, 4096]` array at `np.array(...)`.
+- At the moment of conversion, you can transiently hold:
+  - the **list of N arrays** (already ~1.53 GiB of raw float32 data for flat),
+  - plus the new contiguous **output array** (~1.53 GiB),
+  - plus overhead for 100K Python objects.
+- That makes **~3.0 GiB+ peak** *just for flat features*, inside `collect_all_features_and_deltas()`.
+
+### `get_context_mean()` returns float64 by default (extra memory in the lists)
+- `src/phase0/features/context.py:43-44` uses `context.mean(axis=0)`; numpy’s default mean accumulator/output for float32 input is typically float64.
+- That means the per-sample arrays appended at:
+  - `scripts/04_fit_conditioning.py:68` and
+  - `src/phase0/analysis/run_phase0.py:146`
+  are likely float64 until the final `dtype=np.float32` conversion.
+
+For **N=100K**, mean features in the list can be roughly:
+- float64 `[N, 512]`: **~390.6 MiB** in list element payloads alone (before stacking to float32).
+
+### `get_context_flat()` always copies per sample
+- `src/phase0/features/context.py:76-77` uses `context.flatten()`, which **always** returns a copy.
+- This guarantees per-sample allocations of size `4096 * 4 = 16 KiB`.
+- For 100K samples, that is ~1.53 GiB of allocations just to populate the list, *before* the final stacked array is built.
+
+## 3) PCA fitting on high-dimensional data
+
+### PCA fit on `[N, 4096]` can be multi-gigabyte even before SVD work buffers
+- `src/phase0/clustering/pca.py:53-55` calls `sklearn.decomposition.PCA.fit(features)`.
+
+Risk factors:
+- sklearn PCA centers data; centering frequently creates a full-size copy of X (size `N*D`).
+- sklearn often operates in float64 internally depending on validation paths and solver decisions, which can double memory.
+
+For **N=100K, D=4096**:
+- X float32: **~1.53 GiB**
+- X float64: **~3.05 GiB**
+- A centered copy of X is another **~1.53–3.05 GiB**.
+So PCA fit can easily push transient usage into **~3–6+ GiB** territory *just for the PCA input and centering*, excluding other arrays already resident (train/eval features/deltas).
+
+### PCA projection (`project_pca`) creates a full centered intermediate
+- `src/phase0/clustering/pca.py:80-82`:
+  - `centered = features - model.mean` allocates a full `[N, D]` array.
+  - `np.dot(centered, model.components.T)` then computes the low-d output.
+
+If `features` is `features_flat` `[100K, 4096]` float32:
+- `centered` is another **~1.53 GiB** transient allocation per call.
+
+In `run_full_analysis`, PCA-based conditions call `project_pca()` for:
+- train (`src/phase0/analysis/run_phase0.py:251-253` via `assign_condition_clusters()`)
+- eval (same path)
+So you get **repeated 1.53 GiB transient spikes** during cluster assignment for PCA-based conditions.
+
+## 4) Broadcast operations creating huge intermediate arrays
+
+### The biggest immediate OOM risk: `assign_clusters()` diff tensor
+- `src/phase0/clustering/vq.py:96-103`:
+  - `diff = batch[:, None, :] - model.centroids[None, :, :]` creates `[batch, K, D]`.
+  - `sq_dists = np.sum(diff**2, axis=2)` also materializes `diff**2` (another `[batch, K, D]` temporary).
+
+For the **mean_pool_vq** condition (`K=64`, `D=512`) with default `batch_size=10000`:
+- `diff` size = `10000*64*512` float32 = **~1250 MiB (1.22 GiB)**.
+- `diff**2` can be another **~1.22 GiB** transient.
+- Peak inside the loop can be **~2.4+ GiB** *just for distance computation*, on top of already-resident train/eval feature matrices.
+
+This is a direct OOM trigger when combined with:
+- resident `features_flat` (~1.53 GiB per split),
+- resident `features_mean`/`deltas`/normalized deltas,
+- PCA centering copies (for PCA conditions),
+- pandas frames and Python object overhead.
+
+### Other broadcast/copy sites that add meaningful pressure
+- `src/phase0/features/normalization.py:102` `(delta - mu) / sigma` (full-size intermediates for `[N, 512]`).
+- `src/phase0/metrics/variance_ratio.py:28-31` `diff = deltas - global_mean` and `diff**2` for `[N, 512]` (extra hundreds of MiB transient for large slices).
+
+### Slice filtering creates full copies (not views)
+- `src/phase0/analysis/run_phase0.py:285-287` boolean indexing:
+  - `deltas_slice = deltas_norm[slice_mask]` is a copy.
+- For the `"all"` slice, that copy is essentially the whole array:
+  - another **~195 MiB** for train + **~195 MiB** for eval per condition per lag (transient, but repeated).
+
+### `apply_slice_mask()` builds a large dict repeatedly
+- `src/phase0/analysis/run_phase0.py:73-75` builds `key_to_idx = {k: i ...}` over all `frame_keys`.
+- Called at `src/phase0/analysis/run_phase0.py:452-453` for each slice, and inside the condition loop.
+- For 100K keys, this is a non-trivial extra memory/time cost (tens of MB depending on Python’s dict overhead), but typically secondary compared to the multi-GB numpy allocations above.
+
+---
+
+# Risks / edge cases
+
+- If “100K+ samples” means **per split per lag** (not total), memory scales linearly and the flat feature matrix alone can exceed Colab capacity when combined with PCA and clustering.
+- Longer utterances increase per-utterance `x = latent_store.get_latents(utt_id)` size (`src/phase0/analysis/run_phase0.py:130` / `scripts/04_fit_conditioning.py:51`), which adds additional transient pressure.
+- sklearn implementation details (PCA/KMeans dtype casting, solver choice, copies during centering) can change memory peaks substantially; worst-case peaks are plausibly several GiB higher than the “raw array size” math.
+- The **mean_vq64** path is uniquely risky because it combines:
+  - high D=512, and
+  - a broadcast distance computation (`[batch, K, D]`) that is huge at `batch_size=10000`.
+
+---
+
+# Follow-ups
+
+- Reduce/replace the `[batch, K, D]` broadcast in `src/phase0/clustering/vq.py:101-103`:
+  - either lower `batch_size` specifically for high-D conditions (e.g., 500–2000), or
+  - compute squared distances via `||x||^2 + ||c||^2 - 2 x·c` to avoid 3D intermediates entirely.
+- Avoid list-of-arrays accumulation for flat features (`scripts/04_fit_conditioning.py:40-85`, `src/phase0/analysis/run_phase0.py:119-168`):
+  - preallocate if N is known, or
+  - write features incrementally to a memmap/zarr/npz and stream into PCA/KMeans.
+- Make `get_context_mean()` stay float32 to avoid float64 per-sample arrays (`src/phase0/features/context.py:44`), e.g. by specifying an explicit dtype for the reduction.
+- Replace `flatten()` with a view when possible (`src/phase0/features/context.py:77`) to reduce per-sample allocations (or build flat features into a preallocated output buffer).
+- Use incremental / streaming dimensionality reduction for PCA-based conditions (`src/phase0/clustering/pca.py:53-55`), e.g. `IncrementalPCA` with chunking, to avoid holding/centering the full `[N, 4096]` matrix.
+- In `run_full_analysis`, consider not holding both train and eval full feature matrices simultaneously (`src/phase0/analysis/run_phase0.py:379-388`): collect/transform/assign in phases to lower the resident set size.
+- Reduce slice-copy overhead by computing metrics without materializing full slice copies where feasible (`src/phase0/analysis/run_phase0.py:285-287`), and avoid rebuilding `key_to_idx` for every slice (`src/phase0/analysis/run_phase0.py:73-75`).
+tokens used
+48,145
+# Summary
+
+A 12GB Colab OOM is still plausible at 100K+ samples primarily due to (a) storing multiple large `[N, W*D]` feature matrices in RAM at once, (b) list→`np.array(...)` materialization peaks during feature collection, (c) PCA fit/transform creating full-size centered copies, and (d) the current `assign_clusters()` broadcast (`[batch, K, D]`) which is *especially* large for `mean_pool_vq` (D=512) even with batching.
+
+Assumptions for estimates below (from `configs/phase0.yaml`): latent dim `D=512`, context window `W=8` so flattened dim `W*D=4096`, and float32 unless noted.
+
+---
+
+# What changed
+
+- No files changed (analysis only).
+
+---
+
+# Rationale
+
+## 1) Large array allocations (persistent)
+
+### Flat context features are inherently large
+- `scripts/04_fit_conditioning.py:148-151` collects `feat_flat` as a full dense array.
+- `src/phase0/analysis/run_phase0.py:162-168` stores both `features_mean` and `features_flat` (and deltas) in RAM.
+
+Memory for **N=100,000**:
+- `features_flat` float32 `[N, 4096]`: **~1562.5 MiB (1.53 GiB)**.
+- `features_mean` float32 `[N, 512]`: **~195.3 MiB**.
+- `deltas` float32 `[N, 512]`: **~195.3 MiB**.
+
+So per split (train *or* eval) in `run_phase0.collect_all_features_and_deltas()` you’re at roughly:
+- **~1.53 GiB + 0.19 GiB + 0.19 GiB ≈ 1.91 GiB** (plus Python/pandas overhead).
+
+### `run_full_analysis()` holds train and eval arrays simultaneously
+- `src/phase0/analysis/run_phase0.py:379-388` collects and retains both `train_data` and `eval_data` concurrently.
+
+If train and eval are each ~100K samples, just these persistent arrays are roughly:
+- **~1.91 GiB (train) + ~1.91 GiB (eval) ≈ 3.82 GiB**, before normalization, PCA, clustering, slicing copies, etc.
+
+### Normalization produces additional full-size arrays
+- `src/phase0/analysis/run_phase0.py:395-396` calls `normalize_delta()` for both splits.
+- `src/phase0/features/normalization.py:102` does `(delta - mu) / sigma` which typically allocates at least one full intermediate plus the output.
+
+For **each** split:
+- `train_deltas_norm` float32 `[N, 512]`: **~195.3 MiB** (same for eval).
+So add **~390.6 MiB** persistent across both splits (and often more transient during the operation).
+
+## 2) Data collection loops that accumulate in memory (and spike at materialization)
+
+### Lists of per-sample arrays + final stacked arrays => peak ~2× (or worse)
+- `scripts/04_fit_conditioning.py:40-85` accumulates `features_list`, `deltas_list`, then converts to `np.array(...)`.
+- `src/phase0/analysis/run_phase0.py:119-168` does the same but for **both** mean and flat features, plus deltas.
+
+Key peak behavior:
+- Each sample’s `feat_flat` is created as a standalone numpy array (`flatten()`), stored in a Python list, and then copied again into a contiguous `[N, 4096]` array at `np.array(...)`.
+- At the moment of conversion, you can transiently hold:
+  - the **list of N arrays** (already ~1.53 GiB of raw float32 data for flat),
+  - plus the new contiguous **output array** (~1.53 GiB),
+  - plus overhead for 100K Python objects.
+- That makes **~3.0 GiB+ peak** *just for flat features*, inside `collect_all_features_and_deltas()`.
+
+### `get_context_mean()` returns float64 by default (extra memory in the lists)
+- `src/phase0/features/context.py:43-44` uses `context.mean(axis=0)`; numpy’s default mean accumulator/output for float32 input is typically float64.
+- That means the per-sample arrays appended at:
+  - `scripts/04_fit_conditioning.py:68` and
+  - `src/phase0/analysis/run_phase0.py:146`
+  are likely float64 until the final `dtype=np.float32` conversion.
+
+For **N=100K**, mean features in the list can be roughly:
+- float64 `[N, 512]`: **~390.6 MiB** in list element payloads alone (before stacking to float32).
+
+### `get_context_flat()` always copies per sample
+- `src/phase0/features/context.py:76-77` uses `context.flatten()`, which **always** returns a copy.
+- This guarantees per-sample allocations of size `4096 * 4 = 16 KiB`.
+- For 100K samples, that is ~1.53 GiB of allocations just to populate the list, *before* the final stacked array is built.
+
+## 3) PCA fitting on high-dimensional data
+
+### PCA fit on `[N, 4096]` can be multi-gigabyte even before SVD work buffers
+- `src/phase0/clustering/pca.py:53-55` calls `sklearn.decomposition.PCA.fit(features)`.
+
+Risk factors:
+- sklearn PCA centers data; centering frequently creates a full-size copy of X (size `N*D`).
+- sklearn often operates in float64 internally depending on validation paths and solver decisions, which can double memory.
+
+For **N=100K, D=4096**:
+- X float32: **~1.53 GiB**
+- X float64: **~3.05 GiB**
+- A centered copy of X is another **~1.53–3.05 GiB**.
+So PCA fit can easily push transient usage into **~3–6+ GiB** territory *just for the PCA input and centering*, excluding other arrays already resident (train/eval features/deltas).
+
+### PCA projection (`project_pca`) creates a full centered intermediate
+- `src/phase0/clustering/pca.py:80-82`:
+  - `centered = features - model.mean` allocates a full `[N, D]` array.
+  - `np.dot(centered, model.components.T)` then computes the low-d output.
+
+If `features` is `features_flat` `[100K, 4096]` float32:
+- `centered` is another **~1.53 GiB** transient allocation per call.
+
+In `run_full_analysis`, PCA-based conditions call `project_pca()` for:
+- train (`src/phase0/analysis/run_phase0.py:251-253` via `assign_condition_clusters()`)
+- eval (same path)
+So you get **repeated 1.53 GiB transient spikes** during cluster assignment for PCA-based conditions.
+
+## 4) Broadcast operations creating huge intermediate arrays
+
+### The biggest immediate OOM risk: `assign_clusters()` diff tensor
+- `src/phase0/clustering/vq.py:96-103`:
+  - `diff = batch[:, None, :] - model.centroids[None, :, :]` creates `[batch, K, D]`.
+  - `sq_dists = np.sum(diff**2, axis=2)` also materializes `diff**2` (another `[batch, K, D]` temporary).
+
+For the **mean_pool_vq** condition (`K=64`, `D=512`) with default `batch_size=10000`:
+- `diff` size = `10000*64*512` float32 = **~1250 MiB (1.22 GiB)**.
+- `diff**2` can be another **~1.22 GiB** transient.
+- Peak inside the loop can be **~2.4+ GiB** *just for distance computation*, on top of already-resident train/eval feature matrices.
+
+This is a direct OOM trigger when combined with:
+- resident `features_flat` (~1.53 GiB per split),
+- resident `features_mean`/`deltas`/normalized deltas,
+- PCA centering copies (for PCA conditions),
+- pandas frames and Python object overhead.
+
+### Other broadcast/copy sites that add meaningful pressure
+- `src/phase0/features/normalization.py:102` `(delta - mu) / sigma` (full-size intermediates for `[N, 512]`).
+- `src/phase0/metrics/variance_ratio.py:28-31` `diff = deltas - global_mean` and `diff**2` for `[N, 512]` (extra hundreds of MiB transient for large slices).
+
+### Slice filtering creates full copies (not views)
+- `src/phase0/analysis/run_phase0.py:285-287` boolean indexing:
+  - `deltas_slice = deltas_norm[slice_mask]` is a copy.
+- For the `"all"` slice, that copy is essentially the whole array:
+  - another **~195 MiB** for train + **~195 MiB** for eval per condition per lag (transient, but repeated).
+
+### `apply_slice_mask()` builds a large dict repeatedly
+- `src/phase0/analysis/run_phase0.py:73-75` builds `key_to_idx = {k: i ...}` over all `frame_keys`.
+- Called at `src/phase0/analysis/run_phase0.py:452-453` for each slice, and inside the condition loop.
+- For 100K keys, this is a non-trivial extra memory/time cost (tens of MB depending on Python’s dict overhead), but typically secondary compared to the multi-GB numpy allocations above.
+
+---
+
+# Risks / edge cases
+
+- If “100K+ samples” means **per split per lag** (not total), memory scales linearly and the flat feature matrix alone can exceed Colab capacity when combined with PCA and clustering.
+- Longer utterances increase per-utterance `x = latent_store.get_latents(utt_id)` size (`src/phase0/analysis/run_phase0.py:130` / `scripts/04_fit_conditioning.py:51`), which adds additional transient pressure.
+- sklearn implementation details (PCA/KMeans dtype casting, solver choice, copies during centering) can change memory peaks substantially; worst-case peaks are plausibly several GiB higher than the “raw array size” math.
+- The **mean_vq64** path is uniquely risky because it combines:
+  - high D=512, and
+  - a broadcast distance computation (`[batch, K, D]`) that is huge at `batch_size=10000`.
+
+---
+
+# Follow-ups
+
+- Reduce/replace the `[batch, K, D]` broadcast in `src/phase0/clustering/vq.py:101-103`:
+  - either lower `batch_size` specifically for high-D conditions (e.g., 500–2000), or
+  - compute squared distances via `||x||^2 + ||c||^2 - 2 x·c` to avoid 3D intermediates entirely.
+- Avoid list-of-arrays accumulation for flat features (`scripts/04_fit_conditioning.py:40-85`, `src/phase0/analysis/run_phase0.py:119-168`):
+  - preallocate if N is known, or
+  - write features incrementally to a memmap/zarr/npz and stream into PCA/KMeans.
+- Make `get_context_mean()` stay float32 to avoid float64 per-sample arrays (`src/phase0/features/context.py:44`), e.g. by specifying an explicit dtype for the reduction.
+- Replace `flatten()` with a view when possible (`src/phase0/features/context.py:77`) to reduce per-sample allocations (or build flat features into a preallocated output buffer).
+- Use incremental / streaming dimensionality reduction for PCA-based conditions (`src/phase0/clustering/pca.py:53-55`), e.g. `IncrementalPCA` with chunking, to avoid holding/centering the full `[N, 4096]` matrix.
+- In `run_full_analysis`, consider not holding both train and eval full feature matrices simultaneously (`src/phase0/analysis/run_phase0.py:379-388`): collect/transform/assign in phases to lower the resident set size.
+- Reduce slice-copy overhead by computing metrics without materializing full slice copies where feasible (`src/phase0/analysis/run_phase0.py:285-287`), and avoid rebuilding `key_to_idx` for every slice (`src/phase0/analysis/run_phase0.py:73-75`).
+
+Finished: 2026-02-01T23:17:35-08:00
+Exit code: 0
