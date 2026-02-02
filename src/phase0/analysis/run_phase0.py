@@ -99,6 +99,7 @@ def collect_all_features_and_deltas(
     latent_store: LatentStore,
     window_size: int,
     lag: int,
+    max_samples: Optional[int] = None,
 ) -> dict:
     """
     Collect BOTH mean and flat features in a single pass to ensure alignment.
@@ -151,6 +152,12 @@ def collect_all_features_and_deltas(
             except Exception as e:
                 logger.warning(f"Error processing {utt_id}:{t}: {e}")
                 continue
+
+            if max_samples and len(features_mean_list) >= max_samples:
+                break
+
+        if max_samples and len(features_mean_list) >= max_samples:
+            break
 
     return {
         "features_mean": np.array(features_mean_list, dtype=np.float32),
@@ -312,6 +319,7 @@ def compute_slice_metrics(
 def run_full_analysis(
     config_path: str | Path,
     output_dir: Optional[str | Path] = None,
+    max_samples: Optional[int] = None,
 ) -> dict:
     """
     Run the complete Phase 0 analysis.
@@ -369,13 +377,13 @@ def run_full_analysis(
         # Step 1: Collect ALL features and deltas for this lag (single pass)
         logger.info("Collecting train features...")
         train_data = collect_all_features_and_deltas(
-            train_frames, latent_store, window_size, lag
+            train_frames, latent_store, window_size, lag, max_samples=max_samples
         )
         logger.info(f"Train samples: {len(train_data['deltas'])}")
 
         logger.info("Collecting eval features...")
         eval_data = collect_all_features_and_deltas(
-            eval_frames, latent_store, window_size, lag
+            eval_frames, latent_store, window_size, lag, max_samples=max_samples
         )
         logger.info(f"Eval samples: {len(eval_data['deltas'])}")
 

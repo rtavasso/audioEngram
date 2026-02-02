@@ -28,6 +28,12 @@ def main():
         default="configs/phase0.yaml",
         help="Path to config file",
     )
+    parser.add_argument(
+        "--max-samples",
+        type=int,
+        default=None,
+        help="Maximum samples per split (for memory-constrained environments)",
+    )
     args = parser.parse_args()
 
     # Load config
@@ -41,7 +47,7 @@ def main():
     logger.info("Running Phase 0 analysis...")
 
     # Run full analysis
-    results = run_full_analysis(args.config)
+    results = run_full_analysis(args.config, max_samples=args.max_samples)
 
     # Print summary
     logger.info("\n" + "=" * 70)
