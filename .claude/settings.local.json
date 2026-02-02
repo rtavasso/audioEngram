@@ -5,7 +5,10 @@
       "Bash(uv run:*)",
       "Bash(python3:*)",
       "Skill(codex)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(codex --help:*)",
+      "Bash(cat:*)",
+      "Bash(codex exec:*)"
     ]
   }
 }

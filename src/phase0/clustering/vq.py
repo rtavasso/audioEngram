@@ -176,14 +176,14 @@ def compute_cluster_stats(
     effective = get_effective_clusters(cluster_ids, k, min_size)
 
     n_total = len(cluster_ids)
-    n_in_effective = sum(counts[c] for c in effective)
-    excluded_mass = 1.0 - (n_in_effective / n_total) if n_total > 0 else 0.0
+    n_in_effective = int(counts[effective].sum()) if len(effective) > 0 else 0
+    excluded_mass = float(1.0 - (n_in_effective / n_total)) if n_total > 0 else 0.0
 
     return {
         "n_total_samples": n_total,
         "n_clusters": k,
         "n_effective_clusters": len(effective),
-        "n_in_effective_clusters": n_in_effective,
+        "n_in_effective_clusters": int(n_in_effective),
         "excluded_mass": excluded_mass,
         "cluster_sizes": counts.tolist(),
         "effective_cluster_ids": effective.tolist(),

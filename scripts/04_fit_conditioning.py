@@ -54,7 +54,9 @@ def collect_train_features(
             t = row["t"]
             speaker_id = row["speaker_id"]
 
-            if t < window_size + lag or t < 1:
+            # Context uses W frames ending at (t - lag), inclusive:
+            # start = (t - lag) - (W - 1) must be >= 0  ->  t >= (W - 1) + lag
+            if t < (window_size - 1) + lag or t < 1:
                 continue
 
             try:
