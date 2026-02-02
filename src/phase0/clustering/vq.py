@@ -74,6 +74,7 @@ def fit_kmeans(
 def assign_clusters(
     features: np.ndarray,
     model: ClusterModel,
+    batch_size: int = 10000,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Assign cluster IDs to features.
@@ -81,20 +82,32 @@ def assign_clusters(
     Args:
         features: Feature array [N, D]
         model: Fitted ClusterModel
+        batch_size: Process in batches to limit memory usage
 
     Returns:
         Tuple of (cluster_ids [N], distances [N])
     """
-    # Compute distances to all centroids
-    # features: [N, D], centroids: [K, D]
-    # dist[i, j] = ||features[i] - centroids[j]||^2
-    diff = features[:, None, :] - model.centroids[None, :, :]  # [N, K, D]
-    sq_dists = np.sum(diff**2, axis=2)  # [N, K]
+    n_samples = len(features)
+    cluster_ids = np.empty(n_samples, dtype=np.int32)
+    distances = np.empty(n_samples, dtype=np.float32)
 
-    cluster_ids = np.argmin(sq_dists, axis=1)  # [N]
-    distances = np.sqrt(sq_dists[np.arange(len(features)), cluster_ids])  # [N]
+    # Process in batches to avoid memory explosion
+    # Full broadcast would create [N, K, D] array which is huge
+    for start in range(0, n_samples, batch_size):
+        end = min(start + batch_size, n_samples)
+        batch = features[start:end]
 
-    return cluster_ids.astype(np.int32), distances.astype(np.float32)
+        # Compute distances for this batch only
+        diff = batch[:, None, :] - model.centroids[None, :, :]  # [batch, K, D]
+        sq_dists = np.sum(diff**2, axis=2)  # [batch, K]
+
+        batch_ids = np.argmin(sq_dists, axis=1)
+        batch_dists = np.sqrt(sq_dists[np.arange(len(batch)), batch_ids])
+
+        cluster_ids[start:end] = batch_ids
+        distances[start:end] = batch_dists
+
+    return cluster_ids, distances
 
 
 def get_cluster_sizes(cluster_ids: np.ndarray, k: int) -> np.ndarray:
