@@ -74,7 +74,7 @@ def fit_kmeans(
 def assign_clusters(
     features: np.ndarray,
     model: ClusterModel,
-    batch_size: int = 10000,
+    batch_size: int = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Assign cluster IDs to features.
@@ -88,6 +88,16 @@ def assign_clusters(
         Tuple of (cluster_ids [N], distances [N])
     """
     n_samples = len(features)
+    n_dims = features.shape[1]
+    k = model.k
+
+    # Auto-compute batch size to keep memory under ~500MB for the diff tensor
+    # diff tensor is [batch, K, D] * 4 bytes, plus diff**2 doubles it
+    # Target: batch * K * D * 8 bytes < 500MB => batch < 500MB / (K * D * 8)
+    if batch_size is None:
+        max_memory_bytes = 500 * 1024 * 1024  # 500 MB
+        batch_size = max(100, min(10000, max_memory_bytes // (k * n_dims * 8)))
+
     cluster_ids = np.empty(n_samples, dtype=np.int32)
     distances = np.empty(n_samples, dtype=np.float32)
 
