@@ -13,6 +13,8 @@ import numpy as np
 import torch
 from torch.utils.data import IterableDataset, DataLoader
 
+from phase0.features.context import get_context_flat
+from phase0.features.normalization import compute_delta
 from phase0.utils.logging import get_logger
 from phase0.utils.seed import set_seed
 
@@ -466,4 +468,3 @@ def write_results(
     tables_path = Path(tables_path)
     tables_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(str(tables_path), index=False)
-
