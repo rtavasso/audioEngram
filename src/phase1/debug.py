@@ -104,9 +104,12 @@ def eval_stream_with_debug(
     if n == 0:
         return {"n": 0}
 
-    def q(arr: list[float], ps=(0.5, 0.9, 0.99, 0.999)) -> dict:
+    def q(arr: list[float], ps=(0.5, 0.9, 0.99, 0.999, 0.9999)) -> dict:
         a = np.array(arr, dtype=np.float64)
-        return {f"p{int(p*1000):03d}": float(np.quantile(a, p)) for p in ps}
+        out = {f"p{int(p*1000):03d}": float(np.quantile(a, p)) for p in ps}
+        out["min"] = float(np.min(a))
+        out["max"] = float(np.max(a))
+        return out
 
     worst = [ws for _, ws in sorted(worst_heap, key=lambda x: x[0], reverse=True)]
     dim = model.output_dim
@@ -125,4 +128,3 @@ def eval_stream_with_debug(
         "dnll_quantiles": q(reservoir_dnll),
         "worst_by_dnll": [ws.__dict__ for ws in worst],
     }
-

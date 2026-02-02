@@ -30,6 +30,8 @@ def main() -> int:
     parser.add_argument("--k", type=int, required=True, help="Horizon k to debug")
     parser.add_argument("--slice", type=str, default="all")
     parser.add_argument("--max-samples", type=int, default=200000)
+    parser.add_argument("--skip-samples", type=int, default=0, help="Skip this many samples in each stream before scoring")
+    parser.add_argument("--shuffle-buffer", type=int, default=0, help="If >0, apply buffered shuffle of this size before scoring (approximate)")
     parser.add_argument("--reservoir", type=int, default=50000)
     parser.add_argument("--top-worst", type=int, default=50)
     parser.add_argument("--ckpt", type=str, default=None, help="Optional checkpoint path; defaults to outputs/phase1/checkpoints/mdn_k{K}_final.pt")
@@ -83,24 +85,43 @@ def main() -> int:
     logger.info(f"Loaded checkpoint: {ckpt_path}")
     logger.info(f"Evaluating k={k} slice={args.slice} max_samples={args.max_samples}")
 
-    train_stream = iter_phase1_samples(
+    train_stream_base = iter_phase1_samples(
         frames_index_path=frames_index,
         latents_dir=latents_dir,
         split="train",
         window_size=window_size,
         horizon_k=k,
         slice_name=args.slice,
-        max_samples=args.max_samples,
+        max_samples=None,
     )
-    eval_stream = iter_phase1_samples(
+    eval_stream_base = iter_phase1_samples(
         frames_index_path=frames_index,
         latents_dir=latents_dir,
         split="eval",
         window_size=window_size,
         horizon_k=k,
         slice_name=args.slice,
-        max_samples=args.max_samples,
+        max_samples=None,
     )
+
+    def apply_skip_and_shuffle(stream, seed_offset: int):
+        s = stream
+        if args.skip_samples and args.skip_samples > 0:
+            n_skip = int(args.skip_samples)
+            for _ in range(n_skip):
+                try:
+                    next(s)
+                except StopIteration:
+                    break
+        if args.shuffle_buffer and args.shuffle_buffer > 0:
+            from phase1.data import BufferedShuffle
+
+            shuf = BufferedShuffle(buffer_size=int(args.shuffle_buffer), seed=int(cfg["train"]["seed"]) + seed_offset + k)
+            s = shuf(s)
+        return s
+
+    train_stream = apply_skip_and_shuffle(iter(train_stream_base), seed_offset=10_000)
+    eval_stream = apply_skip_and_shuffle(iter(eval_stream_base), seed_offset=20_000)
 
     train_dbg = eval_stream_with_debug(
         model=model,
@@ -132,11 +153,24 @@ def main() -> int:
     out_path.write_text(json.dumps(out, indent=2))
 
     logger.info(f"Train dnll_mean={train_dbg.get('dnll_mean')} (n={train_dbg.get('n')})")
+    logger.info(f"Train dnll_quantiles={train_dbg.get('dnll_quantiles')}")
+    logger.info(f"Train nll_quantiles={train_dbg.get('nll_quantiles')}")
+    if train_dbg.get("worst_by_dnll"):
+        logger.info("Train worst_by_dnll (top 5):")
+        for w in train_dbg["worst_by_dnll"][:5]:
+            logger.info(f"  {w}")
+
     logger.info(f"Eval  dnll_mean={eval_dbg.get('dnll_mean')} (n={eval_dbg.get('n')})")
+    logger.info(f"Eval  dnll_quantiles={eval_dbg.get('dnll_quantiles')}")
+    logger.info(f"Eval  nll_quantiles={eval_dbg.get('nll_quantiles')}")
+    if eval_dbg.get("worst_by_dnll"):
+        logger.info("Eval worst_by_dnll (top 5):")
+        for w in eval_dbg["worst_by_dnll"][:5]:
+            logger.info(f"  {w}")
+
     logger.info(f"Wrote debug JSON: {out_path}")
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
