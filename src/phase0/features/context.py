@@ -20,7 +20,8 @@ def get_context_mean(
     """
     Get mean-pooled context for a target frame.
 
-    The context window is x[t-lag-window_size : t-lag], mean-pooled to [D].
+    The context window is the W frames ending at frame (t - lag), inclusive:
+    x[t-lag-window_size+1 : t-lag+1], mean-pooled to [D].
 
     Args:
         x: Latent sequence [T, D]
@@ -31,8 +32,8 @@ def get_context_mean(
     Returns:
         Mean-pooled context [D]
     """
-    end = t - lag
-    start = end - window_size
+    end = t - lag  # inclusive
+    start = end - window_size + 1
 
     if start < 0:
         raise ValueError(
@@ -40,7 +41,8 @@ def get_context_mean(
             f"gives start={start} < 0"
         )
 
-    context = x[start:end]  # [W, D]
+    # Slice end is exclusive, so use end+1 to include x[end].
+    context = x[start : end + 1]  # [W, D]
     return context.mean(axis=0)  # [D]
 
 
@@ -53,7 +55,8 @@ def get_context_flat(
     """
     Get flattened context for a target frame.
 
-    The context window is x[t-lag-window_size : t-lag], flattened to [W*D].
+    The context window is the W frames ending at frame (t - lag), inclusive:
+    x[t-lag-window_size+1 : t-lag+1], flattened to [W*D].
 
     Args:
         x: Latent sequence [T, D]
@@ -64,8 +67,8 @@ def get_context_flat(
     Returns:
         Flattened context [W*D]
     """
-    end = t - lag
-    start = end - window_size
+    end = t - lag  # inclusive
+    start = end - window_size + 1
 
     if start < 0:
         raise ValueError(
@@ -73,7 +76,7 @@ def get_context_flat(
             f"gives start={start} < 0"
         )
 
-    context = x[start:end]  # [W, D]
+    context = x[start : end + 1]  # [W, D]
     return context.flatten()  # [W*D]
 
 
@@ -86,7 +89,7 @@ def get_valid_frame_range(
     Get valid frame range for context extraction.
 
     Frames must satisfy:
-    - t >= window_size + max_lag (for valid context window)
+    - t >= (window_size - 1) + max_lag (for valid context window, inclusive end)
     - t < n_frames (within utterance)
     - t >= 1 (for delta computation x[t] - x[t-1])
 
@@ -98,7 +101,7 @@ def get_valid_frame_range(
     Returns:
         Tuple of (first_valid_t, last_valid_t_exclusive)
     """
-    first_valid = max(window_size + max_lag, 1)
+    first_valid = max((window_size - 1) + max_lag, 1)
     last_valid = n_frames
     return first_valid, last_valid
 

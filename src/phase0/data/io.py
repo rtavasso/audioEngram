@@ -210,9 +210,9 @@ class LatentStore:
         Returns:
             Context array [window_size, D]
         """
-        end = t - lag
-        start = end - window_size
-        return np.array(self.store[utterance_id]["x"][start:end])
+        end = t - lag  # inclusive
+        start = end - window_size + 1
+        return np.array(self.store[utterance_id]["x"][start : end + 1])
 
     def __contains__(self, utterance_id: str) -> bool:
         return utterance_id in self.store

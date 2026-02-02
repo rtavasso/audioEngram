@@ -448,7 +448,7 @@ Filter rules:
 * frames t must satisfy: t >= (W + max_context_lag) and t < T
   Where max_context_lag depends on your “Δt” conditioning-lag variant.
   If you keep your current “context ends at t-Δt” idea:
-* for lag L ∈ {1,2,4}, need t- L >= 1 and t-W-L >= 0
+* for lag L ∈ {1,2,4}, need t- L >= 1 and t-L-(W-1) >= 0
 
 Store:
 
@@ -474,7 +474,7 @@ Module: `features/context.py`
 Given utterance latents x[T,D], time t, window W, lag L:
 
 * define end = t - L
-* context frames are x[end-W : end]  (length W)
+* context frames are x[end-W+1 : end+1]  (length W, inclusive end)
 
 Return:
 

@@ -30,13 +30,14 @@ class TestContextExtraction:
         x = np.arange(T).reshape(-1, 1).repeat(D, axis=1).astype(np.float32)
 
         # Window size W=4, lag L=1, target t=10
-        # Context should be x[10-1-4 : 10-1] = x[5:9]
-        # Mean = mean([5,6,7,8]) = 6.5
+        # Context ends at frame (t-L)=9 inclusive, so:
+        # Context should be x[9-4+1 : 9+1] = x[6:10]
+        # Mean = mean([6,7,8,9]) = 7.5
         W, L, t = 4, 1, 10
 
         result = get_context_mean(x, t, W, L)
 
-        expected_mean = 6.5  # (5+6+7+8)/4
+        expected_mean = 7.5  # (6+7+8+9)/4
         assert result.shape == (D,)
         assert np.allclose(result, expected_mean), f"Expected {expected_mean}, got {result[0]}"
 
@@ -48,17 +49,17 @@ class TestContextExtraction:
         W = 4
         t = 15
 
-        # Lag L=1: context = x[10:14], mean = 11.5
+        # Lag L=1: end=14, context = x[11:15], mean = 12.5
         result_l1 = get_context_mean(x, t, W, lag=1)
-        assert np.allclose(result_l1, 11.5), f"Lag 1: expected 11.5, got {result_l1[0]}"
+        assert np.allclose(result_l1, 12.5), f"Lag 1: expected 12.5, got {result_l1[0]}"
 
-        # Lag L=2: context = x[9:13], mean = 10.5
+        # Lag L=2: end=13, context = x[10:14], mean = 11.5
         result_l2 = get_context_mean(x, t, W, lag=2)
-        assert np.allclose(result_l2, 10.5), f"Lag 2: expected 10.5, got {result_l2[0]}"
+        assert np.allclose(result_l2, 11.5), f"Lag 2: expected 11.5, got {result_l2[0]}"
 
-        # Lag L=4: context = x[7:11], mean = 8.5
+        # Lag L=4: end=11, context = x[8:12], mean = 9.5
         result_l4 = get_context_mean(x, t, W, lag=4)
-        assert np.allclose(result_l4, 8.5), f"Lag 4: expected 8.5, got {result_l4[0]}"
+        assert np.allclose(result_l4, 9.5), f"Lag 4: expected 9.5, got {result_l4[0]}"
 
     def test_get_context_flat_basic(self):
         """Test flattened context with hand-constructed data."""
@@ -66,15 +67,15 @@ class TestContextExtraction:
         x = np.arange(T).reshape(-1, 1).repeat(D, axis=1).astype(np.float32)
 
         W, L, t = 4, 1, 10
-        # Context = x[5:9] = frames 5,6,7,8
-        # Flattened: [5,5,5, 6,6,6, 7,7,7, 8,8,8]
+        # Context = x[6:10] = frames 6,7,8,9
+        # Flattened: [6,6,6, 7,7,7, 8,8,8, 9,9,9]
 
         result = get_context_flat(x, t, W, L)
 
         assert result.shape == (W * D,), f"Expected shape {(W*D,)}, got {result.shape}"
 
         # Check values
-        expected = np.array([5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8], dtype=np.float32)
+        expected = np.array([6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9], dtype=np.float32)
         assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
     def test_context_invalid_range_raises(self):
@@ -91,13 +92,14 @@ class TestContextExtraction:
     def test_get_valid_frame_range(self):
         """Test valid frame range computation."""
         # n_frames=50, W=8, max_lag=4
-        # Need t >= W + max_lag = 12 and t >= 1
-        # So first_valid = max(12, 1) = 12
+        # Context uses W frames ending at (t-max_lag), inclusive:
+        # Need t >= (W - 1) + max_lag = 11 and t >= 1
+        # So first_valid = max(11, 1) = 11
         # last_valid = 50
 
         first, last = get_valid_frame_range(n_frames=50, window_size=8, max_lag=4)
 
-        assert first == 12, f"Expected first=12, got {first}"
+        assert first == 11, f"Expected first=11, got {first}"
         assert last == 50, f"Expected last=50, got {last}"
 
     def test_extract_context_features_batch(self):
@@ -111,9 +113,9 @@ class TestContextExtraction:
         # Mean mode
         result_mean = extract_context_features(x, frame_indices, W, L, mode="mean")
         assert result_mean.shape == (3, D)
-        assert np.allclose(result_mean[0], 6.5)   # t=10: mean([5,6,7,8])
-        assert np.allclose(result_mean[1], 11.5)  # t=15: mean([10,11,12,13])
-        assert np.allclose(result_mean[2], 16.5)  # t=20: mean([15,16,17,18])
+        assert np.allclose(result_mean[0], 7.5)   # t=10: mean([6,7,8,9])
+        assert np.allclose(result_mean[1], 12.5)  # t=15: mean([11,12,13,14])
+        assert np.allclose(result_mean[2], 17.5)  # t=20: mean([16,17,18,19])
 
         # Flat mode
         result_flat = extract_context_features(x, frame_indices, W, L, mode="flat")
@@ -129,10 +131,10 @@ class TestContextIndexingEdgeCases:
         x = np.arange(T).reshape(-1, 1).repeat(D, axis=1).astype(np.float32)
 
         W, L = 4, 1
-        t = W + L  # = 5, minimum valid
+        t = (W - 1) + L  # = 4, minimum valid
 
         result = get_context_mean(x, t, W, L)
-        # Context = x[0:4], mean = 1.5
+        # end = t-L = 3, context = x[0:4], mean = 1.5
         assert np.allclose(result, 1.5)
 
     def test_maximum_valid_frame(self):
@@ -144,8 +146,8 @@ class TestContextIndexingEdgeCases:
         t = T - 1  # = 19, maximum valid
 
         result = get_context_mean(x, t, W, L)
-        # Context = x[14:18], mean = 15.5
-        assert np.allclose(result, 15.5)
+        # end = 18, context = x[15:19], mean = 16.5
+        assert np.allclose(result, 16.5)
 
     def test_different_window_sizes(self):
         """Test context with different window sizes."""
@@ -154,11 +156,11 @@ class TestContextIndexingEdgeCases:
 
         L, t = 1, 20
 
-        # W=2: context = x[17:19], mean = 17.5
-        assert np.allclose(get_context_mean(x, t, window_size=2, lag=L), 17.5)
+        # W=2: end=19, context = x[18:20], mean = 18.5
+        assert np.allclose(get_context_mean(x, t, window_size=2, lag=L), 18.5)
 
-        # W=8: context = x[11:19], mean = 14.5
-        assert np.allclose(get_context_mean(x, t, window_size=8, lag=L), 14.5)
+        # W=8: end=19, context = x[12:20], mean = 15.5
+        assert np.allclose(get_context_mean(x, t, window_size=8, lag=L), 15.5)
 
 
 if __name__ == "__main__":
