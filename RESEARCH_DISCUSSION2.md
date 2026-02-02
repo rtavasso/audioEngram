@@ -182,6 +182,23 @@ Until this is resolved, treat the eval numbers as the reliable signal for “str
 
 One additional observation: the unconditional baseline NLL differs between train and eval (e.g., 1260.34 vs 1260.89 at k=1). This is expected because it is the *same* fitted baseline p(Δx) being evaluated on two different distributions; it does not imply the baseline was refit on eval.
 
+### 3.5 Post-hoc Diagnosis: Why Train ΔNLL Flipped Sign
+
+We re-evaluated the *same trained checkpoint* on 200k samples from each split and inspected quantiles and worst-case examples. The discrepancy is not a different code path: it comes from **rare, catastrophic outliers in the train split** that dominate the *mean* conditional NLL.
+
+Key observations for k=1 (train vs eval, 200k samples each):
+- Typical behavior indicates conditioning helps on **both** splits: train median ΔNLL ≈ **-132.5**, eval median ΔNLL ≈ **-138.2**.
+- The train mean becomes positive because a tiny number of frames have astronomically large ΔNLL (e.g. max train ΔNLL ≈ **4.41×10^8** at `utterance_id=89-219-0019`, `t=151`), while eval’s max ΔNLL is only **~6.5×10^2** on the sampled window.
+- A single frame at 4.4×10^8 ΔNLL contributes ~2200 to the mean when averaging over 200k samples, which largely explains why train mean ΔNLL appears as +2028 even though the bulk distribution is negative.
+
+Mechanism (why NLL can explode):
+- The MDN likelihood uses diagonal Gaussians with a **minimum log-σ clamp** (log-σ ≥ -7 ⇒ σ ≳ 9e-4). When Δx has a rare spike (large ||Δx||₂; outliers observed at ~80–135), z-scores become enormous across many dimensions and the quadratic term Σ(z²) can reach 1e8–1e9, making NLL blow up.
+- The unconditional baseline p(Δx) is broad (fit over all train deltas), so it is comparatively less surprised by spikes; thus ΔNLL becomes extremely positive.
+
+Implications:
+- The “train ΔNLL >> 0” anomaly is best interpreted as **mean-of-NLL being hypersensitive to rare off-manifold frames**, not as “conditioning fails on train”.
+- For reporting, we should include robust summaries (median/trimmed mean + tail quantiles) rather than only the mean, and stratify by confound slices (e.g., `utterance_medial`, `high_energy`) to determine whether these spikes are boundary/silence artifacts.
+
 ---
 
 ## 4. Interpretation

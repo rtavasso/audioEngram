@@ -1,0 +1,97 @@
+# Phase 3 Configuration: RSSM-style factorization on frozen Mimi latents (single-rate)
+# ============================================================================
+# Learns z_dyn (predictable state) + z_rec (local innovation) such that:
+# - x_t is reconstructible from (z_dyn,t, z_rec,t)
+# - z_rec has an innovation budget (KL(q||p) controlled)
+# - z_dyn is explicitly modeled by an autoregressive dynamics model
+
+data:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: ./outputs/phase0/latents_index.parquet
+  splits_dir: ./outputs/phase0/splits
+  min_duration_sec: 3.0
+
+normalization:
+  enabled: true
+  stats_file: ./outputs/phase3/x_norm_stats.json
+  # For very large datasets, you can cap how many utterances contribute to stats.
+  max_train_utterances: null
+
+model:
+  x_dim: 512
+  z_dyn_dim: 128
+  z_rec_dim: 64
+
+  dyn_encoder:
+    type: gru
+    hidden_dim: 256
+    num_layers: 1
+    dropout: 0.0
+
+  dyn_model:
+    type: gru
+    hidden_dim: 256
+    num_layers: 1
+    dropout: 0.0
+    # fixed diagonal Gaussian head for p(z_dyn,t | z_dyn,<t)
+    min_log_sigma: -6.0
+    max_log_sigma: 1.0
+
+  posterior:
+    hidden_dim: 256
+    num_layers: 2
+    dropout: 0.0
+    min_log_sigma: -6.0
+    max_log_sigma: 1.0
+
+  prior:
+    hidden_dim: 256
+    num_layers: 2
+    dropout: 0.0
+    min_log_sigma: -6.0
+    max_log_sigma: 1.0
+
+  reconstructor:
+    hidden_dim: 512
+    num_layers: 2
+    dropout: 0.0
+
+train:
+  device: auto  # auto|cpu|cuda
+  seed: 42
+
+  batch_size: 16
+  num_workers: 0
+  max_steps: 50000
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+
+  log_every: 100
+  eval_every: 1000
+  save_every: 5000
+  eval_batches: 50
+
+loss:
+  # Reconstruction loss on normalized x (MSE)
+  recon_weight: 1.0
+
+  # Innovation budget: KL(q(z_rec|x,z_dyn) || p(z_rec|z_dyn))
+  beta_final: 1.0
+  beta_warmup_steps: 5000
+  free_bits_per_dim: 0.05
+
+  # Make z_dyn AR-friendly via teacher-forced dynamics NLL
+  dyn_weight: 1.0
+
+  # Force z_dyn to matter by reconstructing sometimes from prior-sampled z_rec
+  prior_sample_prob: 0.25
+
+output:
+  out_dir: ./outputs/phase3
+  checkpoints_dir: ./outputs/phase3/checkpoints
+  train_log_jsonl: ./outputs/phase3/train_log.jsonl
+  eval_metrics_file: ./outputs/phase3/eval_metrics.json
+  zdyn_dir: ./outputs/phase3/zdyn.zarr
+  zdyn_index: ./outputs/phase3/zdyn_index.parquet
+
