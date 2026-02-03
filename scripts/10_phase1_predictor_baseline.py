@@ -51,9 +51,15 @@ def main() -> int:
 
     # Latents index parquet is used only for rollout utterance sampling.
     # Default: <latents_dir>/../latents_index.parquet (Phase 0 convention).
+    # If you're pointing Phase 1 at exported z_dyn, set data.latents_index to
+    # outputs/phase3/zdyn_index.parquet or we will auto-detect it if present.
     latents_index_path = cfg["data"].get("latents_index")
     if latents_index_path is None:
-        latents_index_path = Path(latents_dir).parent / "latents_index.parquet"
+        latents_parent = Path(latents_dir).parent
+        # Prefer explicit z_dyn index if present (Phase 3 export convention).
+        zdyn_idx = latents_parent / "zdyn_index.parquet"
+        lat_idx = latents_parent / "latents_index.parquet"
+        latents_index_path = zdyn_idx if zdyn_idx.exists() else lat_idx
 
     out_dir = cfg["output"]["out_dir"]
     metrics_path = cfg["output"]["metrics_file"]
@@ -65,9 +71,18 @@ def main() -> int:
     logger.info(f"Horizons k: {horizons_k}")
     logger.info(f"Frames: {frames_index}")
     logger.info(f"Latents: {latents_dir}")
+    logger.info(f"Latents index: {latents_index_path}")
     logger.info(f"Outputs: {out_dir}")
 
     results = []
+
+    rollout_enabled = bool(cfg["rollout"]["enabled"])
+    if rollout_enabled and not Path(latents_index_path).exists():
+        logger.warning(
+            f"[phase1] Rollout disabled: latents_index not found at {latents_index_path}. "
+            "Set data.latents_index in configs/phase1.yaml (e.g., outputs/phase3/zdyn_index.parquet)."
+        )
+        rollout_enabled = False
 
     for k in horizons_k:
         r = train_and_eval_for_k(
@@ -99,7 +114,7 @@ def main() -> int:
             shuffle_buffer=int(cfg["train"]["shuffle_buffer"]),
             max_train_samples=cfg["train"].get("max_train_samples"),
             max_eval_samples=cfg["train"].get("max_eval_samples"),
-            rollout_enabled=bool(cfg["rollout"]["enabled"]),
+            rollout_enabled=rollout_enabled,
             rollout_n_eval_utterances=int(cfg["rollout"]["n_eval_utterances"]),
             rollout_max_frames_per_utt=int(cfg["rollout"]["max_frames_per_utterance"]),
             rollout_sample_from_mixture=bool(cfg["rollout"]["sample_from_mixture"]),
