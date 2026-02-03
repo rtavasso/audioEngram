@@ -57,6 +57,20 @@ train:
   grad_clip_norm: 1.0
   log_every: 200
 
+rollout_train:
+  # Phase 4.5: fine-tune param dynamics with K-step rollout loss.
+  enabled: true
+  k: 16
+  batch_size: 256
+  max_steps: 5000
+  segments_per_utt: 8
+  lr: 2.0e-4
+  grad_clip_norm: 1.0
+  log_every: 100
+  # Use same stabilizers as rollout eval by default
+  step_alpha: 1.0
+  clip_dz_l2: 5.0
+
 eval:
   max_batches: 200
   rollout_eval_utts: 16
