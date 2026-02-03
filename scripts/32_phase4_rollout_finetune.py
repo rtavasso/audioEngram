@@ -58,6 +58,13 @@ def _clip_l2(x: torch.Tensor, max_l2: float) -> torch.Tensor:
     return x * scale
 
 
+def _linear_schedule(step: int, start: float, end: float, warmup_steps: int) -> float:
+    if warmup_steps <= 0:
+        return float(end)
+    a = min(max(float(step) / float(warmup_steps), 0.0), 1.0)
+    return float(start + a * (end - start))
+
+
 @torch.no_grad()
 def _fit_unconditional_baseline(cfg: dict, device: torch.device) -> tuple[torch.Tensor, torch.Tensor]:
     sums = None
@@ -368,6 +375,14 @@ def main() -> int:
     log_every = int(rtcfg.get("log_every", 100))
     step_alpha = float(rtcfg.get("step_alpha", rollout_step_alpha))
     clip_dz_l2 = float(rtcfg.get("clip_dz_l2", rollout_clip))
+    rollout_weight = float(rtcfg.get("rollout_weight", 1.0))
+    teacher_weight = float(rtcfg.get("teacher_weight", 0.0))
+    state_weight = float(rtcfg.get("state_weight", 0.0))
+
+    sched_p_start = float(rtcfg.get("sched_teacher_prob_start", 0.0))
+    sched_p_end = float(rtcfg.get("sched_teacher_prob_end", 0.0))
+    sched_warmup = int(rtcfg.get("sched_teacher_warmup_steps", 0))
+    z_noise_std = float(rtcfg.get("z_noise_std", 0.0))
 
     seg_ds = ZPairIterableDataset(
         lambda: iter_rollout_segments(
@@ -392,7 +407,11 @@ def main() -> int:
 
     opt = torch.optim.AdamW(param.parameters(), lr=lr, weight_decay=float(cfg["train"]["weight_decay"]))
     param.train()
-    logger.info(f"[phase4.5] Fine-tuning param: k={k} batch={batch_size} steps={max_steps} lr={lr:g}")
+    logger.info(
+        f"[phase4.5] Fine-tuning param: k={k} batch={batch_size} steps={max_steps} lr={lr:g} "
+        f"w_rollout={rollout_weight:g} w_teacher={teacher_weight:g} w_state={state_weight:g} "
+        f"sched_p={sched_p_start:g}->{sched_p_end:g}@{sched_warmup} noise_std={z_noise_std:g}"
+    )
 
     seg_iter = iter(seg_loader)
     for step in range(1, max_steps + 1):
@@ -402,30 +421,70 @@ def main() -> int:
             seg_iter = iter(seg_loader)
             batch = next(seg_iter)
 
-        z_hat = batch["z0"].to(device)  # [B,D]
+        z0 = batch["z0"].to(device)  # [B,D]
         dz_seq = batch["dz_seq"].to(device)  # [B,K,D]
+        # Ground-truth states for the segment.
+        z_true = z0.unsqueeze(1) + torch.cumsum(dz_seq, dim=1)  # [B,K,D] = z_{t+1..t+K}
+        z_true_prev = torch.cat([z0.unsqueeze(1), z_true[:, :-1]], dim=1)  # [B,K,D] = z_{t..t+K-1}
+
+        z_hat = z0  # [B,D]
 
         opt.zero_grad(set_to_none=True)
-        loss = 0.0
-        for i in range(k):
-            pred = param(z_hat)
-            dz_true = dz_seq[:, i]
-            loss_i = diag_gaussian_nll(dz_true, pred).mean()
-            loss = loss + loss_i
+        loss_roll = 0.0
+        loss_tf = 0.0
+        loss_state = 0.0
+        n_used_true = 0
 
-            dz_hat = pred.mu * float(step_alpha)
+        p_teacher = _linear_schedule(step, sched_p_start, sched_p_end, sched_warmup)
+        for i in range(k):
+            dz_true = dz_seq[:, i]  # [B,D]
+
+            # Scheduled sampling: choose model input state for this step.
+            if p_teacher > 0:
+                use_true = (torch.rand((z_hat.shape[0], 1), device=device) < p_teacher).to(dtype=z_hat.dtype)
+                z_in = use_true * z_true_prev[:, i] + (1.0 - use_true) * z_hat
+                n_used_true += int(use_true.sum().item())
+            else:
+                z_in = z_hat
+
+            pred_roll = param(z_in)
+            loss_roll = loss_roll + diag_gaussian_nll(dz_true, pred_roll).mean()
+
+            if teacher_weight and teacher_weight > 0:
+                pred_tf = param(z_true_prev[:, i])
+                loss_tf = loss_tf + diag_gaussian_nll(dz_true, pred_tf).mean()
+
+            dz_hat = pred_roll.mu * float(step_alpha)
             if clip_dz_l2 and clip_dz_l2 > 0:
                 dz_hat = _clip_l2(dz_hat, float(clip_dz_l2))
             z_hat = z_hat + dz_hat
+            if z_noise_std and z_noise_std > 0:
+                z_hat = z_hat + float(z_noise_std) * torch.randn_like(z_hat)
 
-        loss = loss / float(k)
+            if state_weight and state_weight > 0:
+                # Align rolled-out state to ground-truth state.
+                loss_state = loss_state + torch.mean((z_hat - z_true[:, i]) ** 2)
+
+        loss_roll = loss_roll / float(k)
+        loss_tf = loss_tf / float(k) if teacher_weight and teacher_weight > 0 else loss_tf
+        loss_state = loss_state / float(k) if state_weight and state_weight > 0 else loss_state
+
+        loss = float(rollout_weight) * loss_roll + float(teacher_weight) * loss_tf + float(state_weight) * loss_state
         loss.backward()
         if grad_clip and grad_clip > 0:
             torch.nn.utils.clip_grad_norm_(param.parameters(), max_norm=grad_clip)
         opt.step()
 
         if log_every and step % log_every == 0:
-            logger.info(f"[phase4.5] step={step}/{max_steps} rollout_loss={float(loss.item()):.4f}")
+            with torch.no_grad():
+                log_sigma_mean = float(torch.clamp(param.log_sigma, float(mcfg["min_log_sigma"]), float(mcfg["max_log_sigma"])).mean().item())
+                true_dz_l2 = float(torch.linalg.vector_norm(dz_seq.reshape(-1, dz_seq.shape[-1]), dim=-1).mean().item())
+            logger.info(
+                f"[phase4.5] step={step}/{max_steps} loss={float(loss.item()):.4f} "
+                f"L_roll={float(loss_roll.item()):.4f} L_tf={float(loss_tf.item()):.4f} L_state={float(loss_state.item()):.4f} "
+                f"p_teacher={p_teacher:.3f} used_true={n_used_true}/{(z0.shape[0]*k)} "
+                f"log_sigma_mean={log_sigma_mean:.3f} true_dz_l2={true_dz_l2:.3f}"
+            )
 
     # Save finetuned checkpoint
     out_ckpt = ckpt_dir / "param_rollout_finetuned.pt"
@@ -535,7 +594,20 @@ def main() -> int:
         "post": {"teacher_forced": post_tf, "rollout": post_ro},
         "post_resid_add": {"teacher_forced": resid_tf, "rollout": resid_ro, "residual_memory_npz": str(resid_path)},
         "checkpoints": {"base": str(args.checkpoint), "finetuned": str(out_ckpt)},
-        "rollout_train": {"k": k, "batch_size": batch_size, "max_steps": max_steps, "step_alpha": step_alpha, "clip_dz_l2": clip_dz_l2},
+        "rollout_train": {
+            "k": k,
+            "batch_size": batch_size,
+            "max_steps": max_steps,
+            "step_alpha": step_alpha,
+            "clip_dz_l2": clip_dz_l2,
+            "rollout_weight": rollout_weight,
+            "teacher_weight": teacher_weight,
+            "state_weight": state_weight,
+            "sched_teacher_prob_start": sched_p_start,
+            "sched_teacher_prob_end": sched_p_end,
+            "sched_teacher_warmup_steps": sched_warmup,
+            "z_noise_std": z_noise_std,
+        },
     }
     out_json = out_dir / "phase4_rollout_finetune_summary.json"
     out_json.write_text(json.dumps(summary, indent=2))
@@ -545,4 +617,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

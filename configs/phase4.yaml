@@ -70,6 +70,20 @@ rollout_train:
   # Use same stabilizers as rollout eval by default
   step_alpha: 1.0
   clip_dz_l2: 5.0
+  # Mixed objective to preserve teacher-forced quality while improving rollout stability:
+  #   loss = rollout_weight * L_rollout + teacher_weight * L_teacher + state_weight * MSE(z_hat, z_true)
+  rollout_weight: 1.0
+  teacher_weight: 0.25
+  state_weight: 0.1
+
+  # Scheduled sampling: with probability p, use z_true as the model input for that step
+  # instead of z_hat. Linearly annealed over warmup_steps.
+  sched_teacher_prob_start: 0.5
+  sched_teacher_prob_end: 0.0
+  sched_teacher_warmup_steps: 2000
+
+  # Optional Gaussian noise injected into z_hat during rollout training for robustness.
+  z_noise_std: 0.0
 
 eval:
   max_batches: 200
