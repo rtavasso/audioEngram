@@ -21,6 +21,7 @@ model:
   x_dim: 512
   z_dyn_dim: 128
   z_rec_dim: 64
+  z_dyn_layernorm: true
 
   dyn_encoder:
     type: gru
@@ -34,8 +35,11 @@ model:
     num_layers: 1
     dropout: 0.0
     # fixed diagonal Gaussian head for p(z_dyn,t | z_dyn,<t)
-    min_log_sigma: -6.0
-    max_log_sigma: 1.0
+    # Important: letting the model shrink sigma to the clamp minimum can make
+    # dyn NLL strongly negative and dominate training. Use a fixed sigma=1
+    # (log_sigma=0) by default for stable optimization.
+    min_log_sigma: 0.0
+    max_log_sigma: 0.0
 
   posterior:
     hidden_dim: 256
@@ -67,7 +71,7 @@ train:
   cudnn_benchmark: true
 
   batch_size: 16
-  num_workers: 4
+  num_workers: 2
   max_steps: 50000
   lr: 3.0e-4
   weight_decay: 1.0e-4

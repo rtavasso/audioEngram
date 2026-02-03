@@ -249,6 +249,7 @@ def train(
         recon_hidden=int(m["reconstructor"]["hidden_dim"]),
         recon_layers=int(m["reconstructor"]["num_layers"]),
         recon_dropout=float(m["reconstructor"]["dropout"]),
+        z_dyn_layernorm=bool(m.get("z_dyn_layernorm", True)),
     ).to(device)
 
     opt = torch.optim.AdamW(

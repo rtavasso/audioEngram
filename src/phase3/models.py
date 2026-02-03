@@ -73,10 +73,11 @@ class DynEncoderGRU(nn.Module):
             batch_first=True,
         )
         self.proj = nn.Linear(hidden_dim, z_dyn_dim)
+        self.norm = nn.LayerNorm(z_dyn_dim)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         h, _ = self.gru(x)
-        return self.proj(h)
+        return self.norm(self.proj(h))
 
 
 class DynModelGRU(nn.Module):
@@ -219,6 +220,7 @@ class Factorizer(nn.Module):
         recon_hidden: int,
         recon_layers: int,
         recon_dropout: float,
+        z_dyn_layernorm: bool = True,
     ):
         super().__init__()
         self.x_dim = int(x_dim)
@@ -232,6 +234,9 @@ class Factorizer(nn.Module):
             num_layers=int(dyn_encoder_layers),
             dropout=float(dyn_encoder_dropout),
         )
+        if not bool(z_dyn_layernorm):
+            # Replace the default LayerNorm with identity if requested.
+            self.e_dyn.norm = nn.Identity()
         self.dyn = DynModelGRU(
             z_dyn_dim=self.z_dyn_dim,
             hidden_dim=int(dyn_model_hidden),
