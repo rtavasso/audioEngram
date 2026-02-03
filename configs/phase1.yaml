@@ -11,6 +11,9 @@
 data:
   # Phase 0 outputs (inputs to Phase 1)
   latents_dir: ./outputs/phase0/latents.zarr
+  # Optional: latents index parquet (used for rollout utterance sampling).
+  # If omitted, defaults to <latents_dir>/../latents_index.parquet.
+  latents_index: null
   frames_index: ./outputs/phase0/phase0_frames.parquet
   splits_dir: ./outputs/phase0/splits
 
@@ -61,4 +64,3 @@ output:
   checkpoints_dir: ./outputs/phase1/checkpoints
   metrics_file: ./outputs/phase1/metrics.json
   tables_file: ./outputs/phase1/tables.csv
-

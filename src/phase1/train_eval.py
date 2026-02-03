@@ -76,7 +76,12 @@ def fit_unconditional_baseline(
         mv.update(s.delta)
 
     if mv is None:
-        raise RuntimeError("No samples found to fit unconditional baseline")
+        raise RuntimeError(
+            "No samples found to fit unconditional baseline. "
+            "Check that latents_dir contains utterances for the requested split "
+            "and that frames_index_path matches those utterance_ids. "
+            "If you're evaluating exported z_dyn, ensure you exported split=all (train+eval)."
+        )
 
     mean, var = mv.finalize()
     return DiagGaussianBaseline(mean=mean, var=var)
@@ -171,8 +176,9 @@ def train_and_eval_for_k(
         max_samples=max_train_samples,
     )
 
-    input_dim = window_size * 512  # Mimi latents are 512-dim in Phase 0 artifacts
-    output_dim = 512
+    # Infer dimensions from baseline (supports Mimi latents and exported z_dyn).
+    output_dim = int(baseline.mean.shape[0])
+    input_dim = int(window_size) * output_dim
 
     model = MDN(
         input_dim=input_dim,

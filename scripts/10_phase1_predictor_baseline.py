@@ -49,9 +49,11 @@ def main() -> int:
     latents_dir = cfg["data"]["latents_dir"]
     splits_dir = cfg["data"]["splits_dir"]
 
-    # Phase 0 latents index path is derived from phase0.yaml convention.
-    # Default: outputs/phase0/latents_index.parquet next to latents_dir.
-    latents_index_path = Path(latents_dir).parent / "latents_index.parquet"
+    # Latents index parquet is used only for rollout utterance sampling.
+    # Default: <latents_dir>/../latents_index.parquet (Phase 0 convention).
+    latents_index_path = cfg["data"].get("latents_index")
+    if latents_index_path is None:
+        latents_index_path = Path(latents_dir).parent / "latents_index.parquet"
 
     out_dir = cfg["output"]["out_dir"]
     metrics_path = cfg["output"]["metrics_file"]
@@ -119,4 +121,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
