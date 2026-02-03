@@ -61,6 +61,9 @@ eval:
   max_batches: 200
   rollout_eval_utts: 16
   rollout_max_frames: 2000
+  # Rollout stabilizers (applied to all models during rollout eval)
+  rollout_step_alpha: 1.0
+  rollout_clip_dz_l2: 5.0
 
 output:
   out_dir: ./outputs/phase4

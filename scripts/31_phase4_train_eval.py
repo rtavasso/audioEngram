@@ -76,6 +76,9 @@ def _eval_teacher_forced(
     cos_sum = 0.0
     n = 0
     nb = 0
+    gate_sum = 0.0
+    gate_sq_sum = 0.0
+    gate_n = 0
     for batch in loader:
         z_prev = batch["z_prev"].to(device)
         dz = batch["dz"].to(device)
@@ -83,6 +86,17 @@ def _eval_teacher_forced(
         pred: DiagGaussianDelta = predict_fn(z_prev)
         nll = diag_gaussian_nll(dz, pred)  # [B]
         nllb = baseline_nll(dz)  # [B]
+
+        # Optional gate diagnostics (for hybrid/gated residual models).
+        if hasattr(predict_fn, "gate"):
+            try:
+                gate_raw = predict_fn.gate(z_prev)  # [B,1] or [B]
+                gate = torch.sigmoid(gate_raw).reshape(-1)
+                gate_sum += float(gate.sum().item())
+                gate_sq_sum += float((gate * gate).sum().item())
+                gate_n += int(gate.numel())
+            except Exception:
+                pass
 
         # Direction cosine of predicted mean vs target
         mu = pred.mu
@@ -98,7 +112,7 @@ def _eval_teacher_forced(
         if max_batches and n >= int(max_batches):
             break
 
-    return {
+    out = {
         "model": model_name,
         "n_batches": n,
         "n_samples": nb,
@@ -107,6 +121,12 @@ def _eval_teacher_forced(
         "dnll": (nll_sum - nllb_sum) / max(n, 1),
         "direction_cos": cos_sum / max(n, 1),
     }
+    if gate_n > 0:
+        gate_mean = gate_sum / gate_n
+        gate_var = max(gate_sq_sum / gate_n - gate_mean * gate_mean, 0.0)
+        out["gate_mean"] = gate_mean
+        out["gate_std"] = float(gate_var**0.5)
+    return out
 
 
 @torch.no_grad()
@@ -120,6 +140,8 @@ def _eval_rollout(
     baseline_mean: torch.Tensor,
     baseline_var: torch.Tensor,
     device: torch.device,
+    step_alpha: float,
+    clip_dz_l2: float,
 ) -> dict:
     log2pi = 1.8378770664093453
 
@@ -141,6 +163,8 @@ def _eval_rollout(
     tf_b_sum = 0.0
     ro_b_sum = 0.0
     n_steps = 0
+    n_clipped = 0
+    dz_l2_sum = 0.0
 
     global_max_z_hat_l2 = 0.0
     global_first_nonfinite_step = None
@@ -171,7 +195,17 @@ def _eval_rollout(
             pred_ro = predict_fn(z_hat.unsqueeze(0))
             ro_nll_sum += float(diag_gaussian_nll(dz_t, pred_ro).item())
             ro_b_sum += float(baseline_nll(dz_t).item())
-            z_hat = z_hat + pred_ro.mu.squeeze(0)
+
+            dz_hat = pred_ro.mu.squeeze(0)
+            if step_alpha != 1.0:
+                dz_hat = dz_hat * float(step_alpha)
+            if clip_dz_l2 and clip_dz_l2 > 0:
+                l2 = float(torch.linalg.vector_norm(dz_hat).item())
+                dz_l2_sum += l2
+                if l2 > float(clip_dz_l2):
+                    dz_hat = dz_hat * (float(clip_dz_l2) / max(l2, 1e-12))
+                    n_clipped += 1
+            z_hat = z_hat + dz_hat
             max_z_hat_l2 = max(max_z_hat_l2, float(torch.linalg.vector_norm(z_hat).item()))
             if not torch.isfinite(z_hat).all():
                 first_nonfinite_step = t + 1
@@ -205,6 +239,10 @@ def _eval_rollout(
         "rollout_nonfinite": any_nonfinite,
         "first_nonfinite_step": global_first_nonfinite_step,
         "max_z_hat_l2": global_max_z_hat_l2,
+        "rollout_step_alpha": float(step_alpha),
+        "rollout_clip_dz_l2": float(clip_dz_l2),
+        "rollout_n_clipped": int(n_clipped),
+        "rollout_mean_dz_l2_preclip": float(dz_l2_sum / max(n_steps, 1)),
         "teacher_forced_nll": tf_nll,
         "rollout_nll": ro_nll,
         "teacher_forced_dnll": tf_dnll,
@@ -387,14 +425,20 @@ def main() -> int:
         step += 1
 
         if log_every and step % log_every == 0:
+            with torch.no_grad():
+                gate_mean = float(torch.sigmoid(hybrid.gate(z_prev)).mean().item())
             row = {
                 "step": step,
                 "loss_param": float(loss_p.item()),
                 "loss_hybrid": float(loss_h.item()),
+                "hybrid_gate_mean": gate_mean,
             }
             with open(log_path, "a") as f:
                 f.write(json.dumps(row) + "\n")
-            logger.info(f"[phase4] step={step} loss_param={row['loss_param']:.4f} loss_hybrid={row['loss_hybrid']:.4f}")
+            logger.info(
+                f"[phase4] step={step} loss_param={row['loss_param']:.4f} loss_hybrid={row['loss_hybrid']:.4f} "
+                f"hybrid_gate_mean={row['hybrid_gate_mean']:.3f}"
+            )
 
     # Save checkpoints
     torch.save({"model": param.state_dict(), "config": cfg}, ckpt_dir / "param_final.pt")
@@ -474,7 +518,7 @@ def main() -> int:
             p.requires_grad = False
         logger.info(f"[phase4] gated_resid params={count_parameters(gated_resid):,} (gate only; param frozen)")
 
-        gate_steps = int(cfg["train"].get("gate_steps", 0))
+        gate_steps = int(cfg["train"].get("gate_steps", 5000))
         if gate_steps > 0:
             gate_opt = torch.optim.AdamW(
                 gated_resid.gate.parameters(),
@@ -499,7 +543,11 @@ def main() -> int:
                     torch.nn.utils.clip_grad_norm_(gated_resid.gate.parameters(), max_norm=grad_clip)
                 gate_opt.step()
                 if log_every and (s + 1) % log_every == 0:
-                    logger.info(f"[phase4] gate step={s+1}/{gate_steps} loss_gate={float(loss_gate.item()):.4f}")
+                    with torch.no_grad():
+                        g_mean = float(torch.sigmoid(gated_resid.gate(z_prev)).mean().item())
+                    logger.info(
+                        f"[phase4] gate step={s+1}/{gate_steps} loss_gate={float(loss_gate.item()):.4f} gate_mean={g_mean:.3f}"
+                    )
 
         torch.save({"model": gated_resid.state_dict(), "config": cfg}, ckpt_dir / "gated_resid_final.pt")
 
@@ -580,6 +628,10 @@ def main() -> int:
         seed=int(cfg["train"]["seed"]) + 123,
     )
     rollout_max_frames = int(cfg["eval"]["rollout_max_frames"])
+    # Defaults are chosen to prevent NaN divergence in free-running rollouts while
+    # minimally affecting typical steps (Δz l2 ~ O(1) in our runs).
+    rollout_step_alpha = float(cfg.get("eval", {}).get("rollout_step_alpha", 1.0))
+    rollout_clip_dz_l2 = float(cfg.get("eval", {}).get("rollout_clip_dz_l2", 5.0))
 
     mem_roll = _eval_rollout(
         model_name="memory",
@@ -590,6 +642,8 @@ def main() -> int:
         baseline_mean=baseline_mean,
         baseline_var=baseline_var,
         device=device,
+        step_alpha=rollout_step_alpha,
+        clip_dz_l2=rollout_clip_dz_l2,
     )
     param_roll = _eval_rollout(
         model_name="param",
@@ -600,6 +654,8 @@ def main() -> int:
         baseline_mean=baseline_mean,
         baseline_var=baseline_var,
         device=device,
+        step_alpha=rollout_step_alpha,
+        clip_dz_l2=rollout_clip_dz_l2,
     )
     hybrid_roll = _eval_rollout(
         model_name="hybrid",
@@ -610,6 +666,8 @@ def main() -> int:
         baseline_mean=baseline_mean,
         baseline_var=baseline_var,
         device=device,
+        step_alpha=rollout_step_alpha,
+        clip_dz_l2=rollout_clip_dz_l2,
     )
 
     extra_roll = []
@@ -624,6 +682,8 @@ def main() -> int:
                 baseline_mean=baseline_mean,
                 baseline_var=baseline_var,
                 device=device,
+                step_alpha=rollout_step_alpha,
+                clip_dz_l2=rollout_clip_dz_l2,
             )
         )
     if gated_resid is not None:
@@ -637,6 +697,8 @@ def main() -> int:
                 baseline_mean=baseline_mean,
                 baseline_var=baseline_var,
                 device=device,
+                step_alpha=rollout_step_alpha,
+                clip_dz_l2=rollout_clip_dz_l2,
             )
         )
 
