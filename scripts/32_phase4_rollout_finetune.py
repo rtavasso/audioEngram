@@ -65,6 +65,12 @@ def _linear_schedule(step: int, start: float, end: float, warmup_steps: int) -> 
     return float(start + a * (end - start))
 
 
+def _as_float(x) -> float:
+    if isinstance(x, torch.Tensor):
+        return float(x.item())
+    return float(x)
+
+
 @torch.no_grad()
 def _fit_unconditional_baseline(cfg: dict, device: torch.device) -> tuple[torch.Tensor, torch.Tensor]:
     sums = None
@@ -522,8 +528,8 @@ def main() -> int:
                 log_sigma_mean = float(torch.clamp(param.log_sigma, float(mcfg["min_log_sigma"]), float(mcfg["max_log_sigma"])).mean().item())
                 true_dz_l2 = float(torch.linalg.vector_norm(dz_seq.reshape(-1, dz_seq.shape[-1]), dim=-1).mean().item())
             logger.info(
-                f"[phase4.5] step={step}/{max_steps} loss={float(loss.item()):.4f} "
-                f"L_roll={float(loss_roll.item()):.4f} L_tf={float(loss_tf.item()):.4f} L_state={float(loss_state.item()):.4f} "
+                f"[phase4.5] step={step}/{max_steps} loss={_as_float(loss):.4f} "
+                f"L_roll={_as_float(loss_roll):.4f} L_tf={_as_float(loss_tf):.4f} L_state={_as_float(loss_state):.4f} "
                 f"p_teacher={p_teacher:.3f} used_true={n_used_true}/{(z0.shape[0]*k)} "
                 f"log_sigma_mean={log_sigma_mean:.3f} true_dz_l2={true_dz_l2:.3f}"
             )
