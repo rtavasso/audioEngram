@@ -30,7 +30,15 @@ from phase0.utils.seed import set_seed
 
 from phase4.data import ZPairIterableDataset, collate_zpairs, iter_zdyn_pairs, sample_eval_utterance_ids
 from phase4.memory import KMeansDeltaMemory
-from phase4.models import ParamDyn, HybridDyn, DiagGaussianDelta, diag_gaussian_nll, count_parameters
+from phase4.models import (
+    ParamDyn,
+    HybridDyn,
+    ResidualMemDyn,
+    GatedResidualMemDyn,
+    DiagGaussianDelta,
+    diag_gaussian_nll,
+    count_parameters,
+)
 
 
 def _device_from_config(device: str) -> torch.device:
@@ -134,6 +142,10 @@ def _eval_rollout(
     ro_b_sum = 0.0
     n_steps = 0
 
+    global_max_z_hat_l2 = 0.0
+    global_first_nonfinite_step = None
+    any_nonfinite = False
+
     for utt in utt_ids:
         z = store.get_latents(utt).astype(np.float32, copy=False)
         if z.shape[0] < 2:
@@ -144,6 +156,8 @@ def _eval_rollout(
         dz_true = z_true[1:] - z_true[:-1]  # [T-1,D]
 
         z_hat = z_true[0].clone()
+        max_z_hat_l2 = float(torch.linalg.vector_norm(z_hat).item())
+        first_nonfinite_step = None
 
         for t in range(t_max - 1):
             dz_t = dz_true[t : t + 1]  # [1,D]
@@ -158,11 +172,28 @@ def _eval_rollout(
             ro_nll_sum += float(diag_gaussian_nll(dz_t, pred_ro).item())
             ro_b_sum += float(baseline_nll(dz_t).item())
             z_hat = z_hat + pred_ro.mu.squeeze(0)
+            max_z_hat_l2 = max(max_z_hat_l2, float(torch.linalg.vector_norm(z_hat).item()))
+            if not torch.isfinite(z_hat).all():
+                first_nonfinite_step = t + 1
+                break
 
             n_steps += 1
 
+        global_max_z_hat_l2 = max(global_max_z_hat_l2, max_z_hat_l2)
+        if first_nonfinite_step is not None:
+            any_nonfinite = True
+            if global_first_nonfinite_step is None or first_nonfinite_step < global_first_nonfinite_step:
+                global_first_nonfinite_step = first_nonfinite_step
+
     if n_steps == 0:
-        return {"model": model_name, "n_steps": 0, "rollout_gap_dnll": float("nan")}
+        return {
+            "model": model_name,
+            "n_steps": 0,
+            "rollout_nonfinite": True,
+            "first_nonfinite_step": 0,
+            "max_z_hat_l2": float("nan"),
+            "rollout_gap_dnll": float("nan"),
+        }
 
     tf_nll = tf_nll_sum / n_steps
     ro_nll = ro_nll_sum / n_steps
@@ -171,6 +202,9 @@ def _eval_rollout(
     return {
         "model": model_name,
         "n_steps": n_steps,
+        "rollout_nonfinite": any_nonfinite,
+        "first_nonfinite_step": global_first_nonfinite_step,
+        "max_z_hat_l2": global_max_z_hat_l2,
         "teacher_forced_nll": tf_nll,
         "rollout_nll": ro_nll,
         "teacher_forced_dnll": tf_dnll,
@@ -237,6 +271,8 @@ def main() -> int:
     if not mem_path.exists():
         raise FileNotFoundError(f"Memory file not found: {mem_path}. Run scripts/30_phase4_fit_memory.py first.")
     memory = KMeansDeltaMemory.load(mem_path, device=device)
+    memory_topk = int(cfg["memory"].get("topk", 1))
+    memory_temp = float(cfg["memory"].get("temperature", 1.0))
     z_dim = memory.dim
     logger.info(f"[phase4] device={device.type} z_dim={z_dim} clusters={memory.n_clusters}")
 
@@ -301,6 +337,8 @@ def main() -> int:
         min_log_sigma=float(mcfg["min_log_sigma"]),
         max_log_sigma=float(mcfg["max_log_sigma"]),
         memory=memory,
+        memory_topk=memory_topk,
+        memory_temperature=memory_temp,
     ).to(device)
 
     logger.info(f"[phase4] param params={count_parameters(param):,}")
@@ -315,7 +353,7 @@ def main() -> int:
     log_path = Path(cfg["output"]["train_log_jsonl"])
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Train both param and hybrid jointly (shared batches) to compare fairly.
+    # Train both param and hybrid(delta-memory) jointly (shared batches) to compare fairly.
     step = 0
     max_steps = int(cfg["train"]["max_steps"])
     log_every = int(cfg["train"]["log_every"])
@@ -362,13 +400,121 @@ def main() -> int:
     torch.save({"model": param.state_dict(), "config": cfg}, ckpt_dir / "param_final.pt")
     torch.save({"model": hybrid.state_dict(), "config": cfg}, ckpt_dir / "hybrid_final.pt")
 
+    # Fit residual memory: r = Δz - μ_param(z)
+    # Default to enabled so older configs still run the improved Phase 4b ablation.
+    residual_enabled = bool(cfg["memory"].get("residual_enabled", True))
+    residual_memory = None
+    residual_path = Path(cfg["memory"].get("residual_output_npz", out_dir / "zdyn_memory_residual.npz"))
+    if residual_enabled:
+        logger.info("[phase4] Fitting residual memory statistics: r = Δz - μ_param(z)")
+        # Hard-assign to nearest centroid for stats (retrieval can still be soft top-k).
+        counts = torch.zeros((memory.n_clusters,), dtype=torch.int64, device=device)
+        sum_r = torch.zeros((memory.n_clusters, z_dim), dtype=torch.float64, device=device)
+        sum_r2 = torch.zeros((memory.n_clusters, z_dim), dtype=torch.float64, device=device)
+
+        fit_pairs = int(cfg["memory"]["max_fit_pairs"])
+        n = 0
+        param.eval()
+        with torch.no_grad():
+            it = iter_zdyn_pairs(
+                zdyn_dir=cfg["data"]["zdyn_dir"],
+                zdyn_index_path=cfg["data"]["zdyn_index"],
+                splits_dir=cfg["data"]["splits_dir"],
+                split="train",
+                min_duration_sec=float(cfg["data"]["min_duration_sec"]),
+                seed=int(cfg["train"]["seed"]) + 999,
+                max_pairs=fit_pairs,
+                sample_prob=1.0,
+            )
+            for p in it:
+                z_prev_np = p.z_prev.astype(np.float32, copy=False)
+                dz_np = p.dz.astype(np.float32, copy=False)
+                z_prev = torch.from_numpy(z_prev_np).to(device)
+                dz = torch.from_numpy(dz_np).to(device)
+                mu = param(z_prev.unsqueeze(0)).mu.squeeze(0)
+                r = (dz - mu).to(dtype=torch.float64)
+                idx = memory.nearest_index(z_prev.unsqueeze(0)).squeeze(0)
+                counts[idx] += 1
+                sum_r[idx] += r
+                sum_r2[idx] += r * r
+                n += 1
+                if n >= fit_pairs:
+                    break
+
+        if int(counts.sum().item()) == 0:
+            logger.warning("[phase4] Residual memory fit found 0 pairs; disabling residual memory.")
+            residual_enabled = False
+        else:
+            counts_f = counts.to(dtype=torch.float64).clamp_min(1.0).unsqueeze(-1)
+            res_mean = (sum_r / counts_f).to(dtype=torch.float32)
+            res_var = (sum_r2 / counts_f - (res_mean.to(dtype=torch.float64) ** 2)).to(dtype=torch.float32).clamp_min(1e-8)
+
+            residual_path.parent.mkdir(parents=True, exist_ok=True)
+            np.savez_compressed(
+                str(residual_path),
+                centroids=memory.centroids.detach().cpu().numpy(),
+                res_mean=res_mean.detach().cpu().numpy(),
+                res_var=res_var.detach().cpu().numpy(),
+                counts=counts.detach().cpu().numpy(),
+            )
+            logger.info(f"[phase4] Wrote residual memory npz: {residual_path}")
+            residual_memory = KMeansDeltaMemory.load(residual_path, device=device)
+
+    # Optional: train a gated residual memory model (gate only; param frozen)
+    gated_resid = None
+    if residual_enabled and residual_memory is not None:
+        gated_resid = GatedResidualMemDyn(
+            param=param,
+            residual_memory=residual_memory,
+            gate_hidden_dim=int(mcfg["gate_hidden_dim"]),
+            memory_topk=memory_topk,
+            memory_temperature=memory_temp,
+        ).to(device)
+        for p in gated_resid.param.parameters():
+            p.requires_grad = False
+        logger.info(f"[phase4] gated_resid params={count_parameters(gated_resid):,} (gate only; param frozen)")
+
+        gate_steps = int(cfg["train"].get("gate_steps", 0))
+        if gate_steps > 0:
+            gate_opt = torch.optim.AdamW(
+                gated_resid.gate.parameters(),
+                lr=float(cfg["train"]["lr"]),
+                weight_decay=float(cfg["train"]["weight_decay"]),
+            )
+            train_iter = iter(train_loader)
+            for s in range(gate_steps):
+                try:
+                    batch = next(train_iter)
+                except StopIteration:
+                    train_iter = iter(train_loader)
+                    batch = next(train_iter)
+                z_prev = batch["z_prev"].to(device)
+                dz = batch["dz"].to(device)
+                gated_resid.train()
+                gate_opt.zero_grad(set_to_none=True)
+                pred = gated_resid(z_prev)
+                loss_gate = diag_gaussian_nll(dz, pred).mean()
+                loss_gate.backward()
+                if grad_clip and grad_clip > 0:
+                    torch.nn.utils.clip_grad_norm_(gated_resid.gate.parameters(), max_norm=grad_clip)
+                gate_opt.step()
+                if log_every and (s + 1) % log_every == 0:
+                    logger.info(f"[phase4] gate step={s+1}/{gate_steps} loss_gate={float(loss_gate.item()):.4f}")
+
+        torch.save({"model": gated_resid.state_dict(), "config": cfg}, ckpt_dir / "gated_resid_final.pt")
+
     # Evaluate teacher-forced on eval
+    log_sigma_shared = torch.clamp(param.log_sigma, float(mcfg["min_log_sigma"]), float(mcfg["max_log_sigma"]))
+
     def mem_predict(zp: torch.Tensor) -> DiagGaussianDelta:
-        mu = memory.predict_mean(zp)
-        # Use per-cluster variance for NLL (converted to log_sigma)
-        var = memory.predict_var(zp)
-        log_sigma = 0.5 * torch.log(var.clamp_min(1e-8))
-        return DiagGaussianDelta(mu=mu, log_sigma=log_sigma)
+        mu = memory.predict_mean(zp, topk=memory_topk, temperature=memory_temp)
+        return DiagGaussianDelta(mu=mu, log_sigma=log_sigma_shared)
+
+    def resid_add_predict(zp: torch.Tensor) -> DiagGaussianDelta:
+        if residual_memory is None:
+            raise RuntimeError("residual_memory not available")
+        mu = param(zp).mu + residual_memory.predict_mean(zp, topk=memory_topk, temperature=memory_temp)
+        return DiagGaussianDelta(mu=mu, log_sigma=log_sigma_shared)
 
     param_metrics = _eval_teacher_forced(
         model_name="param",
@@ -397,6 +543,32 @@ def main() -> int:
         device=device,
         max_batches=int(cfg["eval"]["max_batches"]),
     )
+
+    extra_tf = []
+    if residual_memory is not None:
+        extra_tf.append(
+            _eval_teacher_forced(
+                model_name="resid_add",
+                predict_fn=resid_add_predict,
+                loader=eval_loader,
+                baseline_mean=baseline_mean,
+                baseline_var=baseline_var,
+                device=device,
+                max_batches=int(cfg["eval"]["max_batches"]),
+            )
+        )
+    if gated_resid is not None:
+        extra_tf.append(
+            _eval_teacher_forced(
+                model_name="gated_resid",
+                predict_fn=gated_resid,
+                loader=eval_loader,
+                baseline_mean=baseline_mean,
+                baseline_var=baseline_var,
+                device=device,
+                max_batches=int(cfg["eval"]["max_batches"]),
+            )
+        )
 
     # Rollout eval on a small subset of eval utterances
     store = LatentStore(Path(cfg["data"]["zdyn_dir"]))
@@ -440,9 +612,37 @@ def main() -> int:
         device=device,
     )
 
+    extra_roll = []
+    if residual_memory is not None:
+        extra_roll.append(
+            _eval_rollout(
+                model_name="resid_add",
+                predict_fn=resid_add_predict,
+                store=store,
+                utt_ids=utt_ids,
+                max_frames=rollout_max_frames,
+                baseline_mean=baseline_mean,
+                baseline_var=baseline_var,
+                device=device,
+            )
+        )
+    if gated_resid is not None:
+        extra_roll.append(
+            _eval_rollout(
+                model_name="gated_resid",
+                predict_fn=gated_resid,
+                store=store,
+                utt_ids=utt_ids,
+                max_frames=rollout_max_frames,
+                baseline_mean=baseline_mean,
+                baseline_var=baseline_var,
+                device=device,
+            )
+        )
+
     metrics = {
-        "teacher_forced": [mem_metrics, param_metrics, hybrid_metrics],
-        "rollout": [mem_roll, param_roll, hybrid_roll],
+        "teacher_forced": [mem_metrics, param_metrics, hybrid_metrics, *extra_tf],
+        "rollout": [mem_roll, param_roll, hybrid_roll, *extra_roll],
     }
     Path(cfg["output"]["metrics_json"]).write_text(json.dumps(metrics, indent=2))
     logger.info(f"[phase4] Wrote metrics: {cfg['output']['metrics_json']}")
@@ -451,4 +651,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

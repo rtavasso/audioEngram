@@ -79,6 +79,8 @@ class HybridDyn(nn.Module):
         min_log_sigma: float,
         max_log_sigma: float,
         memory: KMeansDeltaMemory,
+        memory_topk: int = 1,
+        memory_temperature: float = 1.0,
     ):
         super().__init__()
         self.param = ParamDyn(
@@ -92,11 +94,65 @@ class HybridDyn(nn.Module):
         # Simple gate: alpha(z) in (0,1) controlling weight on param vs memory mean.
         self.gate = _mlp(z_dim, 1, gate_hidden_dim, 2, 0.0)
         self.memory = memory
+        self.memory_topk = int(memory_topk)
+        self.memory_temperature = float(memory_temperature)
 
     def forward(self, z_prev: torch.Tensor) -> DiagGaussianDelta:
         p = self.param(z_prev)
-        mu_mem = self.memory.predict_mean(z_prev)
+        mu_mem = self.memory.predict_mean(z_prev, topk=self.memory_topk, temperature=self.memory_temperature)
         alpha = torch.sigmoid(self.gate(z_prev))  # [B,1]
         mu = alpha * p.mu + (1.0 - alpha) * mu_mem
         return DiagGaussianDelta(mu=mu, log_sigma=p.log_sigma)
 
+
+class ResidualMemDyn(nn.Module):
+    """
+    Additive residual memory: μ(z) = μ_param(z) + μ_mem_residual(z).
+    """
+
+    def __init__(
+        self,
+        *,
+        param: ParamDyn,
+        residual_memory: KMeansDeltaMemory,
+        memory_topk: int = 1,
+        memory_temperature: float = 1.0,
+    ):
+        super().__init__()
+        self.param = param
+        self.residual_memory = residual_memory
+        self.memory_topk = int(memory_topk)
+        self.memory_temperature = float(memory_temperature)
+
+    def forward(self, z_prev: torch.Tensor) -> DiagGaussianDelta:
+        p = self.param(z_prev)
+        r = self.residual_memory.predict_mean(z_prev, topk=self.memory_topk, temperature=self.memory_temperature)
+        return DiagGaussianDelta(mu=p.mu + r, log_sigma=p.log_sigma)
+
+
+class GatedResidualMemDyn(nn.Module):
+    """
+    Gated residual memory: μ(z) = μ_param(z) + g(z) * μ_mem_residual(z), g ∈ (0,1).
+    """
+
+    def __init__(
+        self,
+        *,
+        param: ParamDyn,
+        residual_memory: KMeansDeltaMemory,
+        gate_hidden_dim: int,
+        memory_topk: int = 1,
+        memory_temperature: float = 1.0,
+    ):
+        super().__init__()
+        self.param = param
+        self.residual_memory = residual_memory
+        self.gate = _mlp(param.log_sigma.numel(), 1, int(gate_hidden_dim), 2, 0.0)
+        self.memory_topk = int(memory_topk)
+        self.memory_temperature = float(memory_temperature)
+
+    def forward(self, z_prev: torch.Tensor) -> DiagGaussianDelta:
+        p = self.param(z_prev)
+        r = self.residual_memory.predict_mean(z_prev, topk=self.memory_topk, temperature=self.memory_temperature)
+        g = torch.sigmoid(self.gate(z_prev))  # [B,1]
+        return DiagGaussianDelta(mu=p.mu + g * r, log_sigma=p.log_sigma)

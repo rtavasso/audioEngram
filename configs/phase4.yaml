@@ -23,6 +23,15 @@ memory:
   seed: 42
   output_npz: ./outputs/phase4/zdyn_memory_kmeans.npz
 
+  # Retrieval (Engram-ish)
+  topk: 8
+  temperature: 1.0
+
+  # Residual memory: store statistics of (Δz - μ_param(z)) keyed by z.
+  # This is typically much more useful than trying to predict the whole Δz from memory.
+  residual_enabled: true
+  residual_output_npz: ./outputs/phase4/zdyn_memory_residual.npz
+
 model:
   # Parametric dynamics p(Δz | z) mean network
   hidden_dim: 512
@@ -42,6 +51,7 @@ train:
   batch_size: 2048
   num_workers: 2
   max_steps: 20000
+  gate_steps: 5000
   lr: 5.0e-4
   weight_decay: 1.0e-4
   grad_clip_norm: 1.0
@@ -57,4 +67,3 @@ output:
   checkpoints_dir: ./outputs/phase4/checkpoints
   train_log_jsonl: ./outputs/phase4/train_log.jsonl
   metrics_json: ./outputs/phase4/metrics.json
-
