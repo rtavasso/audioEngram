@@ -46,6 +46,62 @@ def main():
         default=None,
         help="Path to Mimi checkpoint (optional, downloads from HF if not provided)",
     )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=1,
+        help="Waveform batch size for encoding (1 = per-utterance, >1 enables padded batching + trimming)",
+    )
+    parser.add_argument(
+        "--num-workers",
+        type=int,
+        default=4,
+        help="DataLoader workers for audio loading/resampling when --batch-size > 1",
+    )
+    parser.add_argument(
+        "--prefetch-factor",
+        type=int,
+        default=2,
+        help="DataLoader prefetch factor when --batch-size > 1 and num_workers > 0",
+    )
+    parser.add_argument(
+        "--amp",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Use autocast mixed precision for encoding (cuda only)",
+    )
+    parser.add_argument(
+        "--amp-dtype",
+        type=str,
+        default="bf16",
+        choices=["bf16", "fp16"],
+        help="Autocast dtype (bf16 recommended if supported)",
+    )
+    parser.add_argument(
+        "--tf32",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable TF32 matmul/cudnn (cuda only)",
+    )
+    parser.add_argument(
+        "--cudnn-benchmark",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable cudnn benchmark (cuda only)",
+    )
+    parser.add_argument(
+        "--verify-mode",
+        type=str,
+        default="sample",
+        choices=["none", "sample", "full"],
+        help="Verification pass after extraction (full can be slow)",
+    )
+    parser.add_argument(
+        "--verify-max-utts",
+        type=int,
+        default=200,
+        help="When --verify-mode=sample, how many utterances to check",
+    )
     args = parser.parse_args()
 
     # Load config
@@ -57,6 +113,12 @@ def main():
     set_seed(config["seed"])
 
     logger.info(f"Device: {args.device}")
+    if str(args.device).startswith("cuda"):
+        if args.tf32:
+            torch.backends.cuda.matmul.allow_tf32 = True
+            torch.backends.cudnn.allow_tf32 = True
+        if args.cudnn_benchmark:
+            torch.backends.cudnn.benchmark = True
 
     # Load Mimi autoencoder
     logger.info("Loading Mimi autoencoder...")
@@ -106,6 +168,11 @@ def main():
         zarr_path=zarr_path,
         device=args.device,
         show_progress=True,
+        batch_size=int(args.batch_size),
+        num_workers=int(args.num_workers),
+        prefetch_factor=int(args.prefetch_factor),
+        amp=bool(args.amp),
+        amp_dtype=str(args.amp_dtype),
     )
 
     # Save index
@@ -114,12 +181,19 @@ def main():
     logger.info(f"Index saved to {index_path}")
 
     # Verify
-    logger.info("Verifying latent store...")
-    stats = verify_latent_store(
-        zarr_path,
-        expected_frame_rate=config["vae"]["frame_rate"],
-        expected_dim=config["vae"]["latent_dim"],
-    )
+    stats = {"valid": True}
+    if args.verify_mode != "none":
+        logger.info("Verifying latent store...")
+        max_utts = None
+        if args.verify_mode == "sample":
+            max_utts = int(args.verify_max_utts)
+            logger.info(f"Verification mode=sample (max_utts={max_utts})")
+        stats = verify_latent_store(
+            zarr_path,
+            expected_frame_rate=config["vae"]["frame_rate"],
+            expected_dim=config["vae"]["latent_dim"],
+            max_utterances=max_utts,
+        )
 
     logger.info("=" * 50)
     logger.info("VERIFICATION RESULTS")

@@ -46,15 +46,40 @@ class OnlineMeanVarVec:
         self.m2 = np.zeros((self.dim,), dtype=np.float64)
 
     def update_batch(self, x: np.ndarray) -> None:
-        # x: [T, D]
+        """
+        Update stats with a batch x of shape [T, D] using a vectorized
+        parallel-variance merge (Chan et al.) to avoid per-frame Python loops.
+        """
         if x.ndim != 2 or x.shape[1] != self.dim:
             raise ValueError(f"Expected [T,{self.dim}] got {x.shape}")
-        for row in x.astype(np.float64, copy=False):
-            self.n += 1
-            delta = row - self.mean
-            self.mean += delta / self.n
-            delta2 = row - self.mean
-            self.m2 += delta * delta2
+        xb = x.astype(np.float64, copy=False)
+        n_b = int(xb.shape[0])
+        if n_b == 0:
+            return
+
+        mean_b = xb.mean(axis=0)
+        # Sum of squared deviations from mean_b
+        diff = xb - mean_b
+        m2_b = np.sum(diff * diff, axis=0)
+
+        if self.n == 0:
+            self.n = n_b
+            self.mean = mean_b
+            self.m2 = m2_b
+            return
+
+        n_a = int(self.n)
+        mean_a = self.mean
+        m2_a = self.m2
+
+        delta = mean_b - mean_a
+        n_t = n_a + n_b
+        mean_t = mean_a + delta * (n_b / n_t)
+        m2_t = m2_a + m2_b + (delta * delta) * (n_a * n_b / n_t)
+
+        self.n = n_t
+        self.mean = mean_t
+        self.m2 = m2_t
 
     def finalize(self, min_std: float = 1e-4) -> NormStats:
         if self.n < 2:
@@ -75,4 +100,3 @@ def normalize_x(x: np.ndarray, stats: NormStats) -> np.ndarray:
 
 def denormalize_x(xn: np.ndarray, stats: NormStats) -> np.ndarray:
     return xn * stats.std + stats.mean
-

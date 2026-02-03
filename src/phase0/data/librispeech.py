@@ -12,6 +12,8 @@ from typing import Optional
 import torch
 import torchaudio
 
+_RESAMPLER_CACHE: dict[tuple[int, int], torchaudio.transforms.Resample] = {}
+
 
 @dataclass
 class UtteranceInfo:
@@ -151,7 +153,11 @@ def load_audio(
 
     # Resample if needed
     if sr != target_sr:
-        resampler = torchaudio.transforms.Resample(sr, target_sr)
+        key = (int(sr), int(target_sr))
+        resampler = _RESAMPLER_CACHE.get(key)
+        if resampler is None:
+            resampler = torchaudio.transforms.Resample(sr, target_sr)
+            _RESAMPLER_CACHE[key] = resampler
         waveform = resampler(waveform)
 
     return waveform, target_sr

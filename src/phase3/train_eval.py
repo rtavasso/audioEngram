@@ -158,6 +158,14 @@ def train(
     device = _device_from_config(config["train"]["device"])
     set_seed(int(config["train"]["seed"]))
 
+    # Speed knobs
+    if device.type == "cuda":
+        if bool(config["train"].get("tf32", False)):
+            torch.backends.cuda.matmul.allow_tf32 = True
+            torch.backends.cudnn.allow_tf32 = True
+        if bool(config["train"].get("cudnn_benchmark", False)):
+            torch.backends.cudnn.benchmark = True
+
     out_dir = Path(config["output"]["out_dir"])
     ckpt_dir = Path(config["output"]["checkpoints_dir"])
     ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -204,6 +212,7 @@ def train(
         num_workers=int(config["train"]["num_workers"]),
         collate_fn=collate_pad,
         pin_memory=(device.type == "cuda"),
+        persistent_workers=(int(config["train"]["num_workers"]) > 0),
     )
     eval_loader = DataLoader(
         eval_ds,
@@ -247,6 +256,13 @@ def train(
         lr=float(config["train"]["lr"]),
         weight_decay=float(config["train"]["weight_decay"]),
     )
+
+    use_amp = bool(config["train"].get("amp", False)) and device.type == "cuda"
+    amp_dtype_cfg = str(config["train"].get("amp_dtype", "bf16")).lower()
+    if amp_dtype_cfg not in ("bf16", "fp16"):
+        raise ValueError("train.amp_dtype must be bf16 or fp16")
+    amp_dtype = torch.bfloat16 if amp_dtype_cfg == "bf16" else torch.float16
+    scaler = torch.cuda.amp.GradScaler(enabled=(use_amp and amp_dtype == torch.float16))
 
     step = 0
     if resume_checkpoint is not None:
@@ -297,26 +313,40 @@ def train(
 
         model.train()
         opt.zero_grad(set_to_none=True)
-        out = model(x, prior_sample_prob=prior_sample_prob)
-        dyn_params = model.dyn(out.z_dyn[:, :-1])
-        losses = compute_losses(
-            x=x,
-            mask=mask,
-            x_hat=out.x_hat_mixed,
-            q_rec=out.q_rec,
-            p_rec=out.p_rec,
-            dyn_params=dyn_params,
-            z_dyn_target=out.z_dyn[:, 1:],
-            recon_weight=recon_weight,
-            beta=beta,
-            free_bits_per_dim=free_bits_per_dim,
-            z_rec_dim=z_rec_dim,
-            dyn_weight=dyn_weight,
-        )
-        losses.total.backward()
+
+        with torch.cuda.amp.autocast(enabled=use_amp, dtype=amp_dtype):
+            out = model(x, prior_sample_prob=prior_sample_prob)
+            dyn_params = model.dyn(out.z_dyn[:, :-1])
+            losses = compute_losses(
+                x=x,
+                mask=mask,
+                x_hat=out.x_hat_mixed,
+                q_rec=out.q_rec,
+                p_rec=out.p_rec,
+                dyn_params=dyn_params,
+                z_dyn_target=out.z_dyn[:, 1:],
+                recon_weight=recon_weight,
+                beta=beta,
+                free_bits_per_dim=free_bits_per_dim,
+                z_rec_dim=z_rec_dim,
+                dyn_weight=dyn_weight,
+            )
+
+        if scaler.is_enabled():
+            scaler.scale(losses.total).backward()
+        else:
+            losses.total.backward()
+
         if grad_clip and grad_clip > 0:
+            if scaler.is_enabled():
+                scaler.unscale_(opt)
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=grad_clip)
-        opt.step()
+
+        if scaler.is_enabled():
+            scaler.step(opt)
+            scaler.update()
+        else:
+            opt.step()
 
         step += 1
 

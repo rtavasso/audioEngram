@@ -11,6 +11,7 @@ from typing import Optional
 import numpy as np
 import torch
 from tqdm import tqdm
+import contextlib
 
 # Add project root to path for imports
 _project_root = Path(__file__).parent.parent.parent.parent
@@ -37,17 +38,54 @@ def compute_frame_energy(
     Returns:
         Energy array [n_frames]
     """
-    wav = waveform.squeeze().numpy()
-    energy = np.zeros(n_frames, dtype=np.float32)
+    wav = waveform.squeeze().numpy().astype(np.float32, copy=False)
+    total = int(n_frames) * int(frame_size)
+    if wav.shape[0] < total:
+        pad = np.zeros((total - wav.shape[0],), dtype=np.float32)
+        wav = np.concatenate([wav, pad], axis=0)
+    else:
+        wav = wav[:total]
+    frames = wav.reshape(int(n_frames), int(frame_size))
+    return np.sqrt(np.mean(frames * frames, axis=1)).astype(np.float32, copy=False)
 
-    for i in range(n_frames):
-        start = i * frame_size
-        end = min(start + frame_size, len(wav))
-        if start < len(wav):
-            segment = wav[start:end]
-            energy[i] = np.sqrt(np.mean(segment**2))
 
-    return energy
+def _infer_batch_latents(
+    waveforms: torch.Tensor,
+    lengths: torch.Tensor,
+    autoencoder,
+    device: str,
+    use_amp: bool,
+    amp_dtype: torch.dtype,
+) -> list[np.ndarray]:
+    """
+    Encode a padded batch and slice each output to its per-utterance latent length.
+
+    waveforms: [B, 1, T_max] float32 on CPU
+    lengths:   [B] original lengths in samples (after resample)
+    returns: list of [T_i, D] float32 arrays
+    """
+    waveforms = waveforms.to(device, non_blocking=True)
+    lengths = lengths.to(device, non_blocking=True)
+
+    if str(device).startswith("cuda"):
+        autocast_ctx = torch.cuda.amp.autocast(enabled=bool(use_amp), dtype=amp_dtype)
+    else:
+        autocast_ctx = contextlib.nullcontext()
+
+    with torch.inference_mode(), autocast_ctx:
+        lat = autoencoder.encode(waveforms)  # [B, D, T']
+
+    lat = lat.detach().float().cpu()  # keep storage float32
+    b, d, t_prime = lat.shape
+    outs: list[np.ndarray] = []
+    frame_size = int(autoencoder.frame_size)
+
+    for i in range(b):
+        # expected latent length is ceil(length / frame_size)
+        n_frames = int((int(lengths[i].item()) + frame_size - 1) // frame_size)
+        li = lat[i, :, :n_frames].permute(1, 0).contiguous().numpy()
+        outs.append(li)
+    return outs
 
 
 def infer_utterance_latents(
@@ -71,7 +109,7 @@ def infer_utterance_latents(
     waveform = waveform.unsqueeze(0).to(device)  # [1, 1, T]
 
     # Run encoder
-    with torch.no_grad():
+    with torch.inference_mode():
         latents = autoencoder.encode(waveform)  # [1, D, T']
 
     # Convert to numpy [T', D]
@@ -101,6 +139,11 @@ def batch_infer_latents(
     zarr_path: str | Path,
     device: str = "cpu",
     show_progress: bool = True,
+    batch_size: int = 1,
+    num_workers: int = 0,
+    prefetch_factor: int = 2,
+    amp: bool = True,
+    amp_dtype: str = "bf16",
 ) -> list[dict]:
     """
     Run VAE encoder on multiple utterances and save to zarr.
@@ -118,39 +161,131 @@ def batch_infer_latents(
     zarr_path = Path(zarr_path)
     zarr_path.parent.mkdir(parents=True, exist_ok=True)
 
+    # AMP config
+    amp_dtype_l = str(amp_dtype).lower()
+    if amp_dtype_l not in ("bf16", "fp16"):
+        raise ValueError("amp_dtype must be bf16 or fp16")
+    torch_amp_dtype = torch.bfloat16 if amp_dtype_l == "bf16" else torch.float16
+
     index_entries = []
-    iterator = tqdm(utterances, desc="Encoding") if show_progress else utterances
 
-    for utt in iterator:
-        try:
-            latents, energy, timestamps = infer_utterance_latents(
-                utt, autoencoder, device
-            )
+    if int(batch_size) <= 1:
+        iterator = tqdm(utterances, desc="Encoding") if show_progress else utterances
+        for utt in iterator:
+            try:
+                latents, energy, timestamps = infer_utterance_latents(utt, autoencoder, device)
+                save_latents_zarr(
+                    latents=latents,
+                    energy=energy,
+                    timestamps=timestamps,
+                    speaker_id=utt.speaker_id,
+                    utterance_id=utt.utterance_id,
+                    zarr_path=zarr_path,
+                )
+                index_entries.append(
+                    {
+                        "utterance_id": utt.utterance_id,
+                        "speaker_id": utt.speaker_id,
+                        "n_frames": latents.shape[0],
+                        "duration_sec": utt.duration_sec,
+                        "audio_path": str(utt.audio_path),
+                    }
+                )
+            except Exception as e:
+                print(f"Error processing {utt.utterance_id}: {e}")
+                continue
+        return index_entries
 
-            # Save to zarr
-            save_latents_zarr(
-                latents=latents,
-                energy=energy,
-                timestamps=timestamps,
-                speaker_id=utt.speaker_id,
-                utterance_id=utt.utterance_id,
-                zarr_path=zarr_path,
-            )
+    # Batched path
+    from torch.utils.data import Dataset, DataLoader
 
-            # Record index entry
-            index_entries.append(
-                {
-                    "utterance_id": utt.utterance_id,
-                    "speaker_id": utt.speaker_id,
-                    "n_frames": latents.shape[0],
-                    "duration_sec": utt.duration_sec,
-                    "audio_path": str(utt.audio_path),
-                }
-            )
+    class _UttDataset(Dataset):
+        def __init__(self, utts: list[UtteranceInfo]):
+            self.utts = utts
 
-        except Exception as e:
-            print(f"Error processing {utt.utterance_id}: {e}")
-            continue
+        def __len__(self) -> int:
+            return len(self.utts)
+
+        def __getitem__(self, idx: int) -> dict:
+            utt = self.utts[idx]
+            wav, _ = load_audio(utt.audio_path, target_sr=autoencoder.sample_rate)
+            # wav: [1,T] -> [1,1,T] for encoder
+            wav = wav.unsqueeze(0).contiguous()
+            length = int(wav.shape[-1])
+            return {
+                "utt": utt,
+                "wav": wav,  # [1,1,T]
+                "length": length,
+            }
+
+    def _collate(items: list[dict]) -> dict:
+        utts = [it["utt"] for it in items]
+        lengths = torch.tensor([it["length"] for it in items], dtype=torch.int64)
+        max_len = int(max(lengths).item())
+        w = torch.zeros((len(items), 1, max_len), dtype=torch.float32)
+        for i, it in enumerate(items):
+            wav = it["wav"].squeeze(0)  # [1,T]
+            t = int(wav.shape[-1])
+            w[i, :, :t] = wav
+        return {"utts": utts, "waveforms": w, "lengths": lengths}
+
+    ds = _UttDataset(utterances)
+    loader_kwargs = dict(
+        batch_size=int(batch_size),
+        shuffle=False,
+        num_workers=int(num_workers),
+        persistent_workers=(int(num_workers) > 0),
+        pin_memory=device.startswith("cuda"),
+        collate_fn=_collate,
+    )
+    if int(num_workers) > 0:
+        loader_kwargs["prefetch_factor"] = int(prefetch_factor)
+
+    loader = DataLoader(ds, **loader_kwargs)
+
+    iterator = tqdm(loader, desc="Encoding(batched)") if show_progress else loader
+    for batch in iterator:
+        utts = batch["utts"]
+        waveforms = batch["waveforms"]
+        lengths = batch["lengths"]
+
+        latents_list = _infer_batch_latents(
+            waveforms=waveforms,
+            lengths=lengths,
+            autoencoder=autoencoder,
+            device=device,
+            use_amp=bool(amp),
+            amp_dtype=torch_amp_dtype,
+        )
+
+        for i, (utt, latents) in enumerate(zip(utts, latents_list)):
+            try:
+                length = int(lengths[i].item())
+                wav = waveforms[i, :, :length].cpu().contiguous().squeeze(0)  # [1,T] -> [T]
+                n_frames = int(latents.shape[0])
+                energy = compute_frame_energy(wav.unsqueeze(0), int(autoencoder.frame_size), n_frames)
+                timestamps = np.arange(n_frames, dtype=np.float32) / float(autoencoder.frame_rate)
+
+                save_latents_zarr(
+                    latents=latents,
+                    energy=energy,
+                    timestamps=timestamps,
+                    speaker_id=utt.speaker_id,
+                    utterance_id=utt.utterance_id,
+                    zarr_path=zarr_path,
+                )
+                index_entries.append(
+                    {
+                        "utterance_id": utt.utterance_id,
+                        "speaker_id": utt.speaker_id,
+                        "n_frames": n_frames,
+                        "duration_sec": utt.duration_sec,
+                        "audio_path": str(utt.audio_path),
+                    }
+                )
+            except Exception as e:
+                print(f"Error processing {utt.utterance_id}: {e}")
+                continue
 
     return index_entries
 
@@ -159,6 +294,7 @@ def verify_latent_store(
     zarr_path: str | Path,
     expected_frame_rate: float = 12.5,
     expected_dim: int = 512,
+    max_utterances: Optional[int] = None,
 ) -> dict:
     """
     Verify latent store integrity.
@@ -182,7 +318,12 @@ def verify_latent_store(
         "dims": set(),
     }
 
-    for utt_id in store.keys():
+    utt_ids = list(store.keys())
+    if max_utterances is not None and max_utterances > 0 and len(utt_ids) > int(max_utterances):
+        rng = np.random.default_rng(0)
+        utt_ids = rng.choice(utt_ids, size=int(max_utterances), replace=False).tolist()
+
+    for utt_id in utt_ids:
         grp = store[utt_id]
         latents = np.array(grp["x"])
         timestamps = np.array(grp["timestamps"])
