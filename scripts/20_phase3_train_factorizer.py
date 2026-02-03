@@ -30,10 +30,9 @@ def main() -> int:
     with open(args.config) as f:
         cfg = yaml.safe_load(f)
 
-    train(cfg, resume_checkpoint=args.resume)
+    train(config=cfg, resume_checkpoint=args.resume)
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
