@@ -268,6 +268,24 @@ def main() -> int:
         default="outputs/phase4/checkpoints/param_final.pt",
         help="Param checkpoint to fine-tune",
     )
+    parser.add_argument(
+        "--tag",
+        type=str,
+        default="",
+        help="Optional tag to suffix outputs (checkpoint/summary/memory) for sweeps",
+    )
+    # Optional overrides (avoid editing YAML for quick sweeps)
+    parser.add_argument("--k", type=int, default=None)
+    parser.add_argument("--max-steps", type=int, default=None)
+    parser.add_argument("--batch-size", type=int, default=None)
+    parser.add_argument("--lr", type=float, default=None)
+    parser.add_argument("--rollout-weight", type=float, default=None)
+    parser.add_argument("--teacher-weight", type=float, default=None)
+    parser.add_argument("--state-weight", type=float, default=None)
+    parser.add_argument("--sched-teacher-prob-start", type=float, default=None)
+    parser.add_argument("--sched-teacher-prob-end", type=float, default=None)
+    parser.add_argument("--sched-teacher-warmup-steps", type=int, default=None)
+    parser.add_argument("--z-noise-std", type=float, default=None)
     args = parser.parse_args()
 
     setup_logging(name="phase4-rollout")
@@ -365,6 +383,30 @@ def main() -> int:
     if not bool(rtcfg.get("enabled", True)):
         logger.info("[phase4.5] rollout_train.disabled; exiting after pre-eval")
         return 0
+
+    # Apply CLI overrides
+    if args.k is not None:
+        rtcfg["k"] = int(args.k)
+    if args.max_steps is not None:
+        rtcfg["max_steps"] = int(args.max_steps)
+    if args.batch_size is not None:
+        rtcfg["batch_size"] = int(args.batch_size)
+    if args.lr is not None:
+        rtcfg["lr"] = float(args.lr)
+    if args.rollout_weight is not None:
+        rtcfg["rollout_weight"] = float(args.rollout_weight)
+    if args.teacher_weight is not None:
+        rtcfg["teacher_weight"] = float(args.teacher_weight)
+    if args.state_weight is not None:
+        rtcfg["state_weight"] = float(args.state_weight)
+    if args.sched_teacher_prob_start is not None:
+        rtcfg["sched_teacher_prob_start"] = float(args.sched_teacher_prob_start)
+    if args.sched_teacher_prob_end is not None:
+        rtcfg["sched_teacher_prob_end"] = float(args.sched_teacher_prob_end)
+    if args.sched_teacher_warmup_steps is not None:
+        rtcfg["sched_teacher_warmup_steps"] = int(args.sched_teacher_warmup_steps)
+    if args.z_noise_std is not None:
+        rtcfg["z_noise_std"] = float(args.z_noise_std)
 
     k = int(rtcfg.get("k", 16))
     batch_size = int(rtcfg.get("batch_size", 256))
@@ -487,7 +529,9 @@ def main() -> int:
             )
 
     # Save finetuned checkpoint
-    out_ckpt = ckpt_dir / "param_rollout_finetuned.pt"
+    tag = str(args.tag).strip()
+    suffix = f"_{tag}" if tag else ""
+    out_ckpt = ckpt_dir / f"param_rollout_finetuned{suffix}.pt"
     torch.save({"model": param.state_dict(), "config": cfg}, out_ckpt)
     logger.info(f"[phase4.5] Wrote checkpoint: {out_ckpt}")
 
@@ -549,7 +593,7 @@ def main() -> int:
     counts_f = counts.to(dtype=torch.float64).clamp_min(1.0).unsqueeze(-1)
     res_mean = (sum_r / counts_f).to(dtype=torch.float32)
     res_var = (sum_r2 / counts_f - (res_mean.to(dtype=torch.float64) ** 2)).to(dtype=torch.float32).clamp_min(1e-8)
-    resid_path = out_dir / "zdyn_memory_residual_rollout_finetuned.npz"
+    resid_path = out_dir / f"zdyn_memory_residual_rollout_finetuned{suffix}.npz"
     np.savez_compressed(
         str(resid_path),
         centroids=memory.centroids.detach().cpu().numpy(),
@@ -609,7 +653,7 @@ def main() -> int:
             "z_noise_std": z_noise_std,
         },
     }
-    out_json = out_dir / "phase4_rollout_finetune_summary.json"
+    out_json = out_dir / f"phase4_rollout_finetune_summary{suffix}.json"
     out_json.write_text(json.dumps(summary, indent=2))
     logger.info(f"[phase4.5] Wrote summary: {out_json}")
     return 0
