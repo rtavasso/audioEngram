@@ -63,9 +63,12 @@ def test_phase3_forward_and_losses_finite() -> None:
         dyn_params=dyn_params,
         z_dyn_target=out.z_dyn[:, 1:],
         recon_weight=1.0,
-        beta=1.0,
+        kl_mode="beta",
+        kl_beta=1.0,
         free_bits_per_dim=0.0,
         z_rec_dim=z_rec_dim,
+        kl_target=0.0,
+        kl_gamma=0.0,
         dyn_weight=1.0,
     )
     assert torch.isfinite(losses.total)

@@ -99,9 +99,12 @@ def evaluate(
     loader: DataLoader,
     device: torch.device,
     recon_weight: float,
-    beta: float,
+    kl_mode: str,
+    kl_beta: float,
     free_bits_per_dim: float,
     z_rec_dim: int,
+    kl_target: float,
+    kl_gamma: float,
     dyn_weight: float,
     prior_sample_prob: float,
     max_batches: int,
@@ -124,9 +127,12 @@ def evaluate(
             dyn_params=dyn_params,
             z_dyn_target=out.z_dyn[:, 1:],
             recon_weight=recon_weight,
-            beta=beta,
+            kl_mode=kl_mode,
+            kl_beta=kl_beta,
             free_bits_per_dim=free_bits_per_dim,
             z_rec_dim=z_rec_dim,
+            kl_target=kl_target,
+            kl_gamma=kl_gamma,
             dyn_weight=dyn_weight,
         )
         sums["recon"] += float(losses.recon.item())
@@ -279,12 +285,29 @@ def train(
     log_path = Path(config["output"]["train_log_jsonl"])
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
-    recon_weight = float(config["loss"]["recon_weight"])
-    beta_final = float(config["loss"]["beta_final"])
-    beta_warmup = int(config["loss"]["beta_warmup_steps"])
-    free_bits_per_dim = float(config["loss"]["free_bits_per_dim"])
-    dyn_weight = float(config["loss"]["dyn_weight"])
-    prior_sample_prob = float(config["loss"]["prior_sample_prob"])
+    loss_cfg = config["loss"]
+    recon_weight = float(loss_cfg["recon_weight"])
+
+    kl_cfg = loss_cfg.get("kl", None)
+    if kl_cfg is None:
+        kl_mode = "beta"
+        beta_final = float(loss_cfg.get("beta_final", 1.0))
+        beta_warmup = int(loss_cfg.get("beta_warmup_steps", 0))
+        free_bits_per_dim = float(loss_cfg.get("free_bits_per_dim", 0.0))
+        kl_target_final = 0.0
+        kl_target_warmup = 0
+        kl_gamma = 0.0
+    else:
+        kl_mode = str(kl_cfg.get("mode", "beta"))
+        beta_final = float(kl_cfg.get("beta_final", loss_cfg.get("beta_final", 1.0)))
+        beta_warmup = int(kl_cfg.get("beta_warmup_steps", loss_cfg.get("beta_warmup_steps", 0)))
+        free_bits_per_dim = float(kl_cfg.get("free_bits_per_dim", loss_cfg.get("free_bits_per_dim", 0.0)))
+        kl_target_final = float(kl_cfg.get("target_final", 0.0))
+        kl_target_warmup = int(kl_cfg.get("target_warmup_steps", 0))
+        kl_gamma = float(kl_cfg.get("gamma", 0.0))
+
+    dyn_weight = float(loss_cfg["dyn_weight"])
+    prior_sample_prob = float(loss_cfg["prior_sample_prob"])
 
     max_steps = int(config["train"]["max_steps"])
     log_every = int(config["train"]["log_every"])
@@ -309,11 +332,19 @@ def train(
         x = batch["x"].to(device)
         mask = batch["mask"].to(device)
 
-        # Beta warmup
-        if beta_warmup > 0:
-            beta = beta_final * min(1.0, float(step + 1) / float(beta_warmup))
+        # KL control schedule (beta weighting vs target capacity)
+        if str(kl_mode).lower() == "beta":
+            if beta_warmup > 0:
+                kl_beta = beta_final * min(1.0, float(step + 1) / float(beta_warmup))
+            else:
+                kl_beta = beta_final
+            kl_target = 0.0
         else:
-            beta = beta_final
+            kl_beta = 0.0
+            if kl_target_warmup > 0:
+                kl_target = kl_target_final * min(1.0, float(step + 1) / float(kl_target_warmup))
+            else:
+                kl_target = kl_target_final
 
         model.train()
         opt.zero_grad(set_to_none=True)
@@ -330,9 +361,12 @@ def train(
                 dyn_params=dyn_params,
                 z_dyn_target=out.z_dyn[:, 1:],
                 recon_weight=recon_weight,
-                beta=beta,
+                kl_mode=kl_mode,
+                kl_beta=kl_beta,
                 free_bits_per_dim=free_bits_per_dim,
                 z_rec_dim=z_rec_dim,
+                kl_target=kl_target,
+                kl_gamma=kl_gamma,
                 dyn_weight=dyn_weight,
             )
 
@@ -370,7 +404,7 @@ def train(
                 z_rec_prior_l2_mean = float(_masked_mean(z_rec_prior_l2, mask).item())
 
                 # Raw KL (before free-bits clamp) for visibility
-                kl_raw = diag_gaussian_kl(out.q_rec, out.p_rec)  # [B,T]
+                kl_raw = diag_gaussian_kl(out.q_rec, out.p_rec).clamp_min(0.0)  # [B,T]
                 kl_raw_mean = float(_masked_mean(kl_raw, mask).item())
 
                 # Sigma stats (per-dim average; avoid summing over z_rec dims)
@@ -399,7 +433,10 @@ def train(
 
             row = {
                 "step": step,
-                "beta": beta,
+                "kl_mode": str(kl_mode),
+                "beta": float(kl_beta),
+                "kl_target": float(kl_target),
+                "kl_gamma": float(kl_gamma),
                 "loss_total": float(losses.total.item()),
                 "loss_recon": float(losses.recon.item()),
                 "loss_kl": float(losses.kl.item()),
@@ -422,7 +459,7 @@ def train(
                 f.write(json.dumps(row) + "\n")
             logger.info(
                 f"[phase3] step={step} total={row['loss_total']:.4f} recon={row['loss_recon']:.4f} "
-                f"kl={row['loss_kl']:.4f} dyn={row['loss_dyn']:.4f} "
+                f"kl_term={row['loss_kl']:.4f} dyn={row['loss_dyn']:.4f} mode={row['kl_mode']} "
                 f"kl_raw={row['kl_raw']:.3f} z_dyn_var={row['z_dyn_var_mean']:.3e} "
                 f"prior_frac={row['prior_frac']:.2f} prior/post={row['recon_prior_over_post']:.2f}"
             )
@@ -432,21 +469,25 @@ def train(
             torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "step": step, "config": config}, ckpt_path)
 
         if eval_every and step % eval_every == 0:
+            eval_kl_target = float(kl_target_final) if str(kl_mode).lower() == "target" else 0.0
             metrics = evaluate(
                 model=model,
                 loader=eval_loader,
                 device=device,
                 recon_weight=recon_weight,
-                beta=beta,
+                kl_mode=kl_mode,
+                kl_beta=kl_beta,
                 free_bits_per_dim=free_bits_per_dim,
                 z_rec_dim=z_rec_dim,
+                kl_target=eval_kl_target,
+                kl_gamma=kl_gamma,
                 dyn_weight=dyn_weight,
                 prior_sample_prob=prior_sample_prob,
                 max_batches=eval_batches,
             )
             logger.info(
                 f"[phase3] eval step={step} total={metrics.total:.4f} recon={metrics.recon:.4f} "
-                f"kl={metrics.kl:.4f} dyn={metrics.dyn:.4f} batches={metrics.n_batches}"
+                f"kl_term={metrics.kl:.4f} dyn={metrics.dyn:.4f} batches={metrics.n_batches}"
             )
             Path(config["output"]["eval_metrics_file"]).write_text(
                 json.dumps({"step": step, **metrics.__dict__}, indent=2)

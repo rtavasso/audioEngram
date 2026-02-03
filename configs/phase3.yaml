@@ -89,18 +89,26 @@ loss:
   recon_weight: 1.0
 
   # Innovation budget: KL(q(z_rec|x,z_dyn) || p(z_rec|z_dyn))
-  # Stronger KL encourages information to flow into z_dyn instead of z_rec.
-  beta_final: 2.0
-  beta_warmup_steps: 5000
-  # Free bits can stall KL gradients and encourage z_dyn collapse early.
-  free_bits_per_dim: 0.0
+  # Pragmatic default: enforce a non-zero KL "capacity" so z_rec doesn't collapse to unused.
+  kl:
+    mode: target  # beta|target
+    # Target KL (nats / timestep), linearly warmed up.
+    target_final: 2.0
+    target_warmup_steps: 10000
+    # Penalty strength for |KL - target| (only used in mode=target).
+    gamma: 0.5
+
+    # Parameters used when mode=beta (kept for easy ablation).
+    beta_final: 2.0
+    beta_warmup_steps: 5000
+    free_bits_per_dim: 0.0
 
   # Make z_dyn AR-friendly via teacher-forced dynamics NLL
   # dyn NLL is summed over z_dyn dims; down-weight to avoid it dominating loss.
   dyn_weight: 0.01
 
   # Force z_dyn to matter by reconstructing sometimes from prior-sampled z_rec
-  prior_sample_prob: 0.75
+  prior_sample_prob: 0.5
 
 output:
   out_dir: ./outputs/phase3
