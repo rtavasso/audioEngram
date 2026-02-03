@@ -274,7 +274,9 @@ Results are on LibriSpeech (read English speech). Structure may differ for:
 
 ### 5.3 Train/Eval Discrepancy
 
-The anomalous train ΔNLL values (positive when eval is negative) require investigation before these results can be considered fully validated.
+The anomalous **mean** train ΔNLL values (positive when eval is negative) were traced to **rare, catastrophic outliers** in the train split that dominate the mean (see §3.4).
+
+In typical regions of the distribution (median and most quantiles), train and eval are consistent: ΔNLL is negative (improvement over baseline) and direction predictability is present. The practical lesson is that for this likelihood head, **reporting only means can be misleading**; robust summaries (median/trimmed mean) and “worst offenders” logging are necessary to interpret results and to debug rollout blow-ups.
 
 ### 5.4 Predictor Architecture
 
@@ -290,8 +292,8 @@ Based on these results, the recommended next steps are:
 
 ### 6.1 Immediate (Validation)
 
-1. **Investigate train/eval discrepancy** for k=1,2
-2. **Cross-encoder comparison:** Run same experiment on EnCodec/DAC latents
+1. **Harden reporting:** Keep robust summaries (median/trimmed) + outlier logging in the Phase 1 baseline to avoid mean-dominated artifacts.
+2. **Cross-encoder comparison (optional):** Run the same experiment on EnCodec/DAC latents to test generality beyond Mimi.
 
 ### 6.2 Short-term (Architecture Development)
 

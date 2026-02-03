@@ -166,6 +166,11 @@ def batch_infer_latents(
     if amp_dtype_l not in ("bf16", "fp16"):
         raise ValueError("amp_dtype must be bf16 or fp16")
     torch_amp_dtype = torch.bfloat16 if amp_dtype_l == "bf16" else torch.float16
+    if bool(amp) and str(device).startswith("cuda") and torch_amp_dtype == torch.bfloat16:
+        # T4/Turing and older GPUs often don't support bf16 autocast.
+        if not torch.cuda.is_bf16_supported():
+            print("[phase0] CUDA bf16 not supported; falling back to fp16 autocast")
+            torch_amp_dtype = torch.float16
 
     index_entries = []
 

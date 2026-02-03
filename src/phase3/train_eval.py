@@ -263,6 +263,9 @@ def train(
     if amp_dtype_cfg not in ("bf16", "fp16"):
         raise ValueError("train.amp_dtype must be bf16 or fp16")
     amp_dtype = torch.bfloat16 if amp_dtype_cfg == "bf16" else torch.float16
+    if use_amp and amp_dtype == torch.bfloat16 and not torch.cuda.is_bf16_supported():
+        logger.warning("[phase3] CUDA bf16 not supported; falling back to fp16 autocast")
+        amp_dtype = torch.float16
     scaler = torch.cuda.amp.GradScaler(enabled=(use_amp and amp_dtype == torch.float16))
 
     step = 0
@@ -370,9 +373,19 @@ def train(
                 kl_raw = diag_gaussian_kl(out.q_rec, out.p_rec)  # [B,T]
                 kl_raw_mean = float(_masked_mean(kl_raw, mask).item())
 
-                # Sigma stats
-                q_log_sigma_mean = float(_masked_mean(out.q_rec.log_sigma, mask).item())
-                p_log_sigma_mean = float(_masked_mean(out.p_rec.log_sigma, mask).item())
+                # Sigma stats (per-dim average; avoid summing over z_rec dims)
+                q_log_sigma_mean = float(_masked_mean(out.q_rec.log_sigma.mean(dim=-1), mask).item())
+                p_log_sigma_mean = float(_masked_mean(out.p_rec.log_sigma.mean(dim=-1), mask).item())
+
+                # z_dyn dynamics "activity" + predictability (with fixed sigma, dyn NLL includes a constant term)
+                dyn_mask = mask[:, 1:]
+                z_dyn_delta = out.z_dyn[:, 1:] - out.z_dyn[:, :-1]
+                z_dyn_delta_l2 = torch.linalg.vector_norm(z_dyn_delta, dim=-1)  # [B,T-1]
+                z_dyn_delta_l2_mean = float(_masked_mean(z_dyn_delta_l2, dyn_mask).item())
+
+                dyn_err = out.z_dyn[:, 1:] - dyn_params.mu
+                dyn_mse_per_t = (dyn_err * dyn_err).mean(dim=-1)  # [B,T-1]
+                dyn_mse = float(_masked_mean(dyn_mse_per_t, dyn_mask).item())
 
                 # Recon gap: posterior vs prior-only reconstruction
                 recon_post = ((out.x_hat_post - x) ** 2).mean(dim=-1)  # [B,T]
@@ -398,6 +411,8 @@ def train(
                 "z_rec_prior_l2_mean": z_rec_prior_l2_mean,
                 "q_log_sigma_mean": q_log_sigma_mean,
                 "p_log_sigma_mean": p_log_sigma_mean,
+                "z_dyn_delta_l2_mean": z_dyn_delta_l2_mean,
+                "dyn_mse": dyn_mse,
                 "recon_post": recon_post_mean,
                 "recon_prior": recon_prior_mean,
                 "recon_prior_over_post": recon_prior_over_post,

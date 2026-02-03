@@ -20,7 +20,9 @@ normalization:
 model:
   x_dim: 512
   z_dyn_dim: 128
-  z_rec_dim: 64
+  # Keep z_rec relatively small so the model can't "hide everything in z_rec"
+  # and collapse z_dyn to a constant.
+  z_rec_dim: 16
   z_dyn_layernorm: true
 
   dyn_encoder:
@@ -66,7 +68,7 @@ train:
 
   # Speed knobs (safe defaults)
   amp: true
-  amp_dtype: bf16  # bf16|fp16 (bf16 recommended if supported)
+  amp_dtype: fp16  # bf16|fp16 (T4/Turing typically needs fp16)
   tf32: true
   cudnn_benchmark: true
 
@@ -87,15 +89,18 @@ loss:
   recon_weight: 1.0
 
   # Innovation budget: KL(q(z_rec|x,z_dyn) || p(z_rec|z_dyn))
-  beta_final: 1.0
+  # Stronger KL encourages information to flow into z_dyn instead of z_rec.
+  beta_final: 2.0
   beta_warmup_steps: 5000
-  free_bits_per_dim: 0.05
+  # Free bits can stall KL gradients and encourage z_dyn collapse early.
+  free_bits_per_dim: 0.0
 
   # Make z_dyn AR-friendly via teacher-forced dynamics NLL
-  dyn_weight: 1.0
+  # dyn NLL is summed over z_dyn dims; down-weight to avoid it dominating loss.
+  dyn_weight: 0.01
 
   # Force z_dyn to matter by reconstructing sometimes from prior-sampled z_rec
-  prior_sample_prob: 0.25
+  prior_sample_prob: 0.75
 
 output:
   out_dir: ./outputs/phase3
