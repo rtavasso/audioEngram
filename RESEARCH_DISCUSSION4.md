@@ -128,6 +128,121 @@ After rollout fine-tune, we refit residual memory and evaluated `resid_add`:
 
 ---
 
+## 5. Phase 4.5 (Sweep): Pure Rollout Objective (teacher_weight=0, state_weight=0)
+
+After implementing Phase 4.5, we ran a “pure rollout” sweep point to establish the extreme end of the Pareto tradeoff:
+- K-step rollout loss only (`K=16`)
+- No teacher-forced auxiliary loss
+- No explicit state-matching loss
+- No scheduled teacher forcing
+
+### 5.1 Results (pure rollout)
+
+**Pre (one-step trained param):**
+- Teacher-forced: `dnll ≈ -44.54`, direction cos ≈ `0.695`
+- Rollout: catastrophically bad (`rollout_dnll ≈ +761,868`) with large `||ẑ||` and frequent clipping.
+
+**Post (pure rollout fine-tune):**
+- Teacher-forced: `dnll ≈ -33.83` (worse than pre; expected)
+- Rollout: `rollout_dnll ≈ -0.987` (stable and slightly better than unconditional baseline)
+  - `max ||ẑ||₂ ≈ 10.25`, `rollout_n_clipped = 0`, mean `||Δẑ||` extremely small
+
+**Residual memory refit after pure rollout fine-tune (`resid_add_post`):**
+- Teacher-forced: `dnll ≈ -34.62` (small improvement), direction cos ≈ `0.724`
+- Rollout: `rollout_dnll ≈ -0.980` (effectively unchanged)
+
+### 5.2 Interpretation
+
+The “pure rollout” point demonstrates a clean extreme:
+- **Rollout stability can be achieved** via objective alignment, even when teacher-forced one-step likelihood degrades.
+- Residual memory remains a minor effect once the dynamics is trained for rollout.
+
+This motivates the next sweep points (nonzero `teacher_weight` and/or `state_weight`) as attempts to recover teacher-forced NLL while preserving the rollout stability achieved here.
+
+---
+
+## 6. Phase 4.5 (Sweep): Add Teacher-Forced Term (teacher_weight=0.1)
+
+We next evaluated a mixed objective with a small teacher-forced auxiliary loss:
+- `teacher_weight = 0.1`, `state_weight = 0.0`
+- scheduled teacher forcing from `p=0.2 → 0.0` over 2000 steps
+- still `K=16` rollout training
+
+### 6.1 Results (tw01)
+
+**Post (param, tw01):**
+- Teacher-forced: `dnll ≈ -35.75` (better than pure rollout’s `-33.83`, but worse than the pre baseline `-44.54`)
+- Rollout: `rollout_dnll ≈ -0.808` (still stable and better than baseline, but worse than pure rollout’s `-0.987`)
+  - `max ||ẑ||₂ ≈ 10.12`, `rollout_n_clipped = 0`
+
+**Residual memory refit after tw01 (`resid_add_post`):**
+- Teacher-forced: `dnll ≈ -36.38` (small improvement over param), direction cos ≈ `0.726`
+- Rollout: `rollout_dnll ≈ -0.791` (effectively unchanged)
+
+### 6.2 Interpretation
+
+This point confirms the expected Pareto tradeoff:
+- adding teacher-forced pressure recovers some one-step likelihood,
+- but it partially sacrifices rollout performance.
+
+Residual memory remains a minor effect once the model is rollout-trained.
+
+---
+
+## 7. Phase 4.5 (Sweep): Add State-Matching (teacher_weight=0.1, state_weight=0.05)
+
+We then added an explicit state-matching regularizer during rollout training:
+- `teacher_weight = 0.1`, `state_weight = 0.05`
+- scheduled teacher forcing from `p=0.2 → 0.0` over 2000 steps
+- `K=16` rollout training
+
+### 7.1 Results (tw01_sw05)
+
+**Post (param, tw01_sw05):**
+- Teacher-forced: `dnll ≈ -35.75` (essentially unchanged vs tw01)
+- Rollout: `rollout_dnll ≈ -0.808` (also essentially unchanged vs tw01)
+  - Stable rollouts: `max ||ẑ||₂ ≈ 10.11`, `rollout_n_clipped = 0`
+
+**Residual memory refit after tw01_sw05 (`resid_add_post`):**
+- Teacher-forced: `dnll ≈ -36.38` (same as tw01), direction cos ≈ `0.726`
+- Rollout: `rollout_dnll ≈ -0.788` (very small change)
+
+### 7.2 Interpretation
+
+At this weight scale, the explicit state-matching term does not materially change outcomes relative to tw01: rollout remains stable and slightly better than baseline, but does not recover the large teacher-forced advantage under free-running conditions.
+
+This suggests either:
+1) the `state_weight` is too small to matter, or
+2) one-step teacher-forced + rollout loss already implicitly constrains state drift at this horizon, so state matching adds little.
+
+---
+
+## 8. Phase 4.5 (Sweep): Increase State-Matching (teacher_weight=0.1, state_weight=0.2)
+
+To test whether state-matching can meaningfully change rollout behavior, we increased the state penalty:
+- `teacher_weight = 0.1`, `state_weight = 0.2`
+- scheduled teacher forcing from `p=0.2 → 0.0` over 2000 steps
+- `K=16` rollout training
+
+### 8.1 Results (tw01_sw20)
+
+**Post (param, tw01_sw20):**
+- Teacher-forced: `dnll ≈ -35.75` (unchanged)
+- Rollout: `rollout_dnll ≈ -0.809` (unchanged)
+  - Stable rollouts: `max ||ẑ||₂ ≈ 10.12`, `rollout_n_clipped = 0`
+
+**Residual memory refit after tw01_sw20 (`resid_add_post`):**
+- Teacher-forced: `dnll ≈ -36.38` (unchanged)
+- Rollout: `rollout_dnll ≈ -0.793` (unchanged)
+
+### 8.2 Interpretation
+
+Even at `state_weight=0.2`, the added state-matching loss does not materially affect outcomes relative to tw01. For this setup (K=16, mean rollouts, clipped updates), rollout stability and performance appear dominated by the rollout likelihood term and scheduled sampling, not the state MSE penalty.
+
+This suggests that the next informative axis is **rollout horizon** (increase K) or **noise/uncertainty modeling**, rather than further increasing state matching.
+
+---
+
 ## 5. What We Learned (Paper-Relevant Claims)
 
 1. **Engram-style memory does not help as a direct predictor of `Δz`** when keyed by raw `z_t` (naive memory).
@@ -163,4 +278,3 @@ Phase 4 memory + eval:
 Phase 4.5 rollout fine-tune:
 - `uv run python scripts/32_phase4_rollout_finetune.py --config configs/phase4.yaml`
 - Output summary: `outputs/phase4/phase4_rollout_finetune_summary.json`
-
