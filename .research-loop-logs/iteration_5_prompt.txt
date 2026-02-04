@@ -1,0 +1,1942 @@
+Here is the team brief and the previous discussions to read and build upon:
+
+=== TEAM BRIEF ===
+# Background
+
+# Conditional Memory for Continuous Audio Latent Dynamics: Technical Synopsis
+
+## Executive Summary
+
+This document provides the conceptual foundation for a research project investigating whether lookup-based memory mechanisms—successful in large language models—can improve autoregressive generation of continuous audio latents. The project tests a specific structural hypothesis about audio representations and is designed to fail fast if that hypothesis is false.
+
+---
+
+## Part I: The Problem We Are Trying to Solve
+
+### The State of Audio Generation
+
+Modern audio generation systems face a fundamental tension between two representation strategies.
+
+**Discrete token models** represent audio as sequences of codes from a learned codebook, typically using Residual Vector Quantization (RVQ). This makes audio "look like text" and allows direct application of language modeling techniques. The approach works well and powers systems like MusicGen, AudioLM, and Mimi. However, quantization is inherently lossy. Achieving high fidelity requires deep codebook hierarchies (8-32 levels), which increases computational cost and introduces complex dependencies between codebook levels. Modeling these dependencies requires architectural compromises like delay patterns or auxiliary RQ-Transformer heads.
+
+**Continuous latent models** represent audio in the latent space of a variational autoencoder, avoiding quantization entirely. The CALM paper demonstrates this approach can match or exceed discrete models in quality while being more computationally efficient. However, continuous latents are harder to model autoregressively. The model must predict a continuous vector at each step, and small errors accumulate over time, causing generated audio to drift off the training manifold. CALM addresses this through several stabilization techniques: injecting noise into the context during training, using a short-context transformer to preserve local detail, and replacing diffusion sampling with consistency models.
+
+These stabilization techniques work, but they are fundamentally *workarounds* for an architectural limitation. The transformer backbone must learn everything from scratch at every step: both the global structure of the audio and the local dynamics of what typically happens next. This is computationally expensive and potentially unstable.
+
+### What Language Models Teach Us
+
+Recent work on large language models reveals an interesting structural insight. A significant fraction of modeling effort is spent reconstructing *static, local, stereotyped patterns*—things like named entities ("Alexander the Great"), formulaic phrases ("by the way"), and common collocations. These patterns are highly predictable from local context and appear repeatedly across different documents and contexts.
+
+The Engram paper introduces *conditional memory* as a solution: a lookup table indexed by recent context that retrieves pre-computed embeddings for common patterns. This is implemented as a hash-based N-gram embedding that maps discrete token sequences to vectors in O(1) time. The key finding is that adding this memory module to a Mixture-of-Experts transformer improves performance across diverse benchmarks—not just knowledge retrieval tasks where memory is obviously useful, but also reasoning, code generation, and mathematics.
+
+The mechanism appears to be that memory *offloads local pattern reconstruction* from the transformer backbone, freeing up depth and capacity for higher-level reasoning. Empirical analysis shows that Engram-augmented models reach "prediction-ready" representations earlier in the network, as if the model has gained effective depth.
+
+### The Core Question
+
+This project asks whether the same principle applies to continuous audio latents:
+
+> **Do short-horizon audio latent dynamics exhibit reusable local structure that can be captured by a lookup mechanism, and if so, does exploiting this structure improve autoregressive modeling?**
+
+This is not a question about whether we can beat benchmarks by adding parameters. It is a question about the *nature* of audio representations—specifically, whether there exist recurring patterns in how audio latents evolve over short time horizons that are stable enough across speakers and contexts to be worth storing and retrieving rather than recomputing.
+
+---
+
+## Part II: Why This Might Work (and Why It Might Not)
+
+### The Optimistic Case
+
+Audio, particularly speech, has strong local regularities. Phoneme transitions follow articulatory constraints. Coarticulation effects create predictable dynamics between adjacent sounds. Prosodic patterns impose structure at slightly longer timescales. These regularities are the reason N-gram models work at all for speech recognition, and why phone-level language models can generate intelligible (if robotic) speech.
+
+In the latent space of a well-trained VAE, these regularities should manifest as *clusters of similar trajectories*. When the recent context looks like "mid-vowel transitioning toward a stop consonant," the distribution of likely next-frame dynamics should be relatively concentrated, regardless of which specific vowel or which specific speaker. If this clustering is strong enough, a lookup table indexed by coarsened context could retrieve a useful prior on next-step dynamics.
+
+This prior would not replace the continuous prediction—it would *augment* it. The transformer backbone would still model the full conditional distribution, but it would receive a hint about the likely region of latent space. This could reduce the entropy the backbone must model, improve stability during autoregressive rollout, and potentially allow the backbone to focus more capacity on longer-range structure.
+
+### The Pessimistic Case
+
+The analogy to language may not hold. Language has several properties that make lookup particularly effective:
+
+**Discrete, symbolic structure.** Words and phrases are categorical objects. The same phrase "Alexander the Great" is identical every time it appears, making it trivially indexable. Audio latents are continuous vectors with no natural discretization.
+
+**Reusable patterns.** In language, the same syntactic constructions and collocations appear across millions of documents by millions of authors. In audio, speaker-specific characteristics (vocal tract shape, speaking rate, accent) might dominate, making "patterns" highly individual rather than universal.
+
+**Stable keys.** In language, the context used to index memory (recent tokens) is discrete and doesn't drift. In audio generation, the context is *generated* latents, which may drift from the training distribution. A corrupted key retrieves an irrelevant or harmful prior.
+
+If audio latent dynamics are dominated by speaker-specific variation, or if the "patterns" are too continuous and context-dependent to discretize usefully, lookup will fail. This is not a theoretical concern—it is the *most likely outcome*.
+
+### What We Must Demonstrate
+
+For the project to proceed, we must establish that audio latents exhibit what we call *Type 2 structure*:
+
+**Type 1 structure** means the future is predictable from the past. All successful autoregressive models exploit Type 1 structure; it is necessary but not sufficient for our purposes.
+
+**Type 2 structure** means the *same prediction rule* applies across many different contexts. The mapping from "coarse description of recent dynamics" to "likely next dynamics" is stable across different speakers, different utterances, and different positions in an utterance.
+
+Language has extreme Type 2 structure because syntax and vocabulary are shared across speakers. Audio might have much weaker Type 2 structure because so much variation is individual.
+
+---
+
+## Part III: The Experimental Design
+
+### Phase 0: Testing for Structure (The Gatekeeper)
+
+Before building any models, we must determine whether the requisite structure exists. This is a pure data analysis task that can be completed in a few days with minimal compute.
+
+**The setup:** Take a trained CALM speech VAE and extract latent sequences for LibriSpeech. For each frame, record the recent context (previous W frames) and the next-step dynamics (Δx = x_t - x_{t-1}).
+
+**The test:** Cluster the contexts using deliberately coarse representations (aggressive PCA, small VQ codebooks). Then measure how much the clustering reduces variance in the dynamics.
+
+If coarse context clusters predict next-step dynamics significantly better than chance, Type 2 structure exists. If they don't, lookup is fundamentally unsuited to this domain.
+
+**Critical constraints:**
+
+1. **Coarse conditioning.** The context representation must be information-poor. If we condition on the full high-dimensional context, prediction will improve trivially due to continuity. We need to show that *coarsened* context still predicts dynamics.
+
+2. **Cross-speaker transfer.** Clusters must be learned on one set of speakers and evaluated on held-out speakers. If structure only appears when clusters are speaker-specific, it is not reusable in the way Engram requires.
+
+3. **Robustness checks.** Structure must persist when we exclude silence frames, utterance boundaries, and other potential confounds.
+
+**Decision criteria:** We proceed to modeling only if:
+- Within-cluster variance ratio falls below 0.6 (clusters explain >40% of dynamics variance)
+- Cross-speaker degradation is less than 15-20%
+- Structure persists across confound checks
+
+If these criteria are not met, the project terminates with a negative structural result. This is a valid and publishable finding about the nature of audio latent spaces.
+
+### Phase 1: Minimal Engram Modeling
+
+If Phase 0 passes, we implement a minimal version of the Engram mechanism for audio:
+
+1. Coarsely quantize the recent context to obtain a discrete key
+2. Look up a learned embedding vector
+3. Apply a scalar gate conditioned on the backbone's hidden state
+4. Add the gated embedding to the short-context transformer's output
+
+This is much simpler than the full Engram architecture (no multi-head hashing, no convolution, no multi-branch integration). If this minimal version shows no benefit, additional complexity will not save the approach.
+
+**Comparisons must be iso-compute.** We cannot simply add Engram on top of CALM and declare victory if metrics improve. We must show that at fixed computational cost, a smaller backbone plus memory outperforms a larger backbone without memory. Otherwise we have merely demonstrated that more parameters help.
+
+**Metrics span multiple concerns:**
+- Teacher-forced likelihood (does memory help modeling?)
+- Rollout stability (does memory reduce drift during generation?)
+- Downstream quality (WER, speaker similarity on generated speech)
+
+### Phase 2: Noise Injection Ablation
+
+CALM injects noise into the long-context backbone during training to make it robust to inference-time error accumulation. This is effective but somewhat unprincipled—a training-time hack to compensate for an inference-time problem.
+
+If Engram provides a structural solution to the same problem, it should reduce or eliminate the need for noise injection. We test this by training CALM with and without Engram at various noise levels. If CALM+Engram maintains stability without noise while CALM alone fails, that is strong evidence that memory provides genuine robustness rather than just additional capacity.
+
+**Diagnostic: gate dynamics.** We track how the Engram gate magnitude evolves during autoregressive rollout. Two patterns are informative:
+- If the gate decays over time, the model has learned to trust memory less as rollout proceeds (because keys become unreliable). This suggests memory acts as a bootstrap prior.
+- If the gate stays high while quality degrades, memory is actively harmful—retrieving inappropriate priors based on corrupted keys.
+
+---
+
+## Part IV: Why Phase 0 Is Designed the Way It Is
+
+The Phase 0 specification is unusually detailed because every choice has consequences for the validity of the conclusions.
+
+### Context Representation
+
+We test three conditioning schemes of increasing sophistication:
+
+1. **Mean-pooled context → VQ(K=64):** Extremely coarse. Averages away all temporal structure within the window. If this works, structure is very robust.
+
+2. **Flattened context → PCA(8) → VQ(K=256):** Preserves some temporal structure in the principal components. More informative keys, but still very low-dimensional.
+
+3. **PCA(8) → quartile binning:** Axis-aligned discretization. Tests whether learned (VQ) vs simple (binning) discretization matters.
+
+The progression tests how much information the key needs to be useful. If only the finest conditioning shows structure, keys must be high-fidelity, which undermines the efficiency argument for lookup.
+
+### Target Variable
+
+We predict Δx (velocity) rather than x (position) because position prediction is dominated by trivial continuity (x_t ≈ x_{t-1}). Velocity is the interesting signal—how the latent is *changing*, not where it currently is.
+
+Velocity is normalized globally (not per-speaker) to ensure the analysis asks about absolute dynamics rather than speaker-relative dynamics.
+
+### Temporal Scales
+
+We test context windows ending at different lags before the target (1, 2, and 4 frames back). This simulates the situation at inference time, where the most recent context frames are generated rather than ground truth. If structure disappears with even a small lag, the approach is fragile to the inherent staleness of generated context.
+
+### Sample Size and Statistical Validity
+
+With ~4.5 million frames from LibriSpeech train-clean-100, we have ample data for stable variance estimation. Clusters with fewer than 100 samples are excluded, and we report what fraction of data falls in excluded clusters. If more than 10% of data is excluded, the clustering is too fine.
+
+Crucially, we compute statistics *on the same sample set* for both numerator and denominator of the variance ratio. Filtering introduces subtle biases if not handled carefully.
+
+### Controls
+
+**Random cluster baseline:** We permute cluster assignments (preserving the size distribution) to verify that the variance ratio is actually measuring structure rather than filtering artifacts. This should yield a ratio near 1.0.
+
+**Speaker-level statistics:** We report variance ratio per speaker and examine the distribution. A single pooled number can hide bimodal behavior where structure exists for some speakers but not others.
+
+**Confound slices:** We compute metrics separately on high-energy frames, utterance-medial frames, and other subsets to ensure structure is not an artifact of silence or prosodic boundaries.
+
+---
+
+## Part V: Interpreting Outcomes
+
+### If Phase 0 Fails
+
+The most likely outcome is that Phase 0 fails: variance ratios above 0.65, or severe degradation on held-out speakers, or structure that disappears when confounds are controlled.
+
+This would mean: **Audio latent dynamics do not exhibit reusable short-horizon structure.** The variation in how latents evolve is too continuous, too speaker-specific, or too context-dependent to compress into discrete keys.
+
+This is a meaningful negative result. It tells us that the success of Engram in language relies on language-specific properties (discrete symbols, shared vocabulary, reusable syntax) that do not transfer to audio. Continuous attention, as in CALM's short-context transformer, is the appropriate inductive bias for this domain.
+
+### If Phase 0 Passes But Phase 1 Fails
+
+Structure might exist but not be *exploitable* by the minimal Engram architecture. Possible reasons:
+- The backbone is already capturing this structure internally, making memory redundant
+- The structure exists but isn't learnable through the simple gating mechanism
+- Memory helps under teacher forcing but not during rollout (key corruption dominates)
+
+Diagnosing this requires probing whether backbone representations correlate with cluster IDs, testing memory under teacher forcing only, and examining gate dynamics.
+
+### If Both Phases Succeed
+
+This would mean: **Conditional memory provides genuine benefits for continuous audio latent modeling**, either through improved efficiency (same quality at lower compute) or improved stability (better rollouts without noise injection hacks).
+
+This would be a significant finding. It would suggest that the discrete/continuous divide in audio generation is partially artificial—that what matters is not discreteness per se, but whether the model has an explicit mechanism for reusing local structure. It would open a research direction exploring memory-augmented continuous models more broadly.
+
+---
+
+## Part VI: Relationship to Existing Work
+
+### CALM
+
+Our work builds directly on CALM. We use their VAE architecture, their consistency-based sampling head, and their insight that continuous latents can match discrete tokens in quality. Our contribution is asking whether an additional architectural primitive (memory) can improve on their approach.
+
+The short-context transformer in CALM already addresses local conditioning. Our question is whether *lookup* provides benefits over *reconstruction*—that is, whether storing patterns is better than recomputing them. This is not obvious; attention is very flexible, and lookup is rigid.
+
+### Engram
+
+We adapt Engram's core insight—that conditional memory complements conditional computation—to a domain where it was not designed to work. The technical challenges are different (continuous keys, distribution shift during generation), but the conceptual framework transfers.
+
+Our minimal Engram is much simpler than the full architecture. We deliberately strip away multi-head hashing (less relevant with smaller key spaces), convolution (we already have a context window), and multi-branch integration (we're testing the core idea, not optimizing throughput). If the minimal version fails, the full version would need strong justification.
+
+### Broader Context
+
+This project sits at the intersection of several research threads:
+- Memory-augmented neural networks (going back to Neural Turing Machines)
+- Sparse mixture models (MoE, product-of-experts)
+- Continuous generative models (VAEs, diffusion, flow matching, consistency)
+- Audio generation (codec-based and latent-space approaches)
+
+The specific question—whether lookup-based memory helps continuous autoregressive modeling—has not been systematically tested. Audio is a good domain to test it because the structure is rich enough that memory might help but continuous enough that it might not.
+
+---
+
+## Part VII: What the Engineer Needs to Know
+
+### Core Task
+
+Implement Phase 0 exactly as specified. This is a data analysis pipeline, not a modeling task. The goal is to determine whether structure exists before committing to expensive training runs.
+
+### Critical Invariants
+
+1. **No data leakage.** All fitting (PCA, VQ, normalization statistics) uses only training speakers. Evaluation uses transforms only.
+
+2. **Consistent sample sets.** Variance ratio numerator and denominator must be computed on exactly the same samples after filtering.
+
+3. **Correct indexing.** Context windows must end at the right lag before the target. Off-by-one errors here invalidate everything. Write unit tests with hand-constructed data.
+
+4. **VAE configuration.** Frame rate and sample rate must come from the actual checkpoint, not hardcoded assumptions. The entire analysis depends on correct temporal alignment.
+
+### What Success Looks Like
+
+A successful Phase 0 produces a clear table showing variance ratios across conditions, splits, and confound slices, along with visualizations of cluster structure. The decision to proceed or stop should be obvious from the numbers.
+
+A successful implementation is one where:
+- The random-cluster control yields ratio ~1.0
+- Results are reproducible across runs with the same seed
+- All filtering and exclusion is documented and accounted for
+- The report makes the decision criteria and outcomes explicit
+
+### Timeline
+
+Phase 0 should take 3-5 days for an experienced engineer:
+- Day 1: Data pipeline (LibriSpeech download, VAE inference, frame extraction)
+- Day 2: Conditioning and clustering (PCA, VQ fitting, cluster assignment)
+- Day 3: Metrics and controls (variance ratio, entropy, random baseline)
+- Day 4: Confound analysis and visualization
+- Day 5: Report generation and review
+
+The compute requirements are minimal—a few hours of GPU time for VAE inference, then CPU-only analysis.
+
+---
+
+## Conclusion
+
+This project tests whether a successful architectural idea from language models—conditional memory for local pattern retrieval—transfers to continuous audio generation. The hypothesis is plausible but far from certain. The experimental design is structured to fail fast and fail informatively.
+
+If the hypothesis fails, we learn something about the structural differences between language and audio. If it succeeds, we open a new direction for audio generation research. Either outcome advances understanding.
+
+The Phase 0 specification is the critical path. Implement it exactly, verify the invariants, and let the data decide.
+
+# Implementation Plan: Phase 0 (LibriSpeech + CALM VAE Latents + Clustering)
+
+## 0) Tech stack
+
+* Python 3.11
+* PyTorch (for VAE inference)
+* torchaudio (resampling, loading)
+* numpy, scipy
+* scikit-learn (PCA, k-means)
+* pandas (report tables)
+* matplotlib (plots)
+* argparse (config)
+* zarr or parquet for storage (see below)
+
+## 1) Repo structure
+
+```
+audio-engram-phase0/
+  README.md
+  pyproject.toml
+  configs/
+    phase0.yaml
+  src/
+    phase0/
+      __init__.py
+      data/
+        librispeech.py
+        splits.py
+        io.py
+      vae/
+        calm_vae.py
+        infer_latents.py
+      features/
+        context.py
+        energy.py
+        normalization.py
+      clustering/
+        vq.py
+        pca.py
+        baselines.py
+      metrics/
+        variance_ratio.py
+        entropy_diag_gauss.py
+        speaker_stats.py
+      analysis/
+        run_phase0.py
+        report.py
+        plots.py
+      utils/
+        seed.py
+        logging.py
+  scripts/
+    00_download_librispeech.sh
+    01_make_speaker_splits.py
+    02_infer_latents.py
+    03_build_phase0_dataset.py
+    04_fit_conditioning.py
+    05_eval_metrics.py
+    06_make_report.py
+  outputs/
+    phase0/
+      <run_id>/
+        metrics.json
+        tables.csv
+        plots/
+  tests/
+    test_indexing.py
+    test_variance_ratio.py
+    test_reproducibility.py
+```
+
+---
+
+## 2) Data artifacts (explicit formats)
+
+### 2.1 Latents store
+
+Store per-utterance latents (and metadata) after VAE inference.
+
+Recommended: **zarr** (fast chunked arrays) or **parquet** if you prefer row-based.
+
+**zarr layout:**
+
+```
+latents.zarr/
+  <utterance_id>/
+    x: float32 [T, D]
+    energy: float32 [T]          # optional
+    timestamps: float32 [T]      # seconds
+    speaker_id: int32
+```
+
+Also write an index table:
+`latents_index.parquet`
+
+* utterance_id
+* speaker_id
+* n_frames
+* duration_sec
+* path_audio
+
+### 2.2 Phase 0 sample table
+
+Don’t store full context windows per frame (too large). Instead store:
+
+* utterance_id, speaker_id, t (frame index)
+  and compute contexts on the fly from stored x arrays.
+
+Create:
+`phase0_frames.parquet`
+
+* utterance_id
+* speaker_id
+* t
+* pos_frac (t / T)  (for utterance position confound)
+* energy (optional)
+
+This keeps Phase 0 memory-light.
+
+---
+
+## 3) Speaker split logic (reproducible)
+
+Script: `01_make_speaker_splits.py`
+
+* parse LibriSpeech metadata → speaker list
+* deterministic shuffle with seed
+* select 200 speakers train, 51 eval
+* save:
+
+  * `splits/train_speakers.txt`
+  * `splits/eval_speakers.txt`
+  * `splits/train_utt_ids.txt`
+  * `splits/eval_utt_ids.txt`
+
+Also store 10% utterance holdout *within train speakers* for kmeans validation:
+
+* `splits/train_utt_ids_train.txt`
+* `splits/train_utt_ids_val.txt`
+
+---
+
+## 4) VAE inference
+
+Script: `02_infer_latents.py`
+Inputs:
+
+* VAE checkpoint path + expected sample rate + hop settings
+* list of utterances
+  Steps:
+
+1. load waveform
+2. resample to VAE sample rate (only if needed)
+3. run encoder → x[T, D]
+4. compute energy per frame:
+
+   * simplest: frame RMS of waveform using the same hop/window alignment as latents
+   * store energy[T]
+5. save to `latents.zarr`
+
+Acceptance checks:
+
+* assert no NaNs
+* record D, hop_sec, mean/std of x
+* verify frame rate ≈ expected (derive from timestamps)
+
+---
+
+## 5) Build phase0 frame index
+
+Script: `03_build_phase0_dataset.py`
+Filter rules:
+
+* duration >= 3 sec
+* frames t must satisfy: t >= (W + max_context_lag) and t < T
+  Where max_context_lag depends on your “Δt” conditioning-lag variant.
+  If you keep your current “context ends at t-Δt” idea:
+* for lag L ∈ {1,2,4}, need t- L >= 1 and t-L-(W-1) >= 0
+
+Store:
+
+* utterance_id, speaker_id, t, pos_frac, energy, split
+
+Also precompute:
+
+* “is_high_energy” flag using speaker-independent threshold:
+
+  * compute global median energy over train speakers
+  * mark frames above median
+
+---
+
+## 6) Conditioning feature computation (three conditions)
+
+All conditioning features must be computed *only from training speakers* for fit.
+
+### 6.1 Common: context extraction
+
+Module: `features/context.py`
+
+Given utterance latents x[T,D], time t, window W, lag L:
+
+* define end = t - L
+* context frames are x[end-W+1 : end+1]  (length W, inclusive end)
+
+Return:
+
+* mean pooled: c_mean[D]
+* flattened: c_flat[W*D]
+
+Unit test (`test_indexing.py`):
+
+* hand-constructed x where each frame equals its index → verify correct slices.
+
+### 6.2 Condition 1: Mean-pool + VQ K=64
+
+Script: `04_fit_conditioning.py --cond mean_vq64`
+
+* compute c_mean for all frames from train speakers
+* fit kmeans K=64 (kmeans++ init, max_iter=100, n_init=10)
+* save centroids
+* assign cluster IDs for train and eval frames (nearest centroid)
+* record assignment distances (confidence proxy)
+
+### 6.3 Condition 2: Flatten + PCA(8) + VQ K=256
+
+Same script:
+
+* compute c_flat for train frames
+* fit PCA(n=8) on train frames
+* project train + eval frames → c_pca[8]
+* fit kmeans K=256 on train c_pca
+* assign IDs + distances
+
+### 6.4 Condition 3: PCA(8) + quantile binning
+
+* compute PCA as above
+* for each PC dimension, compute quartile edges on train set
+* bin each coordinate to {0,1,2,3} and hash into integer bin_id
+* discard bins with <100 samples (but compute excluded mass properly)
+
+Also implement **Condition 0: random clusters**:
+
+* sample cluster IDs with the *same empirical cluster size histogram* as the learned IDs, or simpler:
+
+  * permute learned cluster IDs across samples (preserves histogram exactly)
+    This is the best control.
+
+---
+
+## 7) Target construction + normalization
+
+Module: `features/normalization.py`
+
+For each frame:
+
+* Δx = x[t] - x[t-1]
+* compute μ_global, σ_global over Δx from training speakers only (over the same subset used in evaluation; easiest: compute on all eligible frames before cluster filtering)
+* normalize Δx_norm = (Δx - μ) / σ
+
+Important: handle σ≈0 dims:
+
+* clamp σ_d = max(σ_d, 1e-6)
+
+Store μ, σ as artifacts.
+
+Optional ablations:
+
+* without per-speaker mean centering of x
+* with centering
+
+---
+
+## 8) Metric computation
+
+### 8.1 Cluster filtering
+
+Filter clusters with count >= 100 **within each split** (train/eval). But note:
+
+* if you filter differently in train vs eval, comparisons are messy.
+  Better:
+* define “effective clusters” from train split only
+* apply same set to eval (exclude eval samples whose assigned cluster is not effective)
+  Report excluded mass in both.
+
+### 8.2 Variance ratio
+
+Module: `metrics/variance_ratio.py`
+
+Given Δx_norm samples and cluster IDs:
+
+* compute within-cluster SSE
+* compute total SSE over same included samples S
+* ratio = SSE_within / SSE_total
+
+Also compute per-speaker ratios:
+
+* for each speaker, compute ratio using that speaker’s included samples
+* report mean/std and CI
+
+### 8.3 Diagonal Gaussian entropy reduction
+
+Module: `metrics/entropy_diag_gauss.py`
+
+* unconditional variances per dim on S
+* per-cluster variances per dim
+* compute:
+  $$
+  H \propto rac12 \sum_d \log \sigma_d^2
+  $$
+
+(constants cancel)
+
+* compute relative reduction:
+  $$
+  (H - H_{	ext{cond}}) / H
+  $$
+
+### 8.4 Confound slices
+
+Compute all metrics on:
+
+* all frames
+* high-energy only
+* utterance medial only (pos_frac in [0.17, 0.83]) and compare to initial/final
+
+---
+
+## 9) Diagnostics you requested (plus two that I think are mandatory)
+
+### Required plots (your list + minimal extras)
+
+* histogram of cluster sizes (train)
+* per-cluster variance vs size
+* 2D PCA scatter of μ_k (cluster mean Δx) with point size ~ cluster count
+
+### Mandatory extra diagnostics
+
+1. **Gatekeeping control:** random cluster baseline results on the same filtered set
+2. **Distance/confidence analysis:**
+
+   * plot variance ratio as a function of “keep top-q% most confident assignments”
+   * if ratio improves sharply when keeping only confident assignments, you’ve found “structure but only with reliable keys”, which is relevant to later gating.
+
+---
+
+## 10) Run orchestrator + reporting
+
+Script: `analysis/run_phase0.py`
+
+* runs all conditions × lags
+* saves a single `metrics.json` and `tables.csv` with rows:
+
+  * condition, lag, split, slice (all/high_energy/medial), ratio, entropy_reduction, excluded_mass, n_eff_clusters, speaker_mean, speaker_std, etc.
+
+Script: `06_make_report.py`
+
+* dumps:
+
+  * decision matrix table
+  * the plots
+  * a short “success/failure” paragraph using templated text and actual numbers
+
+---
+
+## 11) Acceptance tests (what “done” means)
+
+Phase 0 implementation is correct if:
+
+1. **Indexing test passes** (context slicing exactly as specified)
+2. **Random-cluster baseline** yields ratio ≈ 1.0 (within noise) on all slices
+
+   * if you see 0.9 systematically, you have a bug or filtering artifact
+3. **Reproducibility:** same seed → identical kmeans centroids and metrics
+4. **No leakage:** PCA/VQ fit uses only train speakers; eval uses transform + assign only
+5. **Exclusion accounting:** excluded mass reported for both train and eval and uses identical “effective cluster set” derived from train
+
+=== END TEAM BRIEF ===
+
+=== DISCUSSION 1 ===
+# Research Discussion: Latent Space Design for AR Audio Modeling
+
+**Date:** 2026-02-02
+**Participants:** Claude (Opus 4.5) + Codex
+**Context:** Follow-up discussion on BRIEF.md findings
+
+---
+
+## 1. Revisiting the Phase 0 Failure
+
+### Original Result
+- Clustering Mimi latent contexts (mean-pool → VQ or PCA → VQ) explained ~0% of next-step dynamics variance
+- Variance ratios of 0.997 and 0.988 against random baselines of 0.999 and 0.995
+- Conclusion drawn: Engram-style lookup not viable for Mimi's representation
+
+### Challenges to This Interpretation
+
+**Challenge 1: The metric may be dominated by "latent junk"**
+- Some latent dimensions may have high variance but weak effect on decoded audio
+- Within-cluster variance of Δx in raw latent space can stay ~1.0 even if *audio-relevant* dynamics are predictable
+- **Fix:** Measure variance in a decoder-aware metric (weight Δx by decoder Jacobian / perceptual sensitivity, or measure predictability of decoded mel features)
+
+**Challenge 2: The coarse key destroys predictive equivalence**
+- Mean-pooling destroys temporal structure within the context window
+- Engram in text benefits from keys that preserve predictive equivalence classes
+- If the compression discards speaker/pitch/tempo normalization or phase-like variables, it destroys clusterability even if a different key would work
+- **Fix:** Learn a key k(context) explicitly optimized so nearest neighbors have similar next-step distributions
+
+**Challenge 3: MSE/R² can be near-zero even when conditional entropy drops**
+- If p(Δx|c) is multimodal and symmetric (two likely directions), the conditional mean is a bad predictor → low R²
+- But the distribution is still more structured than marginal
+- **Fix:** Use probabilistic metrics (NLL under mixture/flow) or contrastive classification of futures
+
+**Challenge 4: Cluster count may underfit**
+- 64-256 clusters vs potentially ~1000+ distinct motifs
+- Counter-argument: even with underfitting, we'd expect *some* variance reduction; getting ~0 suggests the dependency is genuinely weak under that key
+
+### Diagnostic Sanity Check
+Train a predictor f(context_full) → Δx using linear/MLP/small Transformer:
+- If R² is still ~0: representation is genuinely "dynamics-hostile" at this frame rate
+- If R² > 0 but clustering fails: the issue is "wrong key/compression" not "no structure exists"
+
+---
+
+## 2. Why Standard Audio Encoders May Not Be AR-Optimal
+
+### The Training Objective Mismatch
+Mimi's encoder was trained to:
+- Reconstruct audio accurately
+- Quantize well (for RVQ)
+- Preserve semantic content (via distillation from WavLM)
+
+It was **not** trained to produce latents with:
+- Predictable dynamics
+- Clusterable transitions
+- Low conditional entropy given coarse context
+
+### The Rate/Distortion Hypothesis
+Quantization pressure in discrete codecs (EnCodec, DAC) might inadvertently create more predictable dynamics:
+
+1. **Bottlenecking** (limited codebook/bitrate) forces encoder to drop high-entropy, hard-to-predict micro-variation
+2. **Clustering/piecewise constancy**: VQ pressure makes latents live near finite prototypes, making local transitions more repeatable
+3. **Task simplification**: AR over discrete tokens is classification; continuous AR is regression where small errors compound
+
+**Testable prediction:** Run Phase 0 + predictor baselines on EnCodec/SoundStream/DAC latents at matched temporal resolution
+
+---
+
+## 3. Theoretical Framework: RSSM-Style Factorization
+
+### Core Insight from World Models
+In RSSM-style world models (PlaNet/Dreamer lineage), the split between predictable state and stochastic innovation is enforced both architecturally and via loss:
+
+**Architectural:**
+- Deterministic recurrent state: h_t = f(h_{t-1}, a_{t-1}, z_{t-1})
+- Per-step stochastic latent z_t
+- Prior p(z_t | h_t) = what's predictable
+- Posterior q(z_t | h_t, o_t) = what the observation forces you to add
+
+**Loss-based:**
+- ELBO with reconstruction + KL term: KL(q(z_t|...) || p(z_t|...))
+- The KL is the "innovation budget": if something can be carried in h_t (predictable), it's cheaper than paying KL each step
+
+**Practical tricks:**
+- KL balancing / free bits / KL schedules to prevent collapse or runaway residual
+- These are essentially *rate constraints* on the innovation channel
+
+### Translation to Audio
+- z_dyn = predictable state (analogous to h_t)
+- z_rec = innovation/residual (analogous to z_t)
+- The KL budget on z_rec forces information into z_dyn unless it's truly unpredictable
+
+---
+
+## 4. Proposed Architecture: Dual-Latent Factorization
+
+### Option I: Transform Mimi Latents (Freeze Decoder)
+Fastest iteration path. Keep Mimi encoder/decoder frozen, learn a new latent state-space on top.
+
+**Notation:**
+- x_t ∈ R^256 = Mimi latents at 12.5 Hz
+- z_dyn,t = predictable state (slow, AR-friendly)
+- z_rec,t = innovation/residual (detail, mostly local)
+- h_t = deterministic recurrent summary (optional)
+
+**Components:**
+
+1. **State encoder (causal):**
+   ```
+   z_dyn,t = e_dyn(x_≤t)  or  e_dyn(x_{t-L:t})
+   ```
+
+2. **Innovation posterior (local):**
+   ```
+   q_φ(z_rec,t | x_t, z_dyn,t) = N(μ_φ(·), diag(σ²_φ(·)))
+   ```
+   Critical: don't feed long context into this. Architecturally enforce "innovation is local."
+
+3. **Innovation prior (predictable from state):**
+   ```
+   p_ψ(z_rec,t | z_dyn,t) = N(μ_ψ(z_dyn,t), diag(σ²_ψ(z_dyn,t)))
+   ```
+   This is the innovation budget hook.
+
+4. **Latent reconstructor:**
+   ```
+   p_θ(x_t | z_dyn,t, z_rec,t) = N(g_θ(z_dyn,t, z_rec,t), σ²_x I)
+   ```
+
+5. **Dynamics model (AR target):**
+   ```
+   p_ω(z_dyn,t | z_dyn,<t)  — Transformer/RNN
+   ```
+
+**Training Loss (ELBO + distillation):**
+```
+L = E_q[-log p_θ(x_t | z_dyn,t, z_rec,t)]           # reconstruct Mimi latents
+  + β · KL(q_φ(z_rec,t|x_t,z_dyn,t) || p_ψ(z_rec,t|z_dyn,t))  # innovation budget
+  + λ · (-log p_ω(z_dyn,t | z_dyn,<t))              # make z_dyn AR-predictable
+```
+
+**Inference-time generation:**
+1. Generate z_dyn,1:T ~ p_ω(·) autoregressively
+2. Sample z_rec,t ~ p_ψ(z_rec,t | z_dyn,t) (local, parallel)
+3. Produce x̂_t = g_θ(z_dyn,t, z_rec,t)
+4. Decode x̂_1:T with frozen Mimi decoder to waveform
+
+### Option II: End-to-End Dual-Latent Codec
+Same structure, but reconstruct waveform/features directly instead of Mimi latents. More likely to yield actual audio gains, but slower to iterate.
+
+### Getting z_rec at Inference Time
+
+| Option | Description | Tradeoffs |
+|--------|-------------|-----------|
+| A) Deterministic | z_rec = g(z_dyn) | Not really an innovation channel; works if decoder is already stochastic |
+| B) Conditional diffusion/flow | p(z_rec \| z_dyn) via diffusion | Most common high-fidelity pattern; adds cost |
+| C) Learned conditional noise | Gaussian/mixture/flow conditioned on z_dyn | Good middle ground |
+| D) Unconditional prior | Sample from learned marginal | Loses instance-specific detail |
+| E) Multi-rate (recommended) | z_dyn slow, z_rec fast but local | Keeps innovation generator cheap |
+
+**Multi-rate detail:** Make z_dyn slow (12.5 Hz or slower) and z_rec strictly local (short-context AR or lightweight diffusion over a few high-rate frames conditioned on nearby z_dyn).
+
+---
+
+## 5. Preventing Failure Modes
+
+### Failure Mode: Decoder Ignores z_dyn
+If z_rec is too powerful, the decoder learns to ignore z_dyn entirely.
+
+**Mitigations (combine all):**
+1. **Capacity control on z_rec:** KL/bitrate limit, dimensionality, dropout at channel level
+2. **Train with prior-sampled z_rec:** A fraction of the time, decode from z_dyn + samples from p(z_rec|z_dyn), not posterior
+3. **KL penalty:** Explicitly penalize KL(q(z_rec|x,z_dyn) || p(z_rec|z_dyn))
+4. **Occasional masking:** Sometimes set z_rec = sample from prior (prefer this over z_rec = 0)
+
+### Failure Mode: Co-Adaptation / Bad Equilibria
+The λ term creates "make whatever you emit easy to predict" pressure. Encoder + dynamics model can collude to make z_dyn trivially predictable while z_rec carries everything.
+
+**Mitigations:**
+1. **Tight innovation budget:** Makes routing around z_dyn expensive
+2. **Utility objective tied to long-range coherence:** Replace/augment λ with multi-horizon prediction of future Mimi latents or audio features from z_dyn alone
+3. **Rollout reconstruction loss (strongest):**
+   - Roll out z_dyn forward using dynamics model for K steps (no teacher forcing)
+   - At each step, sample z_rec ~ p(z_rec|z_dyn)
+   - Decode to x̂_{t:t+K} and penalize reconstruction of ground-truth x_{t:t+K}
+   - Use curriculum on K (start at 1-2 steps, grow to 8-16)
+   - Mix teacher-forced and free-running rollouts
+
+### Failure Mode: Direction vs Magnitude Confound
+Even if R² is low, direction of Δx might be predictable while magnitude is not.
+
+**Diagnostic decomposition:**
+- Predict unit direction u_t = Δx / ||Δx|| (evaluate cosine similarity, model with vMF)
+- Predict log-magnitude m_t = log(||Δx|| + ε)
+- Report explained variance along principal subspace of Δx
+
+If direction is predictable but magnitude isn't: "the *type* of transition is structured, the *intensity* is stochastic/controlled by slow factors" — exactly where mode/state split helps.
+
+---
+
+## 6. Multi-Rate Architecture Details
+
+If z_dyn needs to be slower than 12.5 Hz (e.g., 3 Hz for ~333ms resolution):
+
+### Option A: Piecewise-Constant State (Recommended First)
+- z_dyn,k lives on slow grid
+- For Mimi frame t, map to k = floor(t / r)
+- Pros: Simplest, very "world model"-ish
+- Cons: Boundary artifacts if state changes within segment
+
+### Option B: Learned Upsampler
+- Small network produces per-frame conditioning c_t = U(z_dyn, t)
+- Transposed conv / interpolation + MLP
+- Pros: Smooth transitions
+- Cons: Upsampler can become "the real model" if too strong
+
+### Option C: Two-Stream with Cross-Attention
+- Model z_dyn on slow stream AR
+- Model x_t/z_rec,t on fast stream with cross-attention to slow tokens
+- Pros: Expressive, standard in multirate transformers
+- Cons: Heavier; confounds representation with model capacity
+
+---
+
+## 7. Literature Connections
+
+### Directly Relevant Prior Art
+
+| Work | Connection |
+|------|------------|
+| **FHVAE** (speech factorization) | Sequence-level vs segment-level latents = "slow state + local residual" |
+| **Dreamer/RSSM** | Exactly the innovation-budget framing we're adapting |
+| **VQ-VAE-2 / Jukebox** | Multi-scale discrete codes with coarse-to-fine = z_dyn/z_rec with VQ |
+| **CPC / wav2vec** | Optimizes discriminative predictability, not generative simplicity |
+| **Koopman / E2C** | "Learn embedding where dynamics become simple (linear-ish)" |
+| **VRNN / SRNN / Deep Kalman Filter** | "Learn latent Markov state; pay KL for innovations" |
+
+### Key Insight: CPC → Generative Gap
+CPC/InfoNCE optimizes *discriminative* predictability, not "make conditional distribution simple":
+- A representation can be excellent at ranking true futures vs negatives while being hard to model with AR Gaussian/mixture head
+- The field bridges this by: self-supervised reps → discretize/cluster → model tokens generatively
+- Consistent with "rate/quantization pressure creates AR-friendliness" hypothesis
+
+### Disentanglement Connection
+Disentanglement helps AR *if* it aligns with dynamical timescales and causal structure:
+- Slow identity/prosody separated from fast content/residual → simpler dynamics per factor
+- Vanilla β-VAE disentanglement doesn't guarantee this alignment
+- Sequential disentanglement literature (speech factorization) is most relevant
+
+### Theory of AR-Optimal Representations
+The ideal state is the **minimal sufficient statistic of the past for predicting the future** (causal states in computational mechanics, PSRs in control).
+
+Our practical goal: representation that makes the conditional **easy for a chosen model class** (AR transformer + Gaussian/mixture head + memory). This is an information-bottleneck / rate-distortion trade with an explicit dynamics model in the loop.
+
+---
+
+## 8. Experimental Roadmap
+
+### Phase 1: Predictor Baseline (CRITICAL - Do First)
+
+**Goal:** Determine if Mimi latents have any predictable structure at 12.5 Hz
+
+**Method:**
+1. Train mixture-density network or lightweight normalizing flow for p(Δx | context)
+2. Report ΔNLL = NLL[p(Δx | full context)] - NLL[p(Δx)] at multiple horizons (k=1,2,4,8)
+3. Report teacher-forced vs free-running gap
+4. Decompose into direction vs magnitude predictability
+
+**Interpretation:**
+- ΔNLL ≈ 0: Representation is genuinely innovation-heavy at 12.5 Hz (major update against the whole direction)
+- ΔNLL >> 0: Proceed to Phase 2
+
+### Phase 2: Cross-Encoder Comparison
+
+**Goal:** Test rate/distortion hypothesis
+
+**Method:**
+- Run Phase 1 diagnostics on EnCodec, SoundStream, DAC latents at matched temporal resolution
+- Compare conditional vs marginal NLL across representations
+
+**Interpretation:**
+- If discrete/quantized latents show much better predictability: supports "rate/distortion pressure creates AR-friendly structure"
+
+### Phase 3: RSSM Factorization (Option I)
+
+**Goal:** Learn z_dyn + z_rec factorization on top of frozen Mimi
+
+**Ablation priorities:**
+1. dim(z_dyn) × KL_target (sweep jointly on coarse grid first)
+2. Context length for z_dyn encoder
+3. Rollout horizon K for reconstruction loss (curriculum)
+
+**Lower priority initially:**
+- p(z_rec|z_dyn) complexity (start Gaussian)
+- Dynamics model architecture (start simple)
+
+**Key metrics:**
+- Is z_dyn easier to model AR than raw Mimi latents? (conditional NLL)
+- What is the innovation rate (KL budget used by z_rec)?
+- Does reconstruction quality degrade?
+
+### Phase 4: Engram Integration
+
+**Goal:** Test if Engram-style lookup helps for z_dyn
+
+**Prerequisite:** Phase 3 shows z_dyn is AR-predictable
+
+**Method:**
+- Add memory mechanism to dynamics model for z_dyn
+- Compare with/without memory at matched parameter count
+
+### Phase 5: End-to-End Evaluation
+
+**Goal:** Compare against CALM on generation quality/efficiency
+
+**Metrics:**
+- Total generative cost (FLOPs/latency) at fixed perceptual quality
+- Training stability (does it require less noise injection, etc.?)
+- Bits/innovation rate: how much KL per second is in z_rec?
+
+---
+
+## 9. Probability Estimates (Codex's Bets)
+
+| Outcome | Probability | Reasoning |
+|---------|-------------|-----------|
+| Predictor baseline shows meaningful predictability (ΔNLL >> 0) | 0.55 | Phase 0 flatness is concerning, but "wrong key/metric" loophole is real |
+| RSSM factorization yields z_dyn easier for AR than raw Mimi | 0.65 | KL innovation budget + prior-sampled training is strong inductive bias |
+| If factorization works, Engram helps for z_dyn | 0.45 | Even if AR-friendly, z_dyn might be "smooth-but-nonrepeating" not memorizable |
+| Full pipeline beats CALM on quality or efficiency | 0.25 | High bar; frame success as "simpler training / fewer tricks" initially |
+
+**Most likely failure point:** (1) or (3) — either representation is genuinely innovation-heavy, or learned state doesn't have reusable motifs even if predictable.
+
+---
+
+## 10. Single Most Important Next Experiment
+
+**Train the best-effort probabilistic predictor on current Mimi latents.**
+
+Report:
+1. ΔNLL = NLL[p(Δx | full context)] - NLL[p(Δx)] (teacher-forced)
+2. Same ΔNLL at multiple horizons (k=1,2,4,8)
+3. One free-running rollout metric to see teacher-forced vs rollout gap
+4. Direction vs magnitude decomposition
+
+**Why this is decisive:**
+- If ΔNLL ≈ 0 even with strong predictor: huge update against "representation is hiding structure at 12.5 Hz"
+- If ΔNLL >> 0: strongly supports moving to Option I and tells us what horizons/timescales to target
+
+---
+
+## 11. Key Quotes and Insights
+
+> "The λ term is not 'make z_dyn useful', it's 'make z_dyn compressible by ω'. That is necessary for AR-friendliness, but not sufficient for carrying the *right* information."
+
+> "Define 'structure' operationally as 'what you need to predict the future over long horizons under your inference-time constraints.'"
+
+> "The non-handwavy claim you want to be able to make is: 'we factorized state vs innovation so the long-range model only carries low-entropy structure; the remaining entropy is local and cheap to sample.'"
+
+> "If you truly made the process more predictable, the innovation channel should shrink (or become more local), and long-horizon modeling should get easier."
+
+> "CPC can yield 'directional / categorical' predictability without yielding low MSE."
+
+---
+
+## 12. Open Questions
+
+1. **Is the discrete mode structure real or imposed?** Does audio actually have recurring dynamical motifs, or would forcing this structure harm generation quality?
+
+2. **What's the right level of coarseness?** Is there a sweet spot where structure emerges?
+
+3. **Does the encoder need to see the future?** Could a bidirectional encoder during training (but causal during inference) help?
+
+4. **How does this relate to semantic vs acoustic structure?** Is the lack of dynamical structure because Mimi prioritizes semantic over acoustic regularity?
+
+5. **Representation bottleneck vs model bottleneck:** How do we distinguish "the representation is the problem" from "we just need better/bigger AR models"?
+
+---
+
+## Appendix: Stability Training Recipe
+
+**For Option I (RSSM factorization):**
+
+1. **KL warmup:** β from 0 → target over N steps
+2. **Free-bits / target-KL:** Per frame for z_rec to prevent collapse or runaway
+3. **Stop-gradient tricks:** Feed sg(z_dyn) into prior network early if z_dyn collapses
+4. **Prior-sampled training:** Decode with z_rec ~ p(z_rec|z_dyn) a good fraction of time
+5. **Rollout curriculum:** Start K=1-2, grow to 8-16; mix teacher-forced and free-running
+6. **Feature losses for long rollouts:** Don't rely only on MSE; use mel/low-rank projections
+
+=== END DISCUSSION 1 ===
+
+=== DISCUSSION 2 ===
+# Phase 1 Results: Predictor Baseline on Mimi Latents
+
+**Date:** 2026-02-02
+**Status:** Experiment complete, results analyzed
+
+---
+
+## 1. Motivation
+
+Prior work (Phase 0) tested whether Engram-style lookup memory could improve autoregressive modeling of continuous audio latents. The test clustered Mimi encoder contexts using coarse representations (mean-pooling, PCA + VQ) and measured whether clustering reduced variance in next-step dynamics (Δx = x_t - x_{t-1}).
+
+**Phase 0 Result:** Variance ratios of 0.997 and 0.988 against random baselines—clustering explained essentially 0% of dynamics variance.
+
+**Phase 0 Conclusion:** No reusable local structure exists in Mimi's latent representation.
+
+**Challenge to Phase 0:** The negative result could reflect:
+1. The representation genuinely lacks predictable structure, OR
+2. The coarse key/metric was wrong (mean-pooling destroys trajectory shape; MSE/variance-ratio misses multimodal structure)
+
+Phase 1 tests this directly: train a learned predictor and measure probabilistic predictability (NLL) rather than relying on clustering with hand-designed keys.
+
+---
+
+## 2. Experimental Design
+
+### 2.1 Research Question
+
+**Primary question:** Does context provide predictive information about next-step Mimi latent dynamics (Δx), as measured by a learned probabilistic model?
+
+**Secondary questions:**
+- How does predictability decay with context staleness (k)?
+- Is the predictable structure in the *direction* of change, the *magnitude* of change, or both?
+- How do errors compound in autoregressive rollout?
+
+### 2.2 Data
+
+**Encoder:** Mimi (the VAE underlying CALM)
+**Source audio:** LibriSpeech
+**Latent properties:**
+- Frame rate: 12.5 Hz (80ms per frame)
+- Dimensionality: 512 (continuous Mimi latents in this repo)
+
+**Train/eval split:** By speaker (inherited from Phase 0 splits).
+
+**Note on sample counts:** The validity constraint depends on k (`t >= (W-1)+k`), so the effective number of frames varies slightly across horizons. Ideally report `n` per horizon and split.
+
+### 2.3 Task Formulation
+
+**Lagged-context prediction (primary):** For each horizon k ∈ {1, 2, 4, 8}, train a model to predict the next-step delta at frame t from a stale context window:
+
+```
+p(Δx_t | x_{t-k-W+1 : t-k})
+```
+
+where:
+- x_t ∈ ℝ^512 is the Mimi latent at frame t
+- Δx_t = x_t - x_{t-1}
+- W is the context window length (W=8 in the run config)
+
+**Horizon interpretation:**
+| k | Context staleness |
+|---|---------------------|
+| 1 | context ends 80ms before target |
+| 2 | context ends 160ms before target |
+| 4 | context ends 320ms before target |
+| 8 | context ends 640ms before target |
+
+This is **not** “predict k steps into the future.” The target is always the same one-step delta Δx_t; k increases how stale the conditioning window is. This directly probes how predictable the dynamics are, and (secondarily) how robust prediction is when recent context is unreliable.
+
+### 2.4 Model Architecture
+
+Mixture Density Network (MDN) with diagonal Gaussian mixture:
+- Input: flattened context window, dimension W×D (W=8, D=512 → 4096)
+- Backbone: 2-layer MLP, width 1024, GELU
+- Output: K=8 mixture components with (π_k, μ_k, σ_k) over Δx_t ∈ ℝ^512
+- Numerical stability: log-σ clamp
+
+### 2.5 Metrics
+
+**Primary metric: ΔNLL (nats saved by conditioning)**
+
+```
+ΔNLL(k) = NLL[p(Δx_t | x_{t-k-W+1 : t-k})] - NLL[p(Δx_t)]
+```
+
+- NLL is reported in **nats per frame**. Divide by log(2) to convert to bits.
+- ΔNLL < 0 means context helps; ΔNLL ≈ 0 means context provides no information
+
+**Secondary metrics:**
+
+1. **Direction cosine similarity:** Decompose prediction into direction and magnitude:
+   - Ground truth direction: u_t = Δx / ||Δx||
+   - Predicted direction: û_t = Δx̂ / ||Δx̂||
+   - Metric: cos(u_t, û_t) averaged over evaluation set
+   - Interpretation: 1.0 = perfect direction prediction, 0.0 = random
+
+2. **Log-magnitude R²:**
+   - Ground truth: m_t = log(||Δx|| + ε)
+   - Predicted: m̂_t
+   - Metric: R² = 1 - Var(m_t - m̂_t) / Var(m_t)
+   - Interpretation: 1.0 = perfect magnitude prediction, 0.0 = predicting mean, <0 = worse than mean
+
+3. **Rollout gap:** Compare teacher-forced NLL to autoregressive rollout NLL:
+   - Teacher-forced: model sees ground-truth context at each step
+   - Rollout: model sees its own predictions as context
+   - Gap measures context-corruption sensitivity / error compounding
+
+### 2.6 Baseline
+
+The marginal baseline models p(Δx_t) without any context as a diagonal Gaussian fit on training deltas. This is the "null hypothesis" that context provides no information.
+
+---
+
+## 3. Results
+
+### 3.1 Primary Results: Conditional vs Marginal NLL
+
+| Horizon k | Eval NLL (conditional) | Eval NLL (baseline) | ΔNLL | Interpretation |
+|-----------|------------------------|---------------------|------|----------------|
+| 1 | 1075.5 | 1260.9 | **-185.4** | Context helps substantially |
+| 2 | 1129.8 | 1260.9 | **-131.1** | Context helps |
+| 4 | 1176.0 | 1260.9 | **-84.8** | Context helps |
+| 8 | 1191.9 | 1258.7 | **-66.8** | Context helps |
+
+**Key finding:** ΔNLL is negative across all horizons, indicating that the full (continuous) context window provides meaningful predictive information about next-step dynamics. The effect decays with context staleness but remains present even when the context ends ~640ms before the target.
+
+**Important nuance (vs Phase 0):** Phase 1 demonstrates structure under full-context conditioning; it does not show that this structure is compressible into a small discrete key suitable for O(1) lookup. So “Phase 0 failed” and “Phase 1 ΔNLL << 0” can both be true.
+
+To put scale on this (eval split):
+- k=1: ΔNLL = -185.44 nats/frame ≈ -0.362 nats/dim ≈ -0.523 bits/dim, which is ~267 bits/frame (~3.34 kbps at 12.5 Hz) of uncertainty removed vs the unconditional baseline.
+- k=8: ΔNLL = -66.79 nats/frame ≈ -0.130 nats/dim ≈ -0.187 bits/dim, which is ~96 bits/frame (~1.20 kbps at 12.5 Hz).
+
+### 3.2 Direction vs Magnitude Decomposition
+
+| Horizon k | Direction cos | Log-mag R² |
+|-----------|---------------|------------|
+| 1 | 0.611 | -0.595 |
+| 2 | 0.392 | -4.814 |
+| 4 | 0.107 | -33.84 |
+| 8 | 0.038 | -56.26 |
+
+**Key finding:** Direction is predictable (cos > 0) at short horizons, decaying toward random (cos → 0) by k=4-8. Magnitude is *not* predictable—R² is negative at all horizons, indicating the model performs worse than simply predicting the mean log-magnitude.
+
+**Interpretation detail:** These direction/magnitude metrics are computed from the model’s conditional mean (mixture-averaged μ). If magnitude is broad/multimodal, the mean can have systematically wrong magnitude even when the NLL improves.
+
+**Interpretation:** The *type* of transition (which direction in latent space) is structured and predictable from context. The *intensity* of transition (how far to move) is stochastic and unpredictable.
+
+**Caveat:** Both “direction cos” and “log-mag R²” are computed from the model’s *conditional mean* Δx̂ (mixture-averaged μ). If p(Δx|context) is multimodal or sign-symmetric, the conditional mean can collapse toward 0 (hurting cosine and magnitude metrics) even while the conditional density improves substantially (ΔNLL << 0). In other words, these mean-based decompositions may understate the amount of *distributional* predictability present.
+
+### 3.3 Rollout Stability
+
+| Horizon k | Rollout gap (NLL) |
+|-----------|-------------------|
+| 1 | — |
+| 2 | — |
+| 4 | ∞ |
+| 8 | 5.69 × 10^10 |
+
+**Key finding:** Rollout-context likelihood becomes numerically extreme at larger k. This is consistent with “off-manifold context” failure: once x̂ drifts, the conditional head can become overconfident in the wrong region (large ||μ|| relative to σ), producing enormous NLL. In practice, “∞” here is likely float overflow rather than a meaningful information-theoretic infinity.
+
+**Diagnostic detail:** This rollout metric still scores the *true* Δx_t under p(Δx_t | context), but the context is built from generated x̂. It measures context corruption sensitivity (teacher-forced vs rollout-context), not “k-step forecasting accuracy.”
+
+**Missing results for k=1,2:** In the raw table for this run, rollout values are blank for k=1 and k=2. That typically means the rollout diagnostic did not run or returned no usable utterances for those horizons; this should be re-run/verified before making strong claims about rollout stability at short k.
+
+### 3.4 Train/Eval Discrepancy (Anomaly)
+
+| Horizon k | Train ΔNLL | Eval ΔNLL |
+|-----------|------------|-----------|
+| 1 | +2028.2 | -185.4 |
+| 2 | +11856.8 | -131.1 |
+| 4 | -83.3 | -84.8 |
+| 8 | +74.1 | -66.8 |
+
+For k=1 and k=2, training ΔNLL is large and *positive* (worse than baseline) while evaluation ΔNLL is negative (better than baseline). This is atypical—normally training performance is equal to or better than evaluation.
+
+**Possible explanations:**
+1. Instrumentation/aggregation bug: `train_*` may not be computed via the same evaluation path as `eval_*` (e.g., mixing “training loss” and “eval NLL”, or mismatched (context, Δx) pairs).
+2. Data mismatch in the train-eval iterator (row filtering/ordering) leading to misalignment on the train pass only.
+3. Numerical instability that triggers only on the train evaluation subset.
+
+Until this is resolved, treat the eval numbers as the reliable signal for “structure exists across held-out speakers”, and treat `train_dnll` as suspect.
+
+One additional observation: the unconditional baseline NLL differs between train and eval (e.g., 1260.34 vs 1260.89 at k=1). This is expected because it is the *same* fitted baseline p(Δx) being evaluated on two different distributions; it does not imply the baseline was refit on eval.
+
+### 3.5 Post-hoc Diagnosis: Why Train ΔNLL Flipped Sign
+
+We re-evaluated the *same trained checkpoint* on 200k samples from each split and inspected quantiles and worst-case examples. The discrepancy is not a different code path: it comes from **rare, catastrophic outliers in the train split** that dominate the *mean* conditional NLL.
+
+Key observations for k=1 (train vs eval, 200k samples each):
+- Typical behavior indicates conditioning helps on **both** splits: train median ΔNLL ≈ **-132.5**, eval median ΔNLL ≈ **-138.2**.
+- The train mean becomes positive because a tiny number of frames have astronomically large ΔNLL (e.g. max train ΔNLL ≈ **4.41×10^8** at `utterance_id=89-219-0019`, `t=151`), while eval’s max ΔNLL is only **~6.5×10^2** on the sampled window.
+- A single frame at 4.4×10^8 ΔNLL contributes ~2200 to the mean when averaging over 200k samples, which largely explains why train mean ΔNLL appears as +2028 even though the bulk distribution is negative.
+
+Mechanism (why NLL can explode):
+- The MDN likelihood uses diagonal Gaussians with a **minimum log-σ clamp** (log-σ ≥ -7 ⇒ σ ≳ 9e-4). When Δx has a rare spike (large ||Δx||₂; outliers observed at ~80–135), z-scores become enormous across many dimensions and the quadratic term Σ(z²) can reach 1e8–1e9, making NLL blow up.
+- The unconditional baseline p(Δx) is broad (fit over all train deltas), so it is comparatively less surprised by spikes; thus ΔNLL becomes extremely positive.
+
+Implications:
+- The “train ΔNLL >> 0” anomaly is best interpreted as **mean-of-NLL being hypersensitive to rare off-manifold frames**, not as “conditioning fails on train”.
+- For reporting, we should include robust summaries (median/trimmed mean + tail quantiles) rather than only the mean, and stratify by confound slices (e.g., `utterance_medial`, `high_energy`) to determine whether these spikes are boundary/silence artifacts.
+
+---
+
+## 4. Interpretation
+
+### 4.1 Phase 0 vs Phase 1 Reconciliation
+
+| Approach | Result | Conclusion |
+|----------|--------|------------|
+| Phase 0: Clustering with coarse keys | Variance ratio ≈ 1.0 | No structure found |
+| Phase 1: Learned probabilistic predictor | ΔNLL = -185 to -67 | Structure exists |
+
+The discrepancy is explained by the limitations of Phase 0's methodology:
+
+1. **Key design:** Mean-pooling and PCA-VQ are information-destroying compressions that may not preserve predictive equivalence classes. A learned predictor can discover the relevant features.
+
+2. **Metric choice:** Variance ratio (equivalent to R² on the mean prediction) misses multimodal structure. If the true conditional p(Δx_t | context) is multimodal, the conditional mean can be a poor predictor even when the distribution is highly structured. NLL captures distributional structure that variance-based metrics miss.
+
+3. **Model capacity:** Clustering with 64-256 codes may underfit. A neural network has more capacity to capture complex conditional dependencies.
+
+But importantly: Phase 1 shows structure exists with full-context conditioning; Phase 0 specifically tested whether structure survives aggressive coarsening into a small key (a requirement for lookup). Phase 1 does not “resurrect lookup” unless we also learn an AR-equivalence key.
+
+### 4.2 Implications for AR Audio Modeling
+
+**Finding 1: Predictable structure exists but is missed by naive methods.**
+
+The Mimi latent space contains meaningful predictive structure at the 80ms frame rate. This structure is:
+- Learnable by a probabilistic model
+- Not captured by simple clustering/quantization of context
+- Present across multiple prediction horizons (80ms to 640ms)
+
+**Finding 2: Direction is predictable, magnitude is not.**
+
+This decomposition suggests a natural factorization:
+- **Predictable component (direction):** What *type* of transition will occur—e.g., phoneme boundary, pitch change, silence onset
+- **Unpredictable component (magnitude):** How *intense* the transition is—e.g., speaking rate, emphasis, exact timing
+
+This aligns with the hypothesis that audio dynamics have discrete "modes" (types of transitions) with continuous variation (intensity/timing).
+
+**Finding 3: Rollout instability is catastrophic.**
+
+Even with meaningful single-step predictability, autoregressive generation fails. This explains why CALM requires multiple stabilization techniques (noise injection, short-context transformers, consistency modeling). The representation is not *AR-friendly*—small errors compound into divergence.
+
+### 4.3 Support for Proposed Research Direction
+
+These results support the RSSM-style dual-latent factorization proposed in RESEARCH_DISCUSSION.md:
+
+| Proposed component | Supported by |
+|--------------------|--------------|
+| z_dyn (predictable state) | Direction is predictable (cos = 0.61 at k=1) |
+| z_rec (innovation/residual) | Magnitude is unpredictable (R² < 0) |
+| KL budget on z_rec | Magnitude variance should be "paid for" as innovation |
+| Rollout reconstruction loss | Rollout instability confirms need for explicit long-horizon training |
+
+The direction/magnitude decomposition maps directly onto the state/innovation split:
+- z_dyn should capture *which direction* the trajectory will move (predictable from context)
+- z_rec should capture *how far* it moves (sampled from a learned prior)
+
+---
+
+## 5. Limitations and Caveats
+
+### 5.1 Single Encoder
+
+Results are specific to Mimi. Other audio encoders (EnCodec, SoundStream, DAC) may show different patterns. Cross-encoder comparison is needed to determine whether these findings generalize.
+
+### 5.2 Single Dataset
+
+Results are on LibriSpeech (read English speech). Structure may differ for:
+- Spontaneous speech
+- Non-English languages
+- Music
+- General audio
+
+### 5.3 Train/Eval Discrepancy
+
+The anomalous **mean** train ΔNLL values (positive when eval is negative) were traced to **rare, catastrophic outliers** in the train split that dominate the mean (see §3.4).
+
+In typical regions of the distribution (median and most quantiles), train and eval are consistent: ΔNLL is negative (improvement over baseline) and direction predictability is present. The practical lesson is that for this likelihood head, **reporting only means can be misleading**; robust summaries (median/trimmed mean) and “worst offenders” logging are necessary to interpret results and to debug rollout blow-ups.
+
+### 5.4 Predictor Architecture
+
+Results depend on the specific model architecture used. A different architecture might find more or less structure.
+
+One practical next tweak is to improve robustness of the likelihood head under off-manifold contexts (heavier-tailed components, stronger σ regularization, or explicit context normalization), which may also reduce rollout blow-ups.
+
+---
+
+## 6. Next Steps
+
+Based on these results, the recommended next steps are:
+
+### 6.1 Immediate (Validation)
+
+1. **Harden reporting:** Keep robust summaries (median/trimmed) + outlier logging in the Phase 1 baseline to avoid mean-dominated artifacts.
+2. **Cross-encoder comparison (optional):** Run the same experiment on EnCodec/DAC latents to test generality beyond Mimi.
+
+### 6.2 Short-term (Architecture Development)
+
+3. **Implement Option I:** RSSM-style factorization of Mimi latents into z_dyn + z_rec
+4. **Ablation grid:** Sweep dim(z_dyn) × KL_budget for z_rec
+5. **Evaluate:** Is z_dyn easier to model AR than raw Mimi latents?
+
+### 6.3 Medium-term (Integration)
+
+6. **Engram integration:** Test if lookup memory helps for z_dyn
+7. **End-to-end evaluation:** Compare against CALM baselines
+
+---
+
+## 7. Summary
+
+**Research question:** Does Mimi's latent space contain predictable structure that Phase 0 clustering missed?
+
+**Answer:** Yes. A learned probabilistic predictor achieves ΔNLL of -185 to -67 across prediction horizons of 80ms to 640ms. The predictable structure is primarily in the *direction* of latent transitions (cos similarity up to 0.61), not the *magnitude* (R² < 0 at all horizons).
+
+**Implication:** The Phase 0 failure reflects limitations of the clustering methodology, not absence of structure. However, rollout instability remains catastrophic, motivating the proposed dual-latent factorization to separate predictable state from unpredictable innovation.
+
+---
+
+## Appendix A: Raw Results
+
+```
+horizon_k,slice,train_nll,train_nll_baseline,train_dnll,eval_nll,eval_nll_baseline,eval_dnll,eval_direction_cos,eval_logmag_r2,rollout_gap_nll,rollout_gap_dnll
+1,all,3288.57,1260.34,2028.23,1075.45,1260.89,-185.44,0.6114,-0.5949,,
+2,all,13117.18,1260.34,11856.85,1129.82,1260.89,-131.07,0.3924,-4.8140,,
+4,all,1177.05,1260.34,-83.28,1176.04,1260.89,-84.85,0.1068,-33.8358,inf,inf
+8,all,1332.29,1258.14,74.15,1191.87,1258.67,-66.79,0.0384,-56.2588,56921627075.45,56921627075.45
+```
+
+## Appendix B: Experimental Configuration
+
+These values correspond to the `configs/phase1.yaml` defaults unless overridden.
+
+- **Encoder:** Mimi (kyutai/mimi)
+- **Frame rate:** 12.5 Hz
+- **Latent dim:** 512
+- **Context window:** W=8 frames, flattened (4096-dim)
+- **Horizons:** k ∈ {1, 2, 4, 8} (context staleness)
+- **Conditional model:** MDN, diagonal Gaussian mixture, K=8
+- **Backbone:** 2-layer MLP, width 1024, GELU
+- **Optimizer:** AdamW
+- **Training:** 25,000 steps, batch size 256
+- **LR / WD:** 1e-3 / 1e-4
+- **Grad clip:** 1.0
+
+=== END DISCUSSION 2 ===
+
+=== DISCUSSION 3 ===
+# Research Discussion 3: Phase 0→3 Findings, Failure Modes, and Current Status
+
+**Date:** 2026-02-03  
+**Project:** `engramAudio` (LibriSpeech train-clean-100, Mimi continuous latents @ 12.5 Hz)  
+**Goal:** Determine whether predictable structure exists in the representation and, if so, whether we can transform it into an **AR-friendly state** (`z_dyn`) plus an **innovation/residual** (`z_rec`) that stabilizes rollouts.
+
+This document is a consolidated narrative of what we ran, what happened, what broke, what we fixed, and what the results currently imply. It is intended to be a “paper backbone”: clear experimental intent, concrete numbers, and explicit failure modes.
+
+---
+
+## 1. Executive Summary
+
+1. **Phase 0 clustering failed** to explain next-step dynamics variance in raw Mimi latents, but that did *not* imply “no structure exists”.
+2. **Phase 1 probabilistic prediction succeeded**: a learned MDN predicts one-step latent deltas significantly better than an unconditional baseline, and predictability decays smoothly with lag `k`.
+3. The predictable component is primarily **directional** (high cosine similarity) rather than **magnitude** (negative log-magnitude R² across horizons).
+4. **Autoregressive rollout is catastrophically unstable** in raw Mimi latents (and remains unstable at long horizons even after Phase 3).
+5. **Phase 3 produces a representation (`z_dyn`) that is substantially more predictable than raw Mimi latents** under the Phase 1 lagged-context diagnostic (stronger ΔNLL per-dim and higher direction cosine at k=1).
+6. **However, the desired state/innovation split is not yet achieved**: in our pragmatic Phase 3 training setup, `z_rec` tends to be weakly used for reconstruction (posterior vs prior recon nearly identical), despite enforcing a non-zero target KL.
+
+The current strongest takeaway: **“A predictable state exists and can be learned (z_dyn), and it improves the lagged-context predictability metrics.”** The remaining gap is turning that into **stable long-horizon generation** and a **meaningful innovation channel**.
+
+---
+
+## 2. Phase 0 (Recap): Why the Initial Failure Was Ambiguous
+
+**Phase 0 intent:** test whether coarse context clustering creates predictive equivalence classes for next-step dynamics (Engram-style key/value retrieval plausibility check).
+
+**Outcome (high level):**
+- Clustering-based conditioning explained ~0% of next-step dynamics variance in raw latent space (variance ratios ~1.0).
+
+**Key interpretation issue (from RESEARCH_DISCUSSION.md):**
+- A representation can still contain predictable structure even if **(a)** the key discards the wrong information, **(b)** the conditional distribution is multimodal (mean predictor fails), or **(c)** “junk” dimensions dominate Euclidean variance.
+
+This motivated Phase 1: a *direct* probabilistic conditional entropy test with a learned predictor.
+
+---
+
+## 3. Phase 1: Predictor Baseline (Lagged-Context Primary Diagnostic)
+
+### 3.1 Diagnostic definition
+
+We model next-step delta under a stale context:
+- Target: `Δx_t = x_t - x_{t-1}`
+- Context: `c_{t,k} = concat(x_{t-k-W+1 : t-k})` (window size `W`, lag horizon `k`)
+- Train an MDN for `p(Δx_t | c_{t,k})`
+- Baseline: unconditional diagonal Gaussian `p(Δx_t)`
+
+Report:
+- `NLL` and `ΔNLL = NLL_model - NLL_baseline` (nats / frame; and for some runs, nats / dim)
+- Direction metric: cosine similarity between predicted mean delta and true delta
+- Magnitude metric: R² on log magnitude (typically negative here)
+- Secondary diagnostic: **rollout-context gap** (replace true context with model-generated context)
+
+### 3.2 Phase 1 on raw Mimi latents (historical run)
+
+Using `k ∈ {1,2,4,8}` and slice `all`, we observed:
+- **Eval ΔNLL improves** (negative) across horizons, decaying with `k`:
+  - `k=1: eval ΔNLL ≈ -185.44`
+  - `k=2: eval ΔNLL ≈ -131.07`
+  - `k=4: eval ΔNLL ≈ -84.85`
+  - `k=8: eval ΔNLL ≈ -66.79`
+- **Direction is predictive** at short horizon:
+  - `k=1: eval cosine ≈ 0.611`
+  - decays quickly by `k=8`
+- **Magnitude is not predictive**:
+  - log-magnitude R² < 0 at all horizons
+- **Rollout instability** is severe:
+  - `k=4` yielded `inf` rollout gap, `k=8` produced enormous values (catastrophic divergence).
+
+### 3.3 Train/eval discrepancy: what it actually was
+
+We observed an anomaly where *mean* train ΔNLL could be positive while eval ΔNLL was negative. This was investigated by re-evaluating a fixed checkpoint on 200k samples and logging quantiles + worst offenders.
+
+**Root cause:** rare, catastrophic outliers in the train split dominated the mean conditional NLL. Typical samples (median/most quantiles) showed train and eval were consistent (ΔNLL negative); a handful of frames produced astronomically large NLL due to large `||Δx||` under a diagonal Gaussian mixture with a minimum σ clamp.
+
+**Lesson:** for this experiment class, always log robust summaries and worst-case examples; means alone are not trustworthy.
+
+---
+
+## 4. Phase 3: RSSM-Style Factorizer (Single-Rate)
+
+### 4.1 Phase 3 intent (from RESEARCH_DISCUSSION.md)
+
+We want:
+- `z_dyn,t`: predictable state that is AR-friendly
+- `z_rec,t`: innovation/residual that captures unpredictable detail and is controlled by a KL “budget”
+
+The goal is a representation that is both:
+- **Predictable** (stable rollouts in state space)
+- **Expressive** (reconstruction quality preserved by allocating unpredictable detail into `z_rec`)
+
+### 4.2 What we implemented
+
+Single-rate factorizer on frozen Mimi latents:
+- `z_dyn = e_dyn(x)` (causal GRU encoder)
+- `p(z_dyn,t | z_dyn,<t)` teacher-forced dynamics model
+- `q(z_rec|x,z_dyn)` posterior, `p(z_rec|z_dyn)` prior
+- Decoder reconstructs `x` from `(z_dyn, z_rec)`
+- Training includes a fraction of timesteps decoded using `z_rec ~ p(z_rec|z_dyn)` (“prior sampling”) to prevent decoder from ignoring the prior.
+
+**Pragmatic stability choices:**
+- Fixed dynamics σ (by default) to avoid the “σ collapse ⇒ extremely negative NLL dominates training” failure mode.
+- Extensive logging to detect:
+  - `z_dyn` collapse (`z_dyn_var_mean`, `z_dyn_delta_l2_mean`)
+  - “all info in one channel” behavior (`recon_prior_over_post`, `kl_raw`)
+  - dynamics predictability (`dyn_mse`)
+
+### 4.3 Phase 3 failure modes observed and mitigations applied
+
+**Failure mode A: dynamics σ collapse / loss domination**
+- Symptom: `loss_dyn` becomes hugely negative; `z_dyn` variance collapses; training “wins” by making dynamics likelihood arbitrarily high via σ clamp.
+- Fix: default to fixed σ=1 for dynamics (`min_log_sigma = max_log_sigma = 0`) and log dyn MSE separately.
+
+**Failure mode B: logging bug made σ stats nonsensical**
+- Symptom: `q_log_sigma_mean` printed values like `-55` despite clamp bounds.
+- Fix: log per-dim mean correctly (avoid accidental sum over dimensions); clamp `kl_raw` to ≥0 in logs.
+
+**Failure mode C: one-channel solutions**
+1) `z_dyn` collapse (constant state, dyn easy) while `z_rec` carries everything  
+2) `z_rec` unused (posterior≈prior, recon_prior≈recon_post) while `z_dyn` carries almost everything
+
+We added a pragmatic control to address (2):
+- **Target-KL mode**: enforce a non-zero KL capacity for `z_rec` (nats per timestep), rather than only β-weighting with free-bits.
+
+This ensures `z_rec` has a measurable information budget, but it does *not* guarantee that information corresponds to reconstruction-relevant innovation (see §6).
+
+---
+
+## 5. Phase 1-on-Phase 3: Predictability of `z_dyn`
+
+### 5.1 Experimental setup
+
+We exported `z_dyn` sequences to `outputs/phase3/zdyn.zarr` and ran the Phase 1 lagged-context MDN predictor on `Δz_dyn`.
+
+### 5.2 Results (Phase 1 predictor on `z_dyn`)
+
+Slice: `all`, horizons `k ∈ {1,2,4,8}`.
+
+Key metrics (eval):
+
+| k | eval ΔNLL (nats/frame) | eval ΔNLL/dim | eval cos(direction) | eval logmag R² | rollout gap ΔNLL |
+|---:|---:|---:|---:|---:|---:|
+| 1 | -61.11 | -0.477 | 0.708 | -0.098 | 68.7 |
+| 2 | -30.37 | -0.237 | 0.440 | -5.734 | — |
+| 4 | -17.44 | -0.136 | 0.152 | -39.242 | — |
+| 8 | -12.54 | -0.098 | 0.061 | -66.951 | 2.2e11 |
+
+**Interpretation:**
+- `z_dyn` is **highly predictable at k=1**, with *stronger* direction cosine (0.708) than the earlier raw Mimi run (≈0.61).
+- Predictability decays smoothly with lag, consistent with a finite-timescale predictable component.
+- Magnitude predictability remains poor (log-magnitude R² negative).
+- Rollout instability remains the major unsolved problem: long-horizon rollout gap still explodes (k=8 catastrophic).
+
+**Conclusion:** Phase 3 produced a representation whose *one-step conditional structure* is stronger and cleaner, but the project still needs explicit long-horizon stabilization (rollout-based training and/or a meaningful innovation model).
+
+---
+
+## 6. Where We Are Relative to the Phase 3 “State/Innovation Split” Goal
+
+### 6.1 What is working
+- We can learn a state-like representation (`z_dyn`) that is:
+  - non-collapsed (non-trivial variance and movement),
+  - teacher-forced predictable (low dyn MSE),
+  - and measurably more predictable under lagged-context than raw Mimi latents.
+
+### 6.2 What is not yet working (and why it matters)
+- Despite enforcing a non-zero target KL, `z_rec` is not reliably **reconstruction-relevant**:
+  - empirically, recon from posterior vs prior can remain nearly identical (`recon_prior_over_post ≈ 1`), suggesting the decoder doesn’t need `z_rec` for the current loss mix/capacity regime.
+- Without a meaningful innovation channel:
+  - we cannot claim the “magnitude/noise lives in innovation” story,
+  - and we do not gain a mechanism for stable diversity under rollout.
+
+### 6.3 Why rollout is still unstable
+The lagged-context predictor and the Phase 3 teacher-forced dynamics both optimize *local* prediction. They do not directly optimize **multi-step free-running stability**. The catastrophic rollout gap at longer horizons is consistent with the earlier Phase 1 rollout failure: small errors compound rapidly when the representation is not explicitly trained for rollouts.
+
+---
+
+## 7. Practical Failure Modes (Checklist) and the Knobs That Address Them
+
+### 7.1 `z_dyn` collapse (constant state)
+- Symptoms:
+  - `z_dyn_var_mean → 0`, `z_dyn_delta_l2_mean → 0`
+  - `dyn_mse → 0` trivially
+- Knobs:
+  - reduce `dyn_weight`
+  - increase `prior_sample_prob`
+  - reduce `z_rec_dim` and/or increase KL pressure on `z_rec` (in beta mode)
+
+### 7.2 `z_rec` unused (no innovation usefulness)
+- Symptoms:
+  - `recon_prior_over_post ≈ 1.0` persistently
+  - `kl_raw` may be >0 (target-KL) but recon doesn’t change
+- Knobs:
+  - increase `loss.kl.target_final` (more capacity for residual that matters)
+  - decrease `prior_sample_prob` (let posterior demonstrate value early)
+  - consider architectural constraint: additive decoder `x̂ = g(z_dyn) + r(z_dyn,z_rec)` with small residual head
+
+### 7.3 Rollout instability (catastrophic divergence)
+- Symptoms:
+  - rollout gap NLL blows up to inf/1e10+ at moderate horizon
+- Knobs (most important future work):
+  - add rollout reconstruction loss (multi-step, no teacher forcing)
+  - multi-horizon dynamics objectives
+  - explicit stochastic innovation model for magnitude/detail (so the model can represent uncertainty rather than “pretend it is deterministic”)
+
+---
+
+## 8. What We Would Claim Today (and What We Would Not)
+
+**We can credibly claim:**
+- Mimi continuous latents contain significant predictable structure at this frame rate.
+- A learned predictor reveals structure missed by clustering-based Phase 0 keys.
+- A learned state representation (`z_dyn`) can be trained that increases short-horizon predictability and directional alignment.
+
+**We cannot credibly claim yet:**
+- Stable long-horizon AR rollouts in this representation (still catastrophic at longer horizons).
+- A robust, meaningful separation of predictable state vs unpredictable innovation (`z_rec`) that improves generation.
+
+---
+
+## 9. Concrete Next Experiments (Paper-Relevant)
+
+1. **Rollout-trained Phase 3 objective**
+   - Curriculum on rollout horizon K (start 1–2, grow to 8–16).
+   - Decode with `z_rec ~ p(z_rec|z_dyn)` during rollout, and penalize reconstruction to ground-truth `x`.
+2. **Direct comparison: Phase 1 on raw Mimi vs Phase 1 on `z_dyn`**
+   - Already partially done; package as a single table with matched metrics.
+3. **Make `z_rec` meaningfully reconstructive**
+   - Increase target KL capacity and verify that `recon_prior_over_post` becomes > 1 (but not huge).
+   - If needed, add decoder structure that forces residual semantics.
+4. **Cross-encoder generality (optional)**
+   - Repeat Phase 1 and Phase 3 on a second encoder (EnCodec/DAC) to test whether Mimi is unusually “innovation-heavy”.
+
+---
+
+## Appendix A: Commands / Artifacts (Repro Pointers)
+
+Phase 0:
+- `uv run python scripts/01_make_speaker_splits.py`
+- `uv run python scripts/02_infer_latents.py --device cuda`
+- `uv run python scripts/03_build_phase0_dataset.py`
+
+Phase 1 on any latents store:
+- Set `configs/phase1.yaml`:
+  - `data.latents_dir` = zarr store
+  - `data.frames_index` = `outputs/phase0/phase0_frames.parquet`
+  - `data.splits_dir` = `outputs/phase0/splits`
+  - `data.latents_index` = corresponding index parquet (needed for rollout)
+- Run:
+  - `uv run python scripts/10_phase1_predictor_baseline.py --config configs/phase1.yaml --slice all`
+
+Phase 3:
+- `uv run python scripts/20_phase3_train_factorizer.py --config configs/phase3.yaml`
+- `uv run python scripts/21_phase3_export_zdyn.py --config configs/phase3.yaml --checkpoint outputs/phase3/checkpoints/phase3_final.pt --split all`
+
+=== END DISCUSSION 3 ===
+
+=== DISCUSSION 4 ===
+# Research Discussion 4: Phase 4/4.5 (Engram Integration + Rollout Training) Results
+
+**Date:** 2026-02-03  
+**Scope:** Phase 4 (Engram integration) and Phase 4.5 (rollout-trained dynamics) on exported Phase 3 `z_dyn`  
+**Primary question:** *If Phase 3 yields an AR-predictable state (`z_dyn`), does an Engram-style memory help, and what does it take to make free-running rollouts stable?*
+
+This document is a phase-focused narrative arc intended to be paper-ready: what we tried, what failed, what we changed, and what the results imply.
+
+---
+
+## 1. Setup and Evaluation Protocol
+
+### 1.1 Data
+- Representation: exported Phase 3 predictable state `z_dyn` (single-rate) stored in `outputs/phase3/zdyn.zarr`.
+- Split: speaker-disjoint train/eval (Phase 0 `outputs/phase0/splits`).
+- Training target: one-step transition `Δz_t = z_{t+1} - z_t`.
+
+### 1.2 Metrics (decision-grade)
+
+We evaluate two regimes:
+
+1) **Teacher-forced (one-step):** condition on true `z_t`.
+   - Metric: `ΔNLL = NLL[p(Δz | z_t)] - NLL[p(Δz)]` (negative is better than baseline).
+   - Direction metric: cosine similarity between predicted mean `μ(z_t)` and true `Δz_t`.
+
+2) **Free-running rollout:** condition on model-generated `ẑ_t`.
+   - Rollout rule: `ẑ_{t+1} = ẑ_t + μ(ẑ_t)` (mean rollout).
+   - Metric: compute NLL of the *true* `Δz_t` under the model conditioned on `ẑ_t` and compare to unconditional baseline (`rollout_dnll`).
+   - Diagnostics: non-finite rollouts, max `||ẑ||₂`, and (later) clip statistics.
+
+**Why this matters:** teacher-forced metrics can look excellent even when the model diverges immediately in rollout. Rollout metrics are the downstream proxy for AR generation viability.
+
+---
+
+## 2. Phase 4 Attempt 1: Naive Memory over `z_t` (Negative Result)
+
+### 2.1 Hypothesis
+If `z_dyn` contains reusable motifs, then nearest-neighbor / k-means lookup keyed by `z_t` should predict `Δz_t` well.
+
+### 2.2 Implementation (Phase 4)
+- Fit `k`-means on keys `z_t` (train split).
+- For each cluster, store `E[Δz | cluster]` and `Var[Δz | cluster]`.
+- Evaluate a “memory-only” predictor by nearest-centroid lookup; compare against a parametric MLP dynamics model.
+
+### 2.3 Outcome
+- **Memory-only** performed badly (in early runs, catastrophically) due to unreliable per-cluster variance and brittle hard assignment.
+- **Parametric model** performed well teacher-forced, but could still diverge in free-running rollouts.
+
+**Conclusion:** naive “k-means memory predicts the whole delta” is not a reliable Engram test.
+
+---
+
+## 3. Phase 4 Attempt 2: Memory as Residual + Soft Retrieval (Positive Teacher-Forced Result)
+
+We revised Phase 4 to better match how memory tends to help in practice: **store exceptions/residuals**, not the entire prediction.
+
+### 3.1 Key idea: residual memory
+Train a parametric model `μ_param(z)` first. Then fit memory on residuals:
+```
+r(z_t) = Δz_t - μ_param(z_t)
+```
+At inference, combine:
+```
+μ(z_t) = μ_param(z_t) + μ_mem_residual(z_t)
+```
+
+### 3.2 Softer retrieval
+Replace hard nearest-centroid with **soft top‑k** weighting:
+```
+w_i ∝ softmax(-||z - c_i||² / τ)
+μ_mem = Σ_i w_i μ_i
+```
+
+### 3.3 Results (teacher-forced)
+On eval one-step prediction:
+- `param`: `dnll ≈ -44.54`, direction cos ≈ `0.695`
+- `hybrid` (gated blend of param+memory): `dnll ≈ -46.15`, cos ≈ `0.702`, **gate_mean ≈ 0.25**
+- `resid_add`: `dnll ≈ -47.98`, cos ≈ `0.717` (best)
+- `gated_resid`: essentially identical to `resid_add`, with **gate_mean ≈ 1.0** (gate saturates)
+
+**Interpretation:** Engram-style memory *does* help in teacher-forced prediction when used as a residual corrector. The gate saturating to ~1 suggests the residual memory is broadly useful under one-step training.
+
+### 3.4 Results (rollout before rollout-training)
+Even with improved memory design, rollout remained poor:
+- Memory variants were numerically stable (no NaNs; `||ẑ||` remained near the data manifold).
+- However, `rollout_dnll` stayed **positive** (worse than unconditional baseline), indicating that free-running conditioning still destroys predictive advantage.
+- The pure parametric model could explode off-manifold (NaNs or enormous NLL) without explicit stabilization.
+
+**Conclusion:** residual memory helps one-step and improves numerical stability, but it does not fix the core compounding-error problem.
+
+---
+
+## 4. Phase 4.5: Rollout-Trained Dynamics (Major Stability Breakthrough)
+
+### 4.1 Motivation
+We were measuring rollout behavior without training for it. Teacher-forced one-step NLL is not the right objective if the downstream use case is autoregressive rollouts.
+
+### 4.2 Method: K-step rollout loss (K=16)
+Fine-tune the parametric dynamics model with an unrolled loss:
+- Sample rollout segments `(z0, Δz[0:K])` from train utterances.
+- Roll out `ẑ` for `K` steps using the model’s own predictions.
+- At each step, score the *true* next-step delta under the model conditioned on the rolled-out state.
+
+This directly optimizes: “be accurate on-distribution *and* remain accurate on the model’s induced state distribution.”
+
+### 4.3 Pre vs Post results (param model)
+
+**Teacher-forced:**
+- `dnll` got worse: `-44.54 → -33.83`
+- Direction cosine got better: `0.695 → 0.713`
+
+**Rollout:**
+- Catastrophic failure pre-finetune:
+  - `rollout_dnll ≈ +761,868` (even with clip stabilizer)
+  - large `||ẑ||₂` and frequent clipping
+- Stable, near-baseline post-finetune:
+  - `rollout_dnll ≈ -0.987` (slightly better than unconditional baseline under rollout)
+  - `max ||ẑ||₂ ≈ 10.25`, `n_clipped = 0`, mean `||Δẑ||` extremely small
+
+**Interpretation:** rollout training converts an exploding free-running model into a stable one. This is strong evidence that the rollout failure mode is largely an *objective mismatch* problem, not purely a representation problem.
+
+### 4.4 Residual memory after rollout training
+After rollout fine-tune, we refit residual memory and evaluated `resid_add`:
+- Teacher-forced: small improvement vs `param_post` (`dnll` changes by < 1 nat/frame).
+- Rollout: essentially identical to `param_post` (`rollout_dnll ≈ -0.98`).
+
+**Interpretation:** once the dynamics model is rollout-trained, residual memory provides little incremental benefit under this evaluation protocol. Memory was most useful as a patch for the one-step-trained model, not as a substitute for rollout training.
+
+---
+
+## 5. Phase 4.5 (Sweep): Pure Rollout Objective (teacher_weight=0, state_weight=0)
+
+After implementing Phase 4.5, we ran a “pure rollout” sweep point to establish the extreme end of the Pareto tradeoff:
+- K-step rollout loss only (`K=16`)
+- No teacher-forced auxiliary loss
+- No explicit state-matching loss
+- No scheduled teacher forcing
+
+### 5.1 Results (pure rollout)
+
+**Pre (one-step trained param):**
+- Teacher-forced: `dnll ≈ -44.54`, direction cos ≈ `0.695`
+- Rollout: catastrophically bad (`rollout_dnll ≈ +761,868`) with large `||ẑ||` and frequent clipping.
+
+**Post (pure rollout fine-tune):**
+- Teacher-forced: `dnll ≈ -33.83` (worse than pre; expected)
+- Rollout: `rollout_dnll ≈ -0.987` (stable and slightly better than unconditional baseline)
+  - `max ||ẑ||₂ ≈ 10.25`, `rollout_n_clipped = 0`, mean `||Δẑ||` extremely small
+
+**Residual memory refit after pure rollout fine-tune (`resid_add_post`):**
+- Teacher-forced: `dnll ≈ -34.62` (small improvement), direction cos ≈ `0.724`
+- Rollout: `rollout_dnll ≈ -0.980` (effectively unchanged)
+
+### 5.2 Interpretation
+
+The “pure rollout” point demonstrates a clean extreme:
+- **Rollout stability can be achieved** via objective alignment, even when teacher-forced one-step likelihood degrades.
+- Residual memory remains a minor effect once the dynamics is trained for rollout.
+
+This motivates the next sweep points (nonzero `teacher_weight` and/or `state_weight`) as attempts to recover teacher-forced NLL while preserving the rollout stability achieved here.
+
+---
+
+## 6. Phase 4.5 (Sweep): Add Teacher-Forced Term (teacher_weight=0.1)
+
+We next evaluated a mixed objective with a small teacher-forced auxiliary loss:
+- `teacher_weight = 0.1`, `state_weight = 0.0`
+- scheduled teacher forcing from `p=0.2 → 0.0` over 2000 steps
+- still `K=16` rollout training
+
+### 6.1 Results (tw01)
+
+**Post (param, tw01):**
+- Teacher-forced: `dnll ≈ -35.75` (better than pure rollout’s `-33.83`, but worse than the pre baseline `-44.54`)
+- Rollout: `rollout_dnll ≈ -0.808` (still stable and better than baseline, but worse than pure rollout’s `-0.987`)
+  - `max ||ẑ||₂ ≈ 10.12`, `rollout_n_clipped = 0`
+
+**Residual memory refit after tw01 (`resid_add_post`):**
+- Teacher-forced: `dnll ≈ -36.38` (small improvement over param), direction cos ≈ `0.726`
+- Rollout: `rollout_dnll ≈ -0.791` (effectively unchanged)
+
+### 6.2 Interpretation
+
+This point confirms the expected Pareto tradeoff:
+- adding teacher-forced pressure recovers some one-step likelihood,
+- but it partially sacrifices rollout performance.
+
+Residual memory remains a minor effect once the model is rollout-trained.
+
+---
+
+## 7. Phase 4.5 (Sweep): Add State-Matching (teacher_weight=0.1, state_weight=0.05)
+
+We then added an explicit state-matching regularizer during rollout training:
+- `teacher_weight = 0.1`, `state_weight = 0.05`
+- scheduled teacher forcing from `p=0.2 → 0.0` over 2000 steps
+- `K=16` rollout training
+
+### 7.1 Results (tw01_sw05)
+
+**Post (param, tw01_sw05):**
+- Teacher-forced: `dnll ≈ -35.75` (essentially unchanged vs tw01)
+- Rollout: `rollout_dnll ≈ -0.808` (also essentially unchanged vs tw01)
+  - Stable rollouts: `max ||ẑ||₂ ≈ 10.11`, `rollout_n_clipped = 0`
+
+**Residual memory refit after tw01_sw05 (`resid_add_post`):**
+- Teacher-forced: `dnll ≈ -36.38` (same as tw01), direction cos ≈ `0.726`
+- Rollout: `rollout_dnll ≈ -0.788` (very small change)
+
+### 7.2 Interpretation
+
+At this weight scale, the explicit state-matching term does not materially change outcomes relative to tw01: rollout remains stable and slightly better than baseline, but does not recover the large teacher-forced advantage under free-running conditions.
+
+This suggests either:
+1) the `state_weight` is too small to matter, or
+2) one-step teacher-forced + rollout loss already implicitly constrains state drift at this horizon, so state matching adds little.
+
+---
+
+## 8. Phase 4.5 (Sweep): Increase State-Matching (teacher_weight=0.1, state_weight=0.2)
+
+To test whether state-matching can meaningfully change rollout behavior, we increased the state penalty:
+- `teacher_weight = 0.1`, `state_weight = 0.2`
+- scheduled teacher forcing from `p=0.2 → 0.0` over 2000 steps
+- `K=16` rollout training
+
+### 8.1 Results (tw01_sw20)
+
+**Post (param, tw01_sw20):**
+- Teacher-forced: `dnll ≈ -35.75` (unchanged)
+- Rollout: `rollout_dnll ≈ -0.809` (unchanged)
+  - Stable rollouts: `max ||ẑ||₂ ≈ 10.12`, `rollout_n_clipped = 0`
+
+**Residual memory refit after tw01_sw20 (`resid_add_post`):**
+- Teacher-forced: `dnll ≈ -36.38` (unchanged)
+- Rollout: `rollout_dnll ≈ -0.793` (unchanged)
+
+### 8.2 Interpretation
+
+Even at `state_weight=0.2`, the added state-matching loss does not materially affect outcomes relative to tw01. For this setup (K=16, mean rollouts, clipped updates), rollout stability and performance appear dominated by the rollout likelihood term and scheduled sampling, not the state MSE penalty.
+
+This suggests that the next informative axis is **rollout horizon** (increase K) or **noise/uncertainty modeling**, rather than further increasing state matching.
+
+---
+
+## 5. What We Learned (Paper-Relevant Claims)
+
+1. **Engram-style memory does not help as a direct predictor of `Δz`** when keyed by raw `z_t` (naive memory).
+2. **Memory helps in the correct regime:** as a residual corrector on top of a parametric model, improving teacher-forced NLL and direction alignment.
+3. **Rollout instability is the dominant bottleneck**, and memory alone does not solve it.
+4. **Rollout-trained objectives fix the catastrophic divergence** and yield a stable free-running model whose rollout performance approaches the unconditional baseline (and slightly beats it here).
+5. After rollout training, **memory adds little** (at least with this simple key and residual design), suggesting that the main lever is objective alignment rather than retrieval.
+
+---
+
+## 6. Remaining Gaps / Next Experiments
+
+### 6.1 Rollout advantage gap
+Even post-finetune, the model loses most of its teacher-forced advantage once it conditions on its own states:
+- teacher-forced `dnll ≈ -35`
+- rollout `dnll ≈ -1`
+
+This suggests additional work is needed to keep the model’s induced state distribution close to the data distribution and/or to better model uncertainty.
+
+### 6.2 Ablations for maximal insight
+1. **Sweep rollout horizon K**: `{4, 8, 16, 32}` to map the stability timescale.
+2. **Mixed objective**: `L = L_1step + λ L_rollout` to recover one-step NLL without reintroducing rollout explosion.
+3. **Uncertainty modeling**: mean rollouts are extremely conservative post-finetune (`||Δẑ||` very small). Evaluate whether the model is “playing it safe” via mean shrinkage and whether learned σ is compensating.
+
+---
+
+## Appendix: Artifacts / Commands
+
+Phase 4 memory + eval:
+- `uv run python scripts/30_phase4_fit_memory.py --config configs/phase4.yaml`
+- `uv run python scripts/31_phase4_train_eval.py --config configs/phase4.yaml`
+
+Phase 4.5 rollout fine-tune:
+- `uv run python scripts/32_phase4_rollout_finetune.py --config configs/phase4.yaml`
+- Output summary: `outputs/phase4/phase4_rollout_finetune_summary.json`
+
+=== END DISCUSSION 4 ===
+
+Read the brief and discussions 1, 2, 3 and 4 in full then start a conversation with codex discussing the research direction and idea. Tell codex to read the brief and discussions 1, 2, 3 and 4, thinking rigorously, and act as a thought partner. Go back and forth exploring these ideas, connections to literature, how they might be tested. Build upon the initial ideas and thoughts explored in discussion 1, 2, 3 and 4 with critique, pushback, novelty, and depth.
+
+When you have finished the discussion with codex, write the markdown that breaks down the conversation you had into a structured document titled RESEARCH_DISCUSSION5.md and save to ./. It should be clear what was discussed, ideas explored, thoughts, and serve as building block on top of the original team brief. This will be part of several discussions the team will have.

@@ -5,6 +5,7 @@ Phase 1 training and evaluation routines.
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -19,9 +20,15 @@ from phase0.utils.logging import get_logger
 from phase0.utils.seed import set_seed
 
 from .data import Phase1Sample, iter_phase1_samples, BufferedShuffle, sample_eval_utterances
-from .mdn import MDN, sample_from_mdn
+from .mdn import MDN
 from .metrics import MetricAgg
-from .stats import OnlineMeanVar, DiagGaussianBaseline
+from .stats import (
+    OnlineMeanVar,
+    OnlineMeanVarScalar,
+    DiagGaussianBaseline,
+    FactorizedDirectionMagnitudeBaseline,
+)
+from .vmf import VmfLogNormal
 
 
 class Phase1IterableDataset(IterableDataset):
@@ -44,9 +51,11 @@ def _device_from_config(device: str) -> torch.device:
 class Phase1RunResult:
     horizon_k: int
     slice_name: str
+    model_type: str
     train: dict
     eval: dict
     rollout: Optional[dict] = None
+    final_checkpoint: Optional[str] = None
 
 
 def fit_unconditional_baseline(
@@ -87,12 +96,55 @@ def fit_unconditional_baseline(
     return DiagGaussianBaseline(mean=mean, var=var)
 
 
+def fit_factorized_baseline(
+    *,
+    frames_index_path: str | Path,
+    latents_dir: str | Path,
+    window_size: int,
+    horizon_k: int,
+    slice_name: str,
+    max_samples: Optional[int],
+) -> FactorizedDirectionMagnitudeBaseline:
+    """
+    Fit unconditional baseline for the (direction, magnitude) objective:
+      nll(dx) = nll_dir_uniform + nll_mag_lognormal.
+    """
+    mv_logm = OnlineMeanVarScalar.create()
+    dim = None
+    eps = 1e-8
+
+    for s in iter_phase1_samples(
+        frames_index_path=frames_index_path,
+        latents_dir=latents_dir,
+        split="train",
+        window_size=window_size,
+        horizon_k=horizon_k,
+        slice_name=slice_name,
+        max_samples=max_samples,
+    ):
+        if dim is None:
+            dim = int(s.delta.shape[0])
+        m = float(np.linalg.norm(s.delta))
+        m = max(m, eps)
+        mv_logm.update(math.log(m))
+
+    if dim is None or mv_logm.n == 0:
+        raise RuntimeError(
+            "No samples found to fit factorized baseline. "
+            "Check that latents_dir contains utterances for the requested split "
+            "and that frames_index_path matches those utterance_ids."
+        )
+
+    logm_mean, logm_var = mv_logm.finalize()
+    return FactorizedDirectionMagnitudeBaseline(dim=int(dim), logm_mean=float(logm_mean), logm_var=float(logm_var))
+
+
 @torch.no_grad()
 def _eval_loop(
     *,
-    model: MDN,
+    model: object,
     loader: DataLoader,
-    baseline: DiagGaussianBaseline,
+    baseline: object,
     device: torch.device,
 ) -> dict:
     model.eval()
@@ -142,6 +194,11 @@ def train_and_eval_for_k(
     dropout: float,
     min_log_sigma: float,
     max_log_sigma: float,
+    model_type: str = "mdn",
+    vmf_min_log_kappa: float = -2.0,
+    vmf_max_log_kappa: float = 12.0,
+    vmf_min_log_sigma_logm: float = -5.0,
+    vmf_max_log_sigma_logm: float = 2.0,
     batch_size: int,
     num_workers: int,
     max_steps: int,
@@ -166,30 +223,57 @@ def train_and_eval_for_k(
     ckpt_dir = out_dir / "checkpoints"
     ckpt_dir.mkdir(parents=True, exist_ok=True)
 
-    # Baseline (train-fit)
-    baseline = fit_unconditional_baseline(
-        frames_index_path=frames_index_path,
-        latents_dir=latents_dir,
-        window_size=window_size,
-        horizon_k=horizon_k,
-        slice_name=slice_name,
-        max_samples=max_train_samples,
-    )
+    model_type = str(model_type).lower().strip()
 
-    # Infer dimensions from baseline (supports Mimi latents and exported z_dyn).
-    output_dim = int(baseline.mean.shape[0])
+    # Baseline (train-fit), matched to the model objective.
+    if model_type == "mdn":
+        baseline = fit_unconditional_baseline(
+            frames_index_path=frames_index_path,
+            latents_dir=latents_dir,
+            window_size=window_size,
+            horizon_k=horizon_k,
+            slice_name=slice_name,
+            max_samples=max_train_samples,
+        )
+    elif model_type == "vmf":
+        baseline = fit_factorized_baseline(
+            frames_index_path=frames_index_path,
+            latents_dir=latents_dir,
+            window_size=window_size,
+            horizon_k=horizon_k,
+            slice_name=slice_name,
+            max_samples=max_train_samples,
+        )
+    else:
+        raise ValueError(f"Unknown model_type: {model_type} (expected mdn|vmf)")
+
+    # Infer dimensions from baseline.
+    output_dim = int(baseline.mean.shape[0]) if hasattr(baseline, "mean") else int(baseline.dim)
     input_dim = int(window_size) * output_dim
 
-    model = MDN(
-        input_dim=input_dim,
-        output_dim=output_dim,
-        n_components=n_components,
-        hidden_dim=hidden_dim,
-        n_hidden_layers=n_hidden_layers,
-        dropout=dropout,
-        min_log_sigma=min_log_sigma,
-        max_log_sigma=max_log_sigma,
-    ).to(device)
+    if model_type == "mdn":
+        model = MDN(
+            input_dim=input_dim,
+            output_dim=output_dim,
+            n_components=n_components,
+            hidden_dim=hidden_dim,
+            n_hidden_layers=n_hidden_layers,
+            dropout=dropout,
+            min_log_sigma=min_log_sigma,
+            max_log_sigma=max_log_sigma,
+        ).to(device)
+    else:
+        model = VmfLogNormal(
+            input_dim=input_dim,
+            output_dim=output_dim,
+            hidden_dim=hidden_dim,
+            n_hidden_layers=n_hidden_layers,
+            dropout=dropout,
+            min_log_kappa=vmf_min_log_kappa,
+            max_log_kappa=vmf_max_log_kappa,
+            min_log_sigma_logm=vmf_min_log_sigma_logm,
+            max_log_sigma_logm=vmf_max_log_sigma_logm,
+        ).to(device)
 
     opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
@@ -254,7 +338,7 @@ def train_and_eval_for_k(
     )
 
     logger.info(
-        f"[phase1] k={horizon_k} slice={slice_name} device={device.type} "
+        f"[phase1] model={model_type} k={horizon_k} slice={slice_name} device={device.type} "
         f"batch={batch_size} steps={max_steps}"
     )
 
@@ -285,9 +369,41 @@ def train_and_eval_for_k(
             logger.info(f"[phase1] k={horizon_k} step={step}/{max_steps} train_nll={float(nll.item()):.4f}")
 
         if save_every and step % save_every == 0:
-            ckpt_path = ckpt_dir / f"mdn_k{horizon_k}_step{step}.pt"
+            ckpt_path = ckpt_dir / f"{model_type}_k{horizon_k}_step{step}.pt"
+            if model_type == "mdn":
+                model_kwargs = {
+                    "input_dim": input_dim,
+                    "output_dim": output_dim,
+                    "n_components": int(n_components),
+                    "hidden_dim": int(hidden_dim),
+                    "n_hidden_layers": int(n_hidden_layers),
+                    "dropout": float(dropout),
+                    "min_log_sigma": float(min_log_sigma),
+                    "max_log_sigma": float(max_log_sigma),
+                }
+            else:
+                model_kwargs = {
+                    "input_dim": input_dim,
+                    "output_dim": output_dim,
+                    "hidden_dim": int(hidden_dim),
+                    "n_hidden_layers": int(n_hidden_layers),
+                    "dropout": float(dropout),
+                    "min_log_kappa": float(vmf_min_log_kappa),
+                    "max_log_kappa": float(vmf_max_log_kappa),
+                    "min_log_sigma_logm": float(vmf_min_log_sigma_logm),
+                    "max_log_sigma_logm": float(vmf_max_log_sigma_logm),
+                }
             torch.save(
-                {"model": model.state_dict(), "step": step, "horizon_k": horizon_k, "window_size": window_size},
+                {
+                    "model": model.state_dict(),
+                    "model_type": model_type,
+                    "step": step,
+                    "horizon_k": horizon_k,
+                    "window_size": window_size,
+                    "input_dim": input_dim,
+                    "output_dim": output_dim,
+                    "model_kwargs": model_kwargs,
+                },
                 ckpt_path,
             )
 
@@ -301,9 +417,41 @@ def train_and_eval_for_k(
             )
 
     # Final checkpoint
-    final_ckpt = ckpt_dir / f"mdn_k{horizon_k}_final.pt"
+    final_ckpt = ckpt_dir / f"{model_type}_k{horizon_k}_final.pt"
+    if model_type == "mdn":
+        model_kwargs = {
+            "input_dim": input_dim,
+            "output_dim": output_dim,
+            "n_components": int(n_components),
+            "hidden_dim": int(hidden_dim),
+            "n_hidden_layers": int(n_hidden_layers),
+            "dropout": float(dropout),
+            "min_log_sigma": float(min_log_sigma),
+            "max_log_sigma": float(max_log_sigma),
+        }
+    else:
+        model_kwargs = {
+            "input_dim": input_dim,
+            "output_dim": output_dim,
+            "hidden_dim": int(hidden_dim),
+            "n_hidden_layers": int(n_hidden_layers),
+            "dropout": float(dropout),
+            "min_log_kappa": float(vmf_min_log_kappa),
+            "max_log_kappa": float(vmf_max_log_kappa),
+            "min_log_sigma_logm": float(vmf_min_log_sigma_logm),
+            "max_log_sigma_logm": float(vmf_max_log_sigma_logm),
+        }
     torch.save(
-        {"model": model.state_dict(), "step": step, "horizon_k": horizon_k, "window_size": window_size},
+        {
+            "model": model.state_dict(),
+            "model_type": model_type,
+            "step": step,
+            "horizon_k": horizon_k,
+            "window_size": window_size,
+            "input_dim": input_dim,
+            "output_dim": output_dim,
+            "model_kwargs": model_kwargs,
+        },
         final_ckpt,
     )
 
@@ -331,17 +479,19 @@ def train_and_eval_for_k(
     return Phase1RunResult(
         horizon_k=horizon_k,
         slice_name=slice_name,
+        model_type=model_type,
         train=train_metrics,
         eval=eval_metrics,
         rollout=rollout_metrics,
+        final_checkpoint=str(final_ckpt),
     )
 
 
 @torch.no_grad()
 def rollout_context_gap(
     *,
-    model: MDN,
-    baseline: DiagGaussianBaseline,
+    model: object,
+    baseline: object,
     splits_dir: str | Path,
     latents_index_path: str | Path,
     latents_dir: str | Path,
@@ -417,9 +567,8 @@ def rollout_context_gap(
             agg_rollout.update(nll=nll_hat, nll_baseline=nll_b, pred_mean=pred_hat, target=dx_true_t)
 
             # Advance rollout state with sampled or mean delta under ctx_hat
-            out = model(ctx_hat_t)
-            if sample_from_mixture:
-                dx_hat = sample_from_mdn(out)[0].detach().cpu().numpy()
+            if sample_from_mixture and hasattr(model, "sample_delta"):
+                dx_hat = model.sample_delta(ctx_hat_t)[0].detach().cpu().numpy()
             else:
                 dx_hat = model.expected_mean(ctx_hat_t)[0].detach().cpu().numpy()
             x_hat[t] = x_hat[t - 1] + dx_hat.astype(np.float32, copy=False)
@@ -451,6 +600,7 @@ def write_results(
         row = {
             "horizon_k": r.horizon_k,
             "slice": r.slice_name,
+            "model_type": r.model_type,
             "train_n": r.train.get("n"),
             "train_nll": r.train.get("nll"),
             "train_nll_per_dim": r.train.get("nll_per_dim"),
@@ -467,6 +617,7 @@ def write_results(
             "eval_dnll_per_dim": r.eval.get("dnll_per_dim"),
             "eval_direction_cos": r.eval.get("direction_cosine"),
             "eval_logmag_r2": r.eval.get("logmag_r2"),
+            "final_checkpoint": r.final_checkpoint,
         }
         if r.rollout:
             row["rollout_gap_nll"] = r.rollout.get("gap_nll")

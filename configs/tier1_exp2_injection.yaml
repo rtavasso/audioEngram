@@ -1,0 +1,40 @@
+# Tier 1 - Experiment 2: Teacher-forcing injection diagnostic
+
+# Checkpoint from Exp1 (vMF) or Phase1 (MDN).
+checkpoint: ./outputs/tier1/exp1_vmf/<RUN_ID>/checkpoints/vmf_k1_final.pt
+
+device: auto
+
+data:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: null
+  frames_index: ./outputs/phase0/phase0_frames.parquet
+  splits_dir: ./outputs/phase0/splits
+
+diag:
+  seed: 42
+  slice: all
+  horizon_k: 1
+  window_size: 8
+
+  # Rollout diagnostic length
+  k_steps: 16
+
+  # Evaluation set
+  n_eval_utterances: 16
+  segments_per_utt: 8
+  max_frames_per_utterance: 2000
+
+  # Injection schedules (1-based steps, "inject after step s")
+  inject_after_steps_periodic: [4, 8, 12]
+  inject_after_steps_one_shot: [1]
+
+  # If true, uses model sampling for state rollout (otherwise uses expected mean Δx̂)
+  sample_from_model: false
+
+  # Optional: cap baseline-fitting samples (train split) for speed
+  max_train_samples: null
+
+output:
+  out_dir: ./outputs/tier1/exp2_injection
+

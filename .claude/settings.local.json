@@ -9,7 +9,8 @@
       "Bash(codex --help:*)",
       "Bash(cat:*)",
       "Bash(codex exec:*)",
-      "Skill(codex-chat)"
+      "Skill(codex-chat)",
+      "Bash(ls:*)"
     ]
   }
 }

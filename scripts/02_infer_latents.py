@@ -131,6 +131,9 @@ def main():
     autoencoder.eval()
 
     logger.info(f"Sample rate: {autoencoder.sample_rate} Hz")
+    # Mimi's pretrained checkpoint exports a fixed latent frame rate (typically 12.5 Hz).
+    # It is not configurable to alternate rates (e.g., "50 Hz") without changing the
+    # underlying model internals/checkpoint.
     logger.info(f"Frame rate: {autoencoder.frame_rate} Hz")
     logger.info(f"Latent dim: {autoencoder.latent_dim}")
     logger.info(f"Frame size: {autoencoder.frame_size} samples")
@@ -139,6 +142,7 @@ def main():
     assert autoencoder.sample_rate == config["vae"]["sample_rate"]
     assert autoencoder.frame_rate == config["vae"]["frame_rate"]
     assert autoencoder.latent_dim == config["vae"]["latent_dim"]
+    assert autoencoder.frame_size == config["vae"]["frame_size"]
 
     # Load splits
     splits = load_splits(config["output"]["splits_dir"])

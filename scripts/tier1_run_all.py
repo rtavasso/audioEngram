@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""
+Convenience wrapper to run all Tier 1 experiments sequentially.
+
+Usage:
+  uv run python scripts/tier1_run_all.py \
+    --exp1-config configs/tier1_exp1_vmf.yaml \
+    --exp2-config configs/tier1_exp2_injection.yaml \
+    --exp3-config configs/tier1_exp3_rep_compare.yaml
+"""
+
+from __future__ import annotations
+
+import argparse
+import subprocess
+import sys
+from datetime import datetime
+from pathlib import Path
+
+
+def _default_run_id() -> str:
+    return datetime.now().strftime("%Y%m%d_%H%M%S")
+
+
+def main() -> int:
+    p = argparse.ArgumentParser(description="Run all Tier 1 experiments")
+    p.add_argument("--run-id", type=str, default=None)
+    p.add_argument("--exp1-config", type=str, default="configs/tier1_exp1_vmf.yaml")
+    p.add_argument("--exp2-config", type=str, default="configs/tier1_exp2_injection.yaml")
+    p.add_argument("--exp3-config", type=str, default="configs/tier1_exp3_rep_compare.yaml")
+    p.add_argument("--exp2-horizon-k", type=int, default=1, help="Which horizon_k checkpoint to use for Exp2")
+    args = p.parse_args()
+
+    run_id = args.run_id or _default_run_id()
+
+    # Exp1
+    subprocess.check_call(
+        [sys.executable, "scripts/tier1_exp1_vmf.py", "--config", args.exp1_config, "--run-id", run_id],
+    )
+
+    # Locate the k=... final checkpoint for Exp2
+    import yaml
+
+    with open(args.exp1_config) as f:
+        exp1_cfg = yaml.safe_load(f)
+    out_root = Path(exp1_cfg["output"]["out_dir"])
+    exp1_out = out_root / run_id
+    ckpt = exp1_out / "checkpoints" / f"vmf_k{int(args.exp2_horizon_k)}_final.pt"
+    if not ckpt.exists():
+        raise FileNotFoundError(f"Expected Exp1 checkpoint not found: {ckpt}")
+
+    # Exp2
+    subprocess.check_call(
+        [
+            sys.executable,
+            "scripts/tier1_exp2_injection.py",
+            "--config",
+            args.exp2_config,
+            "--run-id",
+            run_id,
+            "--checkpoint",
+            str(ckpt),
+        ],
+    )
+
+    # Exp3
+    subprocess.check_call(
+        [sys.executable, "scripts/tier1_exp3_rep_compare.py", "--config", args.exp3_config, "--run-id", run_id],
+    )
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+

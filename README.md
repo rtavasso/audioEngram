@@ -218,6 +218,21 @@ Audio latents exhibit reusable local structure. Proceed to Phase 1: Minimal Engr
 Audio latent dynamics do not exhibit sufficient reusable structure. This is a valid negative result indicating that:
 - The variation in how latents evolve is too continuous, speaker-specific, or context-dependent
 - Lookup-based memory (as in Engram) is unsuitable for this domain
+
+## Tier 1 Experiments (Post-Phase0)
+
+These implement the immediate-priority experiments described in `ENGINEER_ONBOARDING.md`.
+
+```bash
+# Exp 1: vMF direction + LogNormal magnitude (drop-in model)
+uv run python scripts/tier1_exp1_vmf.py --config configs/tier1_exp1_vmf.yaml
+
+# Exp 2: injection diagnostic (point this at a checkpoint produced by Exp 1)
+uv run python scripts/tier1_exp2_injection.py --config configs/tier1_exp2_injection.yaml --checkpoint <path/to/*.pt>
+
+# Exp 3: representation comparison (Mimi 12.5 vs EnCodec if available)
+uv run python scripts/tier1_exp3_rep_compare.py --config configs/tier1_exp3_rep_compare.yaml
+```
 - Continuous attention mechanisms (as in CALM) remain the appropriate approach
 
 ## References

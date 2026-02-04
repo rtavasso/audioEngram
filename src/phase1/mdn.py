@@ -89,6 +89,13 @@ class MDN(nn.Module):
         pi = torch.softmax(out.logit_pi, dim=-1)  # [B, K]
         return (pi.unsqueeze(-1) * out.mu).sum(dim=1)  # [B, D]
 
+    @torch.no_grad()
+    def sample_delta(self, context_flat: torch.Tensor) -> torch.Tensor:
+        """
+        Sample Δx from the mixture. Intended for rollout diagnostics.
+        """
+        return sample_from_mdn(self.forward(context_flat))
+
     def nll(self, context_flat: torch.Tensor, delta: torch.Tensor) -> torch.Tensor:
         """
         Negative log-likelihood per sample.
@@ -116,4 +123,3 @@ def sample_from_mdn(out: MDNOutput) -> torch.Tensor:
     sigma = torch.exp(out.log_sigma[b, k])
     eps = torch.randn_like(mu)
     return mu + sigma * eps
-

@@ -1,0 +1,236 @@
+=== Research Loop ===
+Brief: TEAM_BRIEF.md
+Output: .
+Target iterations: 3
+Log file: ./.research-loop-logs/run_20260204_105752.log
+
+Existing discussions: 4
+Will run until: 7 discussions
+
+========================================
+Starting iteration 5 of 7
+========================================
+Prompt preview (first 300 chars):
+Here is the team brief and the previous discussions to read and build upon:
+
+=== TEAM BRIEF ===
+# Background
+
+# Conditional Memory for Continuous Audio Latent Dynamics: Technical Synopsis
+
+## Executive Summary
+
+This document provides the conceptual foundation for a research project investigating whe...
+
+Full prompt saved to: ./.research-loop-logs/iteration_5_prompt.txt
+Launching Claude...
+
+Codex chat state saved to: ./.research-loop-logs/iteration_5_codex
+This has been an excellent discussion with clear priorities and a decision tree. Let me now write up the full discussion document.
+
+=== TOOL CALL: Write ===
+{
+  "file_path": "/Users/rtavasso/atiercorp/audioEngram/RESEARCH_DISCUSSION5.md",
+  "content": "# Research Discussion 5: vMF Direction Modeling, Memory-as-Basis, and Experimental Priorities\n\n**Date:** 2026-02-04\n**Participants:** Claude (Opus 4.5) + Codex\n**Context:** Deep dive following Phase 4/4.5 results on rollout stability and the teacher-forced vs rollout performance gap\n\n---\n\n## 1. Executive Summary\n\nThis discussion revisits the Engram hypothesis in light of Phases 0-4.5 finding
+
+=== TOOL CALL: Bash ===
+{
+  "command": "rm codex_prompt.txt",
+  "description": "Clean up temporary prompt file"
+}
+
+=== CLAUDE ===
+I've completed the research discussion with Codex and written it up as `RESEARCH_DISCUSSION5.md`. Here's a summary of what was covered:
+
+## Key Findings from Discussion 5
+
+**1. Diagnosing the Teacher-Forced vs Rollout Gap**
+- The ~34 nats/frame gap is likely due to **mean shrinkage**: the model learns to hedge during rollout because confident predictions compound into disaster
+- This is a local optimum of the rollout objective, not necessarily what we want
+
+**2. vMF Direction Modeling**
+- Factor Δz into direction (unit vector, predictable) × magnitude (scalar, unpredictable)
+- Use von Mises-Fisher distribution for directions on the unit sphere
+- For observed cosine ~0.7 in D=512, κ ≈ 850 (moderate-to-high concentration)
+- Couple magnitude and kappa: small magnitude → low kappa (uncertain direction)
+
+**3. Memory Reformulation: From Lookup to Learned Basis**
+- Original Engram fails because continuous latents have no exact matches
+- **Memory-as-basis**: store K direction prototypes, use soft attention to select combinations
+- This sidesteps the key-matching problem entirely
+
+**4. Experimental Roadmap (Priority Order)**
+1. Minimal vMF + magnitude factorization (~50-100 LOC change)
+2. Direction archetype discovery (spherical clustering, cross-speaker validation)
+3. vMF rollout training (understand new model's behavior under rollout)
+4. Memory-as-basis (only if archetypes exist and gap persists)
+5. Temporal smoothing (last resort, changes representation)
+
+**5. Decision Criteria for Archetypes**
+- Cluster membership accuracy >60% AND within-cluster tightness >0.75 AND cross-speaker generalization → proceed with memory
+- Otherwise → stick with pure parametric vMF
+
+**6. Updated Thesis**
+The Engram principle (separate reusable structure from context-specific computation) may extend to continuous audio, but requires fundamentally different mechanisms: soft retrieval, directional factorization, and learned prototypes rather than hash-based lookup.
+
+=== TOOL RESULT ===
+
+
+
+✓ Created: ./RESEARCH_DISCUSSION5.md
+
+Discussions now: 5
+
+========================================
+Starting iteration 6 of 7
+========================================
+Prompt preview (first 300 chars):
+Here is the team brief and the previous discussions to read and build upon:
+
+=== TEAM BRIEF ===
+# Background
+
+# Conditional Memory for Continuous Audio Latent Dynamics: Technical Synopsis
+
+## Executive Summary
+
+This document provides the conceptual foundation for a research project investigating whe...
+
+Full prompt saved to: ./.research-loop-logs/iteration_6_prompt.txt
+Launching Claude...
+
+Codex chat state saved to: ./.research-loop-logs/iteration_6_codex
+{
+  "file_path": "/Users/rtavasso/atiercorp/audioEngram/.codex_prompt_temp3.md"
+}
+
+=== CLAUDE ===
+Excellent. I now have a rich multi-turn discussion with Codex. Let me synthesize this into a structured RESEARCH_DISCUSSION6.md document.
+
+=== TOOL CALL: Write ===
+{
+  "file_path": "/Users/rtavasso/atiercorp/audioEngram/RESEARCH_DISCUSSION6.md",
+  "content": "# Research Discussion 6: Critical Analysis, vMF Factorization, and Experimental Priorities\n\n**Date:** 2026-02-04\n**Participants:** Claude (Opus 4.5) + Codex\n**Context:** Deep dive following Phase 4/4.5 results on rollout stability and the teacher-forced vs rollout performance gap\n\n---\n\n## 1. Executive Summary\n\nThis discussion critically examines the proposed next steps from Discussion 5 (vMF
+
+=== TOOL CALL: Bash ===
+{
+  "command": "rm /Users/rtavasso/atiercorp/audioEngram/.codex_prompt_temp*.md",
+  "description": "Clean up temporary prompt files"
+}
+
+=== CLAUDE ===
+I've completed the research discussion with Codex and saved the structured document as `RESEARCH_DISCUSSION6.md`. Here's a summary of what was covered:
+
+## Key Findings from Discussion 6
+
+**1. Diagnosis over Architecture**
+The most important insight is that the teacher-forced vs rollout gap (-35 vs -1 ΔNLL) is primarily an **objective mismatch problem**, not a representation problem. The model learns "do nothing" because that minimizes cumulative loss under covariate shift. Diagnostic experiments should precede architectural changes.
+
+**2. Two High-Priority Experiments Identified**
+- **Teacher-forcing injection experiment**: Run rollout but periodically inject ground-truth states (Modes A-D). This reveals whether the problem is per-step error, cumulative drift, or distribution shift. Takes <1 hour.
+- **K=1 behavior comparison**: Compare teacher-forcing-trained vs rollout-trained models under teacher-forcing evaluation to determine if the model learned a global conservative prior.
+
+**3. vMF Factorization - Nuanced Assessment**
+vMF may help, but not for the reasons initially proposed. The value is enabling "slow but correctly directed" trajectories that preserve directional information while hedging on magnitude. However, Codex is more pessimistic than me on whether this breaks the conservatism feedback loop (0.15 vs 0.25 probability).
+
+**4. Memory-as-Basis is Not Really Engram**
+The continuous-key / soft-retrieval mechanism is fundamentally different from discrete lookup. The honest framing should be "learned direction codebook for continuous dynamics" rather than "Engram for audio."
+
+**5. Recommended Paper Framing**
+"Continuous AR audio needs explicit uncertainty factorization" - some aspects of audio dynamics are categorical (transition type), some are continuous (transition intensity), and conflating them hurts. This is a general contribution that survives even if memory doesn't work.
+
+**6. Experimental Roadmap**
+1. Diagnostic phase first (teacher-forcing injection, cosine vs L2 tracking)
+2. vMF as drop-in for Phase 1 if diagnostics support
+3. Direction archetype extraction
+4. Memory-as-basis only if archetypes are validated
+
+The document includes implementation notes, probability estimates, and fallback plans for negative results.
+
+=== TOOL RESULT ===
+
+
+
+✓ Created: ./RESEARCH_DISCUSSION6.md
+
+Discussions now: 6
+
+========================================
+Starting iteration 7 of 7
+========================================
+Prompt preview (first 300 chars):
+Here is the team brief and the previous discussions to read and build upon:
+
+=== TEAM BRIEF ===
+# Background
+
+# Conditional Memory for Continuous Audio Latent Dynamics: Technical Synopsis
+
+## Executive Summary
+
+This document provides the conceptual foundation for a research project investigating whe...
+
+Full prompt saved to: ./.research-loop-logs/iteration_7_prompt.txt
+Launching Claude...
+
+Codex chat state saved to: ./.research-loop-logs/iteration_7_codex
+=== CLAUDE ===
+I see there's already a RESEARCH_DISCUSSION7.md file. Let me update it with the comprehensive discussion from our conversation.
+
+=== TOOL CALL: Write ===
+{
+  "file_path": "/Users/rtavasso/atiercorp/audioEngram/RESEARCH_DISCUSSION7.md",
+  "content": "# Research Discussion 7: Critical Analysis, vMF Factorization, and the Path Forward\n\n**Date:** 2026-02-04\n**Participants:** Claude (Opus 4.5) + Codex (multi-turn discussion)\n**Context:** Deep synthesis following Phases 0-4.5 results, building on Discussions 1-6\n\n---\n\n## 1. Executive Summary\n\nThis discussion critically examines the proposed directions from Discussions 5-6 and develops a refin
+
+=== CLAUDE ===
+Now let me clean up the temporary file I created and provide a summary.
+
+=== TOOL CALL: Bash ===
+{
+  "command": "rm -f /Users/rtavasso/atiercorp/audioEngram/codex_prompt.txt",
+  "description": "Remove temporary prompt file"
+}
+
+=== CLAUDE ===
+I've completed the research discussion and saved RESEARCH_DISCUSSION7.md. Here's a summary of what was explored:
+
+## Summary of Research Discussion 7
+
+The discussion with Codex covered several critical threads building on Discussions 1-6:
+
+### Key Conclusions
+
+1. **Why Phase 0 Failed But Phase 1 Succeeded**: The core insight is that **language has categorical structure that survives coarsening, while audio has continuous structure that doesn't**. This explains why Engram-style discrete lookup works for language but fails for continuous audio latents. The solution is "memory-as-basis" (soft retrieval over prototypes) rather than hard lookup.
+
+2. **The Teacher-Forced vs Rollout Gap**: The 45-nat gap (98% lost) is partially fundamental (covariate shift is exponential) but partially addressable. The 450x magnitude shrinkage indicates the model learned "predict zero is the Nash equilibrium under accumulated error." Realistic goal: recover 10-15 nats, not all 45.
+
+3. **vMF Factorization Rationale**: The key insight is enabling "slow but correctly directed" trajectories (Mode B) rather than stationary predictions (Mode A) or fast-but-wrong (Mode C). If perceptual quality correlates more with direction than magnitude, this is a meaningful improvement.
+
+4. **Magnitude Generative Story**: Four options evaluated. Recommend starting with Option B (magnitude conditioned on direction), escalating to Option C (prosody-conditioned) if needed.
+
+5. **Relationship to CALM**: Our work is complementary, not replacement. The natural synthesis is "vMF-factored CALM" combining explicit uncertainty factorization with CALM's noise injection and consistency modeling.
+
+6. **Honest Paper Framing**: "Factorized Uncertainty Modeling for Continuous Autoregressive Audio" - a general contribution about direction/magnitude decomposition rather than an Engram-for-audio claim.
+
+### Experimental Roadmap
+
+- **This Week**: Teacher-forcing injection diagnostic (Modes A-D), cosine vs L2 tracking, MDN component analysis
+- **Next Week**: vMF factorization + rollout training, listen to outputs
+- **Week 3**: Direction archetype discovery (if vMF succeeds)
+- **Week 4**: Memory integration (if archetypes exist)
+
+The document is saved at `./RESEARCH_DISCUSSION7.md` with detailed analysis, probability estimates, implementation code in appendices, and clear stopping conditions for each experimental phase.
+
+=== TOOL RESULT ===
+
+
+
+✓ Created: ./RESEARCH_DISCUSSION7.md
+
+Discussions now: 7
+
+========================================
+Research loop complete!
+Total discussions: 7
+Logs saved to: ./.research-loop-logs
+========================================

@@ -75,6 +75,9 @@ class MimiEncoder(nn.Module):
         emb = self.encoder(x)
         if self.encoder_transformer is not None:
             (emb,) = self.encoder_transformer(emb)
+        # NOTE: Mimi's pretrained tokenizer/codec has a fixed latent frame rate.
+        # The public checkpoint is not configurable to alternate latent rates
+        # (e.g., "50 Hz") without changing the model internals/checkpoint.
         emb = self._to_framerate(emb)
 
         if project:
@@ -146,9 +149,9 @@ class MimiAutoencoder(nn.Module):
         self.encoder = MimiEncoder(mimi)
         self.decoder = MimiDecoder(mimi)
         self.sample_rate = mimi.sample_rate      # 24000
-        self.frame_rate = mimi.frame_rate        # 12.5
+        self.frame_rate = mimi.frame_rate        # 12.5 (fixed by checkpoint)
         self.latent_dim = mimi.dimension         # 512
-        self.frame_size = mimi.frame_size        # 1920
+        self.frame_size = mimi.frame_size        # 1920 (samples per latent frame)
 
     def encode(self, x: torch.Tensor, project: bool = True) -> torch.Tensor:
         """
@@ -161,7 +164,12 @@ class MimiAutoencoder(nn.Module):
                      encoder output (useful for feature extraction).
 
         Returns:
-            Latent tensor [B, 512, T'] at 12.5Hz
+            Latent tensor [B, 512, T'] at the checkpoint's fixed frame rate.
+
+        NOTE:
+            Mimi's public pretrained checkpoint is not configurable to export
+            alternative latent rates (e.g., "50 Hz") without modifying model
+            internals/checkpoints. Treat frame_rate/frame_size as fixed.
         """
         return self.encoder(x, project=project)
 
