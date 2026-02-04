@@ -1,0 +1,19 @@
+• - Exp 1 (vMF factorized Phase1 baseline):
+      - uv run python scripts/tier1_exp1_vmf.py --config configs/tier1_exp1_vmf.yaml
+      - Optional fixed run id: uv run python scripts/tier1_exp1_vmf.py --config configs/
+        tier1_exp1_vmf.yaml --run-id 20260204_a
+  - Exp 2 (injection diagnostic; point at an Exp1 checkpoint):
+      - uv run python scripts/tier1_exp2_injection.py --config configs/tier1_exp2_injection.yaml
+        --checkpoint outputs/tier1/exp1_vmf/<RUN_ID>/checkpoints/vmf_k1_final.pt
+      - Optional run id (keeps outputs aligned): uv run python scripts/tier1_exp2_injection.py
+        --config configs/tier1_exp2_injection.yaml --run-id <RUN_ID> --checkpoint outputs/tier1/
+        exp1_vmf/<RUN_ID>/checkpoints/vmf_k1_final.pt
+  - Exp 3 (representation comparison; Mimi fixed-rate + EnCodec if available):
+      - uv run python scripts/tier1_exp3_rep_compare.py --config configs/
+        tier1_exp3_rep_compare.yaml
+      - Force recompute cached latents/frames: uv run python scripts/tier1_exp3_rep_compare.py
+        --config configs/tier1_exp3_rep_compare.yaml --force
+  - Run all Tier1 in sequence:
+      - uv run python scripts/tier1_run_all.py --exp1-config configs/tier1_exp1_vmf.yaml --exp2-
+        config configs/tier1_exp2_injection.yaml --exp3-config configs/tier1_exp3_rep_compare.yaml
+        --run-id <RUN_ID>
