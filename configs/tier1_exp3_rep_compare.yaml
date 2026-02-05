@@ -65,6 +65,10 @@ representations:
 
   - name: encodec
     type: encodec
+    # HuggingFace transformers EnCodec (24kHz). Outputs either discrete codebooks ("codes")
+    # or encoder features ("encoder").
+    model_id: facebook/encodec_24khz
+    representation: codes
 
 output:
   out_dir: ./outputs/tier1/exp3_rep_compare

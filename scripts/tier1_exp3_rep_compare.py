@@ -154,50 +154,81 @@ def _extract_encodec_latents(
     index_path: str | Path,
     device: str,
     logger,
+    model_id: str = "facebook/encodec_24khz",
+    representation: str = "codes",
 ) -> None:
-    try:
-        import torch
-        import torchaudio
-    except Exception as e:
-        raise RuntimeError("EnCodec extraction requires torch + torchaudio installed.") from e
-
     from phase0.data.io import save_latents_zarr
     from phase0.data.librispeech import load_audio
     from phase0.vae.infer_latents import compute_frame_energy
 
-    # Try to load EnCodec model from torchaudio.
-    model = None
-    sample_rate = 24000
-    if hasattr(torchaudio, "pipelines") and hasattr(torchaudio.pipelines, "ENCODEC_24KHZ"):
-        bundle = torchaudio.pipelines.ENCODEC_24KHZ
-        sample_rate = int(getattr(bundle, "sample_rate", 24000))
-        model = bundle.get_model().to(device)
-    elif hasattr(torchaudio, "models") and hasattr(torchaudio.models, "encodec_model_24khz"):
-        model = torchaudio.models.encodec_model_24khz().to(device)
-        sample_rate = 24000
-    else:
-        raise RuntimeError("Could not find an EnCodec model in torchaudio (expected pipelines.ENCODEC_24KHZ).")
+    try:
+        import torch
+        from transformers import EncodecModel, AutoProcessor
+    except Exception as e:
+        raise RuntimeError(
+            "EnCodec extraction requires `transformers` + `datasets` deps installed "
+            "(see pyproject.toml)."
+        ) from e
 
+    representation = str(representation).lower().strip()
+    if representation not in {"codes", "encoder"}:
+        raise ValueError(f"Unknown EnCodec representation: {representation} (expected codes|encoder)")
+
+    processor = AutoProcessor.from_pretrained(str(model_id))
+    sample_rate = int(getattr(processor, "sampling_rate", 24000))
+    model = EncodecModel.from_pretrained(str(model_id)).to(device)
     model.eval()
-    logger.info(f"[exp3] Loaded EnCodec model (sr={sample_rate})")
+    logger.info(f"[exp3] Loaded EnCodec via transformers: {model_id} (sr={sample_rate}, rep={representation})")
 
     entries = []
     for utt in utterances:
         try:
             wav, _sr = load_audio(utt.audio_path, target_sr=sample_rate)
-            wav = wav.unsqueeze(0).to(device)  # [1,1,T]
+            audio = wav.squeeze(0).detach().cpu().numpy()
+
+            inputs = processor(raw_audio=audio, sampling_rate=sample_rate, return_tensors="pt")
+            input_values = inputs["input_values"].to(device)
+            padding_mask = inputs.get("padding_mask")
+            if padding_mask is not None:
+                padding_mask = padding_mask.to(device)
+
             with torch.inference_mode():
-                if hasattr(model, "encoder"):
-                    emb = model.encoder(wav)  # [B,C,T']
+                if representation == "encoder":
+                    if not hasattr(model, "encoder"):
+                        raise RuntimeError("EncodecModel missing .encoder; cannot extract encoder features.")
+                    enc_out = model.encoder(input_values, padding_mask) if padding_mask is not None else model.encoder(input_values)
+                    if hasattr(enc_out, "last_hidden_state"):
+                        enc = enc_out.last_hidden_state
+                    elif torch.is_tensor(enc_out):
+                        enc = enc_out
+                    else:
+                        raise RuntimeError("Unexpected encoder output type; expected Tensor or object with .last_hidden_state")
+
+                    # Try to coerce to [1, C, T']
+                    if enc.ndim == 3 and enc.shape[0] == 1:
+                        pass
+                    elif enc.ndim == 2 and enc.shape[0] == 1:
+                        enc = enc.unsqueeze(1)
+                    else:
+                        raise RuntimeError(f"Unexpected encoder tensor shape: {tuple(enc.shape)}")
+
+                    emb = enc.detach().float().cpu()
+                    lat = emb.squeeze(0).permute(1, 0).contiguous().numpy()  # [T',C]
                 else:
-                    raise RuntimeError("EnCodec model missing .encoder; cannot extract continuous latents.")
-            emb = emb.detach().float().cpu()
-            lat = emb.squeeze(0).permute(1, 0).contiguous().numpy()  # [T',C]
+                    out = model(input_values, padding_mask)
+                    if not hasattr(out, "audio_codes") or out.audio_codes is None:
+                        raise RuntimeError("EncodecModel output missing audio_codes; cannot extract codes.")
+                    codes = out.audio_codes.detach().cpu()
+                    # Expected: [B, Q, T'] where Q=#codebooks.
+                    if codes.ndim != 3 or codes.shape[0] != 1:
+                        raise RuntimeError(f"Unexpected audio_codes shape: {tuple(codes.shape)}")
+                    lat = codes.squeeze(0).permute(1, 0).contiguous().to(torch.float32).numpy()  # [T',Q]
+
             n_frames = int(lat.shape[0])
 
             # Energy aligned by uniform partition into n_frames slices.
             frame_size = int((int(wav.shape[-1]) + n_frames - 1) // max(n_frames, 1))
-            energy = compute_frame_energy(wav.squeeze(0).cpu(), frame_size, n_frames)
+            energy = compute_frame_energy(wav, frame_size, n_frames)
 
             # Timestamps from effective frame rate (approx).
             duration_sec = float(utt.duration_sec)
@@ -315,6 +346,8 @@ def main() -> int:
                         index_path=latents_index,
                         device=str(device),
                         logger=logger,
+                        model_id=str(rep.get("model_id", "facebook/encodec_24khz")),
+                        representation=str(rep.get("representation", "codes")),
                     )
                 except Exception as e:
                     logger.warning(f"[exp3] Skipping {name}: EnCodec extraction unavailable ({e})")

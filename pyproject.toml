@@ -28,6 +28,10 @@ dependencies = [
     "safetensors>=0.4.0,<0.8.0",
     "huggingface-hub>=0.24,<1.0.0",
     "einops>=0.7,<0.9",
+
+    # HF model/dataset utilities (used for EnCodec in Tier1 Exp3)
+    "datasets>=2.18,<4.0",
+    "transformers>=4.41,<5.0",
 ]
 
 [project.optional-dependencies]
