@@ -112,6 +112,10 @@ def main() -> int:
             rollout_n_eval_utterances=int(cfg["rollout"]["n_eval_utterances"]),
             rollout_max_frames_per_utt=int(cfg["rollout"]["max_frames_per_utterance"]),
             rollout_sample_from_mixture=bool(cfg["rollout"]["sample_from_model"]),
+            compile_model=bool(cfg["train"].get("compile", False)),
+            compile_mode=str(cfg["train"].get("compile_mode", "default")),
+            amp=bool(cfg["train"].get("amp", False)),
+            amp_dtype=str(cfg["train"].get("amp_dtype", "bf16")),
         )
         results.append(r)
 

@@ -233,6 +233,13 @@ uv run python scripts/tier1_exp2_injection.py --config configs/tier1_exp2_inject
 # Exp 3: representation comparison (Mimi 12.5 vs EnCodec if available)
 uv run python scripts/tier1_exp3_rep_compare.py --config configs/tier1_exp3_rep_compare.yaml
 ```
+
+Speed tips:
+- Tier1 scripts log `Device: ...` — if it says `cpu`, Exp1/Exp3 can take a very long time.
+- For quicker iterations, cut `train.max_steps`, `context.horizons_k`, and `train.max_eval_samples`, and set `rollout.enabled: false`.
+- You can also try increasing `train.num_workers` to overlap data prep (the Phase 1 IterableDataset is sharded across workers).
+- Optional training knobs (in `train:`) include `compile`, `compile_mode`, `amp`, and `amp_dtype`.
+- For Exp2, `diag.max_train_samples` caps baseline-fitting cost; reducing `diag.n_eval_utterances` / `diag.segments_per_utt` also helps.
 - Continuous attention mechanisms (as in CALM) remain the appropriate approach
 
 ## References

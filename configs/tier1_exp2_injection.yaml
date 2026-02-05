@@ -16,6 +16,8 @@ diag:
   slice: all
   horizon_k: 1
   window_size: 8
+  # Optional: cap baseline-fitting samples (train split) for speed
+  max_train_samples: null
 
   # Rollout diagnostic length
   k_steps: 16
@@ -31,9 +33,6 @@ diag:
 
   # If true, uses model sampling for state rollout (otherwise uses expected mean Δx̂)
   sample_from_model: false
-
-  # Optional: cap baseline-fitting samples (train split) for speed
-  max_train_samples: null
 
 output:
   out_dir: ./outputs/tier1/exp2_injection

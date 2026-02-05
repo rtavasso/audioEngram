@@ -376,6 +376,10 @@ def main() -> int:
                 rollout_max_frames_per_utt=int(cfg["rollout"]["max_frames_per_utterance"]),
                 rollout_sample_from_mixture=bool(cfg["rollout"]["sample_from_mixture"]),
                 model_type="mdn",
+                compile_model=bool(cfg["train"].get("compile", False)),
+                compile_mode=str(cfg["train"].get("compile_mode", "default")),
+                amp=bool(cfg["train"].get("amp", False)),
+                amp_dtype=str(cfg["train"].get("amp_dtype", "bf16")),
             )
             results.append(r)
 

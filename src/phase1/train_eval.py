@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass
+from itertools import islice
 from pathlib import Path
 from typing import Optional
 
@@ -19,7 +20,7 @@ from phase0.features.normalization import compute_delta
 from phase0.utils.logging import get_logger
 from phase0.utils.seed import set_seed
 
-from .data import Phase1Sample, iter_phase1_samples, BufferedShuffle, sample_eval_utterances
+from .data import Phase1Sample, iter_phase1_samples, iter_phase1_deltas, BufferedShuffle, sample_eval_utterances
 from .mdn import MDN
 from .metrics import MetricAgg
 from .stats import (
@@ -37,7 +38,12 @@ class Phase1IterableDataset(IterableDataset):
         self._iterator_fn = iterator_fn
 
     def __iter__(self):
-        return self._iterator_fn()
+        it = self._iterator_fn()
+        worker_info = torch.utils.data.get_worker_info()
+        if worker_info is None:
+            return it
+        # IterableDataset must be sharded manually across DataLoader workers to avoid duplicates.
+        return islice(it, worker_info.id, None, worker_info.num_workers)
 
 
 def _device_from_config(device: str) -> torch.device:
@@ -71,7 +77,7 @@ def fit_unconditional_baseline(
     Fit unconditional diag-Gaussian baseline p(Δx) on train split.
     """
     mv = None
-    for s in iter_phase1_samples(
+    for dx in iter_phase1_deltas(
         frames_index_path=frames_index_path,
         latents_dir=latents_dir,
         split="train",
@@ -81,8 +87,8 @@ def fit_unconditional_baseline(
         max_samples=max_samples,
     ):
         if mv is None:
-            mv = OnlineMeanVar.create(dim=int(s.delta.shape[0]))
-        mv.update(s.delta)
+            mv = OnlineMeanVar.create(dim=int(dx.shape[0]))
+        mv.update(dx)
 
     if mv is None:
         raise RuntimeError(
@@ -113,7 +119,7 @@ def fit_factorized_baseline(
     dim = None
     eps = 1e-8
 
-    for s in iter_phase1_samples(
+    for dx in iter_phase1_deltas(
         frames_index_path=frames_index_path,
         latents_dir=latents_dir,
         split="train",
@@ -123,8 +129,8 @@ def fit_factorized_baseline(
         max_samples=max_samples,
     ):
         if dim is None:
-            dim = int(s.delta.shape[0])
-        m = float(np.linalg.norm(s.delta))
+            dim = int(dx.shape[0])
+        m = float(np.linalg.norm(dx))
         m = max(m, eps)
         mv_logm.update(math.log(m))
 
@@ -215,6 +221,10 @@ def train_and_eval_for_k(
     rollout_n_eval_utterances: int,
     rollout_max_frames_per_utt: int,
     rollout_sample_from_mixture: bool,
+    compile_model: bool = False,
+    compile_mode: str = "default",
+    amp: bool = False,
+    amp_dtype: str = "bf16",
 ) -> Phase1RunResult:
     logger = get_logger()
     set_seed(seed)
@@ -275,7 +285,28 @@ def train_and_eval_for_k(
             max_log_sigma_logm=vmf_max_log_sigma_logm,
         ).to(device)
 
-    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+    if device.type == "cuda":
+        torch.backends.cuda.matmul.allow_tf32 = True
+        try:
+            torch.set_float32_matmul_precision("high")
+        except Exception:
+            pass
+
+    if bool(compile_model):
+        try:
+            model = torch.compile(model, mode=str(compile_mode))
+        except Exception as e:
+            logger.warning(f"[phase1] torch.compile failed; continuing without compile ({e})")
+
+    opt_kwargs = {"lr": lr, "weight_decay": weight_decay}
+    if device.type == "cuda":
+        # Fused AdamW is a nice speedup when available.
+        opt_kwargs["fused"] = True
+    try:
+        opt = torch.optim.AdamW(model.parameters(), **opt_kwargs)
+    except TypeError:
+        opt_kwargs.pop("fused", None)
+        opt = torch.optim.AdamW(model.parameters(), **opt_kwargs)
 
     # Train iterator with buffered shuffle
     base_it = lambda: iter_phase1_samples(
@@ -291,13 +322,16 @@ def train_and_eval_for_k(
     train_it = lambda: shuffler(base_it())
     train_ds = Phase1IterableDataset(train_it)
 
-    train_loader = DataLoader(
-        train_ds,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        collate_fn=_collate_fn,
-        pin_memory=(device.type == "cuda"),
-    )
+    train_loader_kwargs = {
+        "batch_size": batch_size,
+        "num_workers": num_workers,
+        "collate_fn": _collate_fn,
+        "pin_memory": (device.type == "cuda"),
+    }
+    if num_workers and int(num_workers) > 0:
+        train_loader_kwargs["persistent_workers"] = True
+        train_loader_kwargs["prefetch_factor"] = 2
+    train_loader = DataLoader(train_ds, **train_loader_kwargs)
 
     # Eval loaders (no shuffle)
     eval_train_ds = Phase1IterableDataset(
@@ -346,6 +380,16 @@ def train_and_eval_for_k(
     model.train()
     train_iter = iter(train_loader)
 
+    use_amp = bool(amp) and device.type in ("cuda", "cpu")
+    amp_dtype_t = torch.bfloat16 if str(amp_dtype).lower() in ("bf16", "bfloat16") else torch.float16
+    if device.type == "cpu" and amp_dtype_t == torch.float16:
+        amp_dtype_t = torch.bfloat16
+        logger.warning("[phase1] amp_dtype=float16 is unsupported on CPU; using bf16")
+    autocast = torch.autocast(device_type=device.type, dtype=amp_dtype_t, enabled=use_amp)
+    scaler = None
+    if use_amp and device.type == "cuda" and amp_dtype_t == torch.float16:
+        scaler = torch.cuda.amp.GradScaler()
+
     while step < max_steps:
         try:
             batch = next(train_iter)
@@ -353,15 +397,23 @@ def train_and_eval_for_k(
             train_iter = iter(train_loader)
             batch = next(train_iter)
 
-        ctx = batch["context"].to(device)
-        dx = batch["delta"].to(device)
+        ctx = batch["context"].to(device, non_blocking=(device.type == "cuda"))
+        dx = batch["delta"].to(device, non_blocking=(device.type == "cuda"))
 
         opt.zero_grad(set_to_none=True)
-        nll = model.nll(ctx, dx).mean()
-        nll.backward()
+        with autocast:
+            nll = model.nll(ctx, dx).mean()
+        if scaler is None:
+            nll.backward()
+        else:
+            scaler.scale(nll).backward()
         if grad_clip_norm and grad_clip_norm > 0:
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=grad_clip_norm)
-        opt.step()
+        if scaler is None:
+            opt.step()
+        else:
+            scaler.step(opt)
+            scaler.update()
 
         step += 1
 

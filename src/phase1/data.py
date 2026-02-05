@@ -191,6 +191,92 @@ def iter_phase1_samples(
                 return
 
 
+def iter_phase1_deltas(
+    *,
+    frames_index_path: str | Path,
+    latents_dir: str | Path,
+    split: str,
+    window_size: int,
+    horizon_k: int,
+    slice_name: str = "all",
+    max_samples: Optional[int] = None,
+) -> Iterator[np.ndarray]:
+    """
+    Stream only Δx samples (no context) for baseline fitting.
+
+    Uses the same row filtering / validity constraints as iter_phase1_samples so
+    baseline stats match the training/eval sample distribution for (W, k, slice).
+    """
+    frames_index_path = Path(frames_index_path)
+    latent_store = LatentStore(latents_dir)
+    row_ok = _default_row_filter(slice_name=slice_name)
+
+    dataset = ds.dataset(str(frames_index_path), format="parquet")
+    scanner = dataset.scanner(
+        columns=[
+            "utterance_id",
+            "t",
+            "pos_frac",
+            "is_high_energy",
+            "split",
+        ],
+        filter=ds.field("split") == split,
+        batch_size=8192,
+    )
+
+    current_utt_id: Optional[str] = None
+    current_latents: Optional[np.ndarray] = None
+    n_yielded = 0
+
+    # Match iter_phase1_samples constraints (delta needs t>=1; context validity needs t>= (W-1)+k).
+    min_t = max(1, (window_size - 1) + horizon_k)
+
+    for record_batch in scanner.to_batches():
+        cols = record_batch.columns
+        utt_col, t_col, pos_col, energy_col, _split_col = cols
+        n_rows = record_batch.num_rows
+
+        for i in range(n_rows):
+            utt_id = str(_as_python_scalar(utt_col[i]))
+            t = int(_as_python_scalar(t_col[i]))
+            if t < min_t:
+                continue
+
+            is_high_energy = bool(_as_python_scalar(energy_col[i]))
+            pos_frac = float(_as_python_scalar(pos_col[i]))
+            if not row_ok(is_high_energy, pos_frac):
+                continue
+
+            if current_utt_id != utt_id:
+                if utt_id not in latent_store:
+                    current_utt_id = None
+                    current_latents = None
+                    continue
+                try:
+                    current_latents = latent_store.get_latents(utt_id)
+                    current_utt_id = utt_id
+                except Exception:
+                    current_utt_id = None
+                    current_latents = None
+                    continue
+
+            x = current_latents
+            if x is None:
+                continue
+            if t >= x.shape[0]:
+                continue
+
+            try:
+                dx = compute_delta(x, t).astype(np.float32, copy=False)
+            except Exception:
+                continue
+
+            yield dx
+            n_yielded += 1
+            if max_samples is not None and n_yielded >= int(max_samples):
+                return
+
+
 def sample_eval_utterances(
     *,
     splits_dir: str | Path,

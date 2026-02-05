@@ -30,6 +30,11 @@ train:
   seed: 42
   batch_size: 256
   num_workers: 0
+  # Optional speed knobs (off by default for reproducibility)
+  compile: false
+  compile_mode: default
+  amp: false
+  amp_dtype: bf16
   max_steps: 25000
   lr: 1.0e-3
   weight_decay: 1.0e-4
