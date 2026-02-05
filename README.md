@@ -37,6 +37,16 @@ uv run python -c "import torch; print(f'CUDA available: {torch.cuda.is_available
 
 Execute the scripts in order. Each script depends on outputs from previous steps.
 
+### One-command setup (optional)
+
+To set up a fresh machine (clone repo, install deps, download LibriSpeech, build Phase 0 artifacts) in one shot:
+
+```bash
+python3 instance_setup.py
+```
+
+This script is intentionally static for this project.
+
 ### Step 1: Download LibriSpeech
 
 Download the train-clean-100 subset (~6GB):
