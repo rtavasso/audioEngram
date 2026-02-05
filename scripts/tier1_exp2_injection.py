@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -37,6 +38,11 @@ def _default_run_id() -> str:
 
 
 def _write_plots(out_dir: Path, per_step: pd.DataFrame) -> None:
+    # This script only saves figures to disk; always use a non-interactive backend.
+    # In notebook environments (e.g., Colab) MPLBACKEND may be set to an inline backend
+    # string that isn't valid in a plain Python process, which would otherwise crash
+    # at import time.
+    os.environ["MPLBACKEND"] = "Agg"
     import matplotlib.pyplot as plt
 
     plots_dir = out_dir / "plots"

@@ -29,44 +29,72 @@ def main() -> int:
     p.add_argument("--exp2-config", type=str, default="configs/tier1_exp2_injection.yaml")
     p.add_argument("--exp3-config", type=str, default="configs/tier1_exp3_rep_compare.yaml")
     p.add_argument("--exp2-horizon-k", type=int, default=1, help="Which horizon_k checkpoint to use for Exp2")
+    p.add_argument(
+        "--resume",
+        action="store_true",
+        help="Skip experiments if their output for --run-id already exists",
+    )
     args = p.parse_args()
 
     run_id = args.run_id or _default_run_id()
 
     # Exp1
-    subprocess.check_call(
-        [sys.executable, "scripts/tier1_exp1_vmf.py", "--config", args.exp1_config, "--run-id", run_id],
-    )
-
-    # Locate the k=... final checkpoint for Exp2
     import yaml
 
     with open(args.exp1_config) as f:
         exp1_cfg = yaml.safe_load(f)
-    out_root = Path(exp1_cfg["output"]["out_dir"])
-    exp1_out = out_root / run_id
+    exp1_out_root = Path(exp1_cfg["output"]["out_dir"])
+    exp1_out = exp1_out_root / run_id
+    exp1_done = (exp1_out / "metrics.json").exists() and (exp1_out / "tables.csv").exists()
+
+    if args.resume and exp1_done:
+        pass
+    else:
+        subprocess.check_call(
+            [sys.executable, "scripts/tier1_exp1_vmf.py", "--config", args.exp1_config, "--run-id", run_id],
+        )
+
+    # Locate the k=... final checkpoint for Exp2
     ckpt = exp1_out / "checkpoints" / f"vmf_k{int(args.exp2_horizon_k)}_final.pt"
     if not ckpt.exists():
         raise FileNotFoundError(f"Expected Exp1 checkpoint not found: {ckpt}")
 
     # Exp2
-    subprocess.check_call(
-        [
-            sys.executable,
-            "scripts/tier1_exp2_injection.py",
-            "--config",
-            args.exp2_config,
-            "--run-id",
-            run_id,
-            "--checkpoint",
-            str(ckpt),
-        ],
-    )
+    with open(args.exp2_config) as f:
+        exp2_cfg = yaml.safe_load(f)
+    exp2_out_root = Path(exp2_cfg["output"]["out_dir"])
+    exp2_out = exp2_out_root / run_id
+    exp2_done = (exp2_out / "metrics.json").exists()
+
+    if args.resume and exp2_done:
+        pass
+    else:
+        subprocess.check_call(
+            [
+                sys.executable,
+                "scripts/tier1_exp2_injection.py",
+                "--config",
+                args.exp2_config,
+                "--run-id",
+                run_id,
+                "--checkpoint",
+                str(ckpt),
+            ],
+        )
 
     # Exp3
-    subprocess.check_call(
-        [sys.executable, "scripts/tier1_exp3_rep_compare.py", "--config", args.exp3_config, "--run-id", run_id],
-    )
+    with open(args.exp3_config) as f:
+        exp3_cfg = yaml.safe_load(f)
+    exp3_out_root = Path(exp3_cfg["output"]["out_dir"])
+    exp3_out = exp3_out_root / run_id
+    exp3_done = (exp3_out / "summary.csv").exists()
+
+    if args.resume and exp3_done:
+        pass
+    else:
+        subprocess.check_call(
+            [sys.executable, "scripts/tier1_exp3_rep_compare.py", "--config", args.exp3_config, "--run-id", run_id],
+        )
 
     return 0
 
