@@ -1,0 +1,30 @@
+{
+  "experiment": "exp1b_vmf_rollout",
+  "run_id": "stage1_fix2",
+  "config_path": "configs/tier1_exp1b_vmf_rollout.yaml",
+  "cli_args": [
+    "--config",
+    "configs/tier1_exp1b_vmf_rollout.yaml",
+    "--checkpoint",
+    "outputs/tier1/exp1_vmf/stage1/checkpoints/vmf_k1_final.pt",
+    "--run-id",
+    "stage1_fix2"
+  ],
+  "git_commit": "a1a1bc2",
+  "start_time": "2026-02-06T06:19:23+00:00",
+  "status": "completed",
+  "environment": {
+    "python_version": "3.11.14",
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA TITAN X (Pascal)",
+    "platform": "Linux-6.8.0-94-generic-x86_64-with-glibc2.39"
+  },
+  "output_dir": "outputs/tier1/exp1b_vmf_rollout/stage1_fix2",
+  "end_time": "2026-02-06T06:36:50+00:00",
+  "duration_sec": 1047.0,
+  "key_metrics": {
+    "final_loss": -948.3599243164062,
+    "D_rollout_cos_final": -0.011694135493598878
+  }
+}

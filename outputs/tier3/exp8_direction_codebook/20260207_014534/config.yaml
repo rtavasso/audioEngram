@@ -1,0 +1,24 @@
+seed: 42
+data:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: ./outputs/phase0/latents_index.parquet
+  splits_dir: ./outputs/phase0/splits
+codebook:
+  k_values:
+  - 64
+  near_zero_epsilons:
+  - 0.001
+  - 0.01
+  - 0.1
+  - 0.5
+  kmeans_n_init: 1
+  kmeans_max_iter: 300
+  kmeans_batch_size: 4096
+eval:
+  n_utterances: 10
+  output_sample_rate: 48000
+  mimi_checkpoint: null
+train:
+  device: auto
+output:
+  out_dir: ./outputs/tier3/exp8_direction_codebook

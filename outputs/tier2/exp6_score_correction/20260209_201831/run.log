@@ -1,0 +1,280 @@
+2026-02-09 20:18:31 | INFO     | phase0 | [tracking] Registered run: experiment=exp6_score_correction run_id=20260209_201831 git=a1a1bc2 out=outputs/tier2/exp6_score_correction/20260209_201831
+2026-02-09 20:18:31 | INFO     | phase0 | [exp6] Loading Phase 1 checkpoint: outputs/phase1/checkpoints/mdn_k1_final.pt
+2026-02-09 20:19:25 | INFO     | phase0 | [exp6] 22216 train utterances for score model
+2026-02-09 20:19:25 | INFO     | phase0 | [exp6] Training score model... (conditional=True)
+2026-02-09 20:19:26 | INFO     | phase0 | [score_train_cond] dim=512 cond_dim=4096 hidden=1024 layers=4 sigma=[0.01,1.0] batch=256 steps=20000 W=8 k=1
+2026-02-09 20:19:27 | INFO     | phase0 | [score_train_cond] step=100/20000 loss=550316.2872
+2026-02-09 20:19:28 | INFO     | phase0 | [score_train_cond] step=200/20000 loss=549753.8697
+2026-02-09 20:19:29 | INFO     | phase0 | [score_train_cond] step=300/20000 loss=561560.0944
+2026-02-09 20:19:30 | INFO     | phase0 | [score_train_cond] step=400/20000 loss=557744.7025
+2026-02-09 20:19:31 | INFO     | phase0 | [score_train_cond] step=500/20000 loss=556427.5134
+2026-02-09 20:19:32 | INFO     | phase0 | [score_train_cond] step=600/20000 loss=553573.0584
+2026-02-09 20:19:33 | INFO     | phase0 | [score_train_cond] step=700/20000 loss=558080.1866
+2026-02-09 20:19:34 | INFO     | phase0 | [score_train_cond] step=800/20000 loss=555575.9244
+2026-02-09 20:19:35 | INFO     | phase0 | [score_train_cond] step=900/20000 loss=561037.9313
+2026-02-09 20:19:35 | INFO     | phase0 | [score_train_cond] step=1000/20000 loss=553371.4500
+2026-02-09 20:19:36 | INFO     | phase0 | [score_train_cond] step=1100/20000 loss=559298.2219
+2026-02-09 20:19:37 | INFO     | phase0 | [score_train_cond] step=1200/20000 loss=556176.2822
+2026-02-09 20:19:38 | INFO     | phase0 | [score_train_cond] step=1300/20000 loss=550328.3309
+2026-02-09 20:19:39 | INFO     | phase0 | [score_train_cond] step=1400/20000 loss=565356.4459
+2026-02-09 20:19:40 | INFO     | phase0 | [score_train_cond] step=1500/20000 loss=566024.0656
+2026-02-09 20:19:41 | INFO     | phase0 | [score_train_cond] step=1600/20000 loss=557575.0166
+2026-02-09 20:19:42 | INFO     | phase0 | [score_train_cond] step=1700/20000 loss=550332.4625
+2026-02-09 20:19:43 | INFO     | phase0 | [score_train_cond] step=1800/20000 loss=556083.9391
+2026-02-09 20:19:43 | INFO     | phase0 | [score_train_cond] step=1900/20000 loss=552049.3047
+2026-02-09 20:19:44 | INFO     | phase0 | [score_train_cond] step=2000/20000 loss=546160.7084
+2026-02-09 20:19:45 | INFO     | phase0 | [score_train_cond] step=2100/20000 loss=561599.0628
+2026-02-09 20:19:46 | INFO     | phase0 | [score_train_cond] step=2200/20000 loss=547303.8031
+2026-02-09 20:19:47 | INFO     | phase0 | [score_train_cond] step=2300/20000 loss=557591.7775
+2026-02-09 20:19:48 | INFO     | phase0 | [score_train_cond] step=2400/20000 loss=549270.2953
+2026-02-09 20:19:49 | INFO     | phase0 | [score_train_cond] step=2500/20000 loss=561730.7716
+2026-02-09 20:19:49 | INFO     | phase0 | [score_train_cond] step=2600/20000 loss=564659.6769
+2026-02-09 20:19:50 | INFO     | phase0 | [score_train_cond] step=2700/20000 loss=561974.0513
+2026-02-09 20:19:51 | INFO     | phase0 | [score_train_cond] step=2800/20000 loss=562607.5216
+2026-02-09 20:19:52 | INFO     | phase0 | [score_train_cond] step=2900/20000 loss=562426.9769
+2026-02-09 20:19:53 | INFO     | phase0 | [score_train_cond] step=3000/20000 loss=558202.9359
+2026-02-09 20:19:54 | INFO     | phase0 | [score_train_cond] step=3100/20000 loss=560547.7094
+2026-02-09 20:19:55 | INFO     | phase0 | [score_train_cond] step=3200/20000 loss=564016.0791
+2026-02-09 20:19:56 | INFO     | phase0 | [score_train_cond] step=3300/20000 loss=541631.1288
+2026-02-09 20:19:57 | INFO     | phase0 | [score_train_cond] step=3400/20000 loss=557035.7056
+2026-02-09 20:19:57 | INFO     | phase0 | [score_train_cond] step=3500/20000 loss=552717.1322
+2026-02-09 20:19:58 | INFO     | phase0 | [score_train_cond] step=3600/20000 loss=553273.7584
+2026-02-09 20:19:59 | INFO     | phase0 | [score_train_cond] step=3700/20000 loss=553734.7241
+2026-02-09 20:20:00 | INFO     | phase0 | [score_train_cond] step=3800/20000 loss=546737.4234
+2026-02-09 20:20:01 | INFO     | phase0 | [score_train_cond] step=3900/20000 loss=549506.2034
+2026-02-09 20:20:01 | INFO     | phase0 | [score_train_cond] step=4000/20000 loss=555925.0406
+2026-02-09 20:20:02 | INFO     | phase0 | [score_train_cond] step=4100/20000 loss=551772.2716
+2026-02-09 20:20:03 | INFO     | phase0 | [score_train_cond] step=4200/20000 loss=555566.0794
+2026-02-09 20:20:04 | INFO     | phase0 | [score_train_cond] step=4300/20000 loss=555149.8144
+2026-02-09 20:20:05 | INFO     | phase0 | [score_train_cond] step=4400/20000 loss=552146.5784
+2026-02-09 20:20:06 | INFO     | phase0 | [score_train_cond] step=4500/20000 loss=547872.5319
+2026-02-09 20:20:07 | INFO     | phase0 | [score_train_cond] step=4600/20000 loss=551608.5541
+2026-02-09 20:20:08 | INFO     | phase0 | [score_train_cond] step=4700/20000 loss=560469.6837
+2026-02-09 20:20:09 | INFO     | phase0 | [score_train_cond] step=4800/20000 loss=573603.1887
+2026-02-09 20:20:10 | INFO     | phase0 | [score_train_cond] step=4900/20000 loss=554485.9781
+2026-02-09 20:20:11 | INFO     | phase0 | [score_train_cond] step=5000/20000 loss=563715.9928
+2026-02-09 20:20:11 | INFO     | phase0 | [score_train_cond] step=5100/20000 loss=565765.1794
+2026-02-09 20:20:12 | INFO     | phase0 | [score_train_cond] step=5200/20000 loss=556972.1475
+2026-02-09 20:20:13 | INFO     | phase0 | [score_train_cond] step=5300/20000 loss=560651.1919
+2026-02-09 20:20:14 | INFO     | phase0 | [score_train_cond] step=5400/20000 loss=559108.0825
+2026-02-09 20:20:15 | INFO     | phase0 | [score_train_cond] step=5500/20000 loss=545118.0516
+2026-02-09 20:20:16 | INFO     | phase0 | [score_train_cond] step=5600/20000 loss=563138.3194
+2026-02-09 20:20:17 | INFO     | phase0 | [score_train_cond] step=5700/20000 loss=551127.9078
+2026-02-09 20:20:17 | INFO     | phase0 | [score_train_cond] step=5800/20000 loss=555441.5050
+2026-02-09 20:20:18 | INFO     | phase0 | [score_train_cond] step=5900/20000 loss=551515.6209
+2026-02-09 20:20:19 | INFO     | phase0 | [score_train_cond] step=6000/20000 loss=554579.2094
+2026-02-09 20:20:20 | INFO     | phase0 | [score_train_cond] step=6100/20000 loss=554320.1753
+2026-02-09 20:20:21 | INFO     | phase0 | [score_train_cond] step=6200/20000 loss=555203.7219
+2026-02-09 20:20:22 | INFO     | phase0 | [score_train_cond] step=6300/20000 loss=568757.4350
+2026-02-09 20:20:23 | INFO     | phase0 | [score_train_cond] step=6400/20000 loss=557649.7016
+2026-02-09 20:20:24 | INFO     | phase0 | [score_train_cond] step=6500/20000 loss=560039.9906
+2026-02-09 20:20:25 | INFO     | phase0 | [score_train_cond] step=6600/20000 loss=540569.8344
+2026-02-09 20:20:25 | INFO     | phase0 | [score_train_cond] step=6700/20000 loss=547306.9888
+2026-02-09 20:20:26 | INFO     | phase0 | [score_train_cond] step=6800/20000 loss=540746.9419
+2026-02-09 20:20:27 | INFO     | phase0 | [score_train_cond] step=6900/20000 loss=540207.8850
+2026-02-09 20:20:28 | INFO     | phase0 | [score_train_cond] step=7000/20000 loss=559787.6081
+2026-02-09 20:20:29 | INFO     | phase0 | [score_train_cond] step=7100/20000 loss=555576.3406
+2026-02-09 20:20:30 | INFO     | phase0 | [score_train_cond] step=7200/20000 loss=546927.7656
+2026-02-09 20:20:31 | INFO     | phase0 | [score_train_cond] step=7300/20000 loss=566508.7916
+2026-02-09 20:20:32 | INFO     | phase0 | [score_train_cond] step=7400/20000 loss=554640.0366
+2026-02-09 20:20:32 | INFO     | phase0 | [score_train_cond] step=7500/20000 loss=554671.8197
+2026-02-09 20:20:33 | INFO     | phase0 | [score_train_cond] step=7600/20000 loss=552716.0459
+2026-02-09 20:20:34 | INFO     | phase0 | [score_train_cond] step=7700/20000 loss=554659.1238
+2026-02-09 20:20:35 | INFO     | phase0 | [score_train_cond] step=7800/20000 loss=548349.6725
+2026-02-09 20:20:36 | INFO     | phase0 | [score_train_cond] step=7900/20000 loss=549796.9434
+2026-02-09 20:20:37 | INFO     | phase0 | [score_train_cond] step=8000/20000 loss=556698.6734
+2026-02-09 20:20:38 | INFO     | phase0 | [score_train_cond] step=8100/20000 loss=552353.1091
+2026-02-09 20:20:38 | INFO     | phase0 | [score_train_cond] step=8200/20000 loss=561677.3459
+2026-02-09 20:20:39 | INFO     | phase0 | [score_train_cond] step=8300/20000 loss=563161.8225
+2026-02-09 20:20:40 | INFO     | phase0 | [score_train_cond] step=8400/20000 loss=544729.3656
+2026-02-09 20:20:41 | INFO     | phase0 | [score_train_cond] step=8500/20000 loss=554318.1572
+2026-02-09 20:20:42 | INFO     | phase0 | [score_train_cond] step=8600/20000 loss=547798.2375
+2026-02-09 20:20:43 | INFO     | phase0 | [score_train_cond] step=8700/20000 loss=565769.6303
+2026-02-09 20:20:44 | INFO     | phase0 | [score_train_cond] step=8800/20000 loss=557280.5337
+2026-02-09 20:20:45 | INFO     | phase0 | [score_train_cond] step=8900/20000 loss=561301.9587
+2026-02-09 20:20:46 | INFO     | phase0 | [score_train_cond] step=9000/20000 loss=558717.5109
+2026-02-09 20:20:46 | INFO     | phase0 | [score_train_cond] step=9100/20000 loss=560245.5644
+2026-02-09 20:20:47 | INFO     | phase0 | [score_train_cond] step=9200/20000 loss=550082.4703
+2026-02-09 20:20:48 | INFO     | phase0 | [score_train_cond] step=9300/20000 loss=560873.4759
+2026-02-09 20:20:49 | INFO     | phase0 | [score_train_cond] step=9400/20000 loss=555154.4119
+2026-02-09 20:20:50 | INFO     | phase0 | [score_train_cond] step=9500/20000 loss=558925.0831
+2026-02-09 20:20:51 | INFO     | phase0 | [score_train_cond] step=9600/20000 loss=561104.9419
+2026-02-09 20:20:52 | INFO     | phase0 | [score_train_cond] step=9700/20000 loss=543147.8309
+2026-02-09 20:20:53 | INFO     | phase0 | [score_train_cond] step=9800/20000 loss=565555.3250
+2026-02-09 20:20:54 | INFO     | phase0 | [score_train_cond] step=9900/20000 loss=562340.6887
+2026-02-09 20:20:55 | INFO     | phase0 | [score_train_cond] step=10000/20000 loss=554316.1259
+2026-02-09 20:20:56 | INFO     | phase0 | [score_train_cond] step=10100/20000 loss=550799.3934
+2026-02-09 20:20:57 | INFO     | phase0 | [score_train_cond] step=10200/20000 loss=555488.9622
+2026-02-09 20:20:58 | INFO     | phase0 | [score_train_cond] step=10300/20000 loss=557938.9797
+2026-02-09 20:20:59 | INFO     | phase0 | [score_train_cond] step=10400/20000 loss=566519.0391
+2026-02-09 20:21:00 | INFO     | phase0 | [score_train_cond] step=10500/20000 loss=557565.2150
+2026-02-09 20:21:00 | INFO     | phase0 | [score_train_cond] step=10600/20000 loss=557921.1169
+2026-02-09 20:21:01 | INFO     | phase0 | [score_train_cond] step=10700/20000 loss=555877.6034
+2026-02-09 20:21:02 | INFO     | phase0 | [score_train_cond] step=10800/20000 loss=550471.7019
+2026-02-09 20:21:03 | INFO     | phase0 | [score_train_cond] step=10900/20000 loss=543893.2556
+2026-02-09 20:21:04 | INFO     | phase0 | [score_train_cond] step=11000/20000 loss=564542.3700
+2026-02-09 20:21:05 | INFO     | phase0 | [score_train_cond] step=11100/20000 loss=561724.4834
+2026-02-09 20:21:06 | INFO     | phase0 | [score_train_cond] step=11200/20000 loss=554576.4194
+2026-02-09 20:21:06 | INFO     | phase0 | [score_train_cond] step=11300/20000 loss=555516.5859
+2026-02-09 20:21:07 | INFO     | phase0 | [score_train_cond] step=11400/20000 loss=557487.2538
+2026-02-09 20:21:09 | INFO     | phase0 | [score_train_cond] step=11500/20000 loss=544896.9237
+2026-02-09 20:21:10 | INFO     | phase0 | [score_train_cond] step=11600/20000 loss=562605.7312
+2026-02-09 20:21:11 | INFO     | phase0 | [score_train_cond] step=11700/20000 loss=556597.1647
+2026-02-09 20:21:12 | INFO     | phase0 | [score_train_cond] step=11800/20000 loss=549533.9219
+2026-02-09 20:21:13 | INFO     | phase0 | [score_train_cond] step=11900/20000 loss=553747.4659
+2026-02-09 20:21:14 | INFO     | phase0 | [score_train_cond] step=12000/20000 loss=552088.1041
+2026-02-09 20:21:14 | INFO     | phase0 | [score_train_cond] step=12100/20000 loss=562854.1250
+2026-02-09 20:21:15 | INFO     | phase0 | [score_train_cond] step=12200/20000 loss=539173.3588
+2026-02-09 20:21:16 | INFO     | phase0 | [score_train_cond] step=12300/20000 loss=553885.5256
+2026-02-09 20:21:17 | INFO     | phase0 | [score_train_cond] step=12400/20000 loss=556103.7594
+2026-02-09 20:21:18 | INFO     | phase0 | [score_train_cond] step=12500/20000 loss=555502.4528
+2026-02-09 20:21:19 | INFO     | phase0 | [score_train_cond] step=12600/20000 loss=554360.4281
+2026-02-09 20:21:20 | INFO     | phase0 | [score_train_cond] step=12700/20000 loss=551847.0809
+2026-02-09 20:21:21 | INFO     | phase0 | [score_train_cond] step=12800/20000 loss=553329.5909
+2026-02-09 20:21:21 | INFO     | phase0 | [score_train_cond] step=12900/20000 loss=559799.2278
+2026-02-09 20:21:22 | INFO     | phase0 | [score_train_cond] step=13000/20000 loss=564789.4403
+2026-02-09 20:21:23 | INFO     | phase0 | [score_train_cond] step=13100/20000 loss=548549.0159
+2026-02-09 20:21:24 | INFO     | phase0 | [score_train_cond] step=13200/20000 loss=558742.1512
+2026-02-09 20:21:25 | INFO     | phase0 | [score_train_cond] step=13300/20000 loss=560799.4903
+2026-02-09 20:21:26 | INFO     | phase0 | [score_train_cond] step=13400/20000 loss=558155.8066
+2026-02-09 20:21:27 | INFO     | phase0 | [score_train_cond] step=13500/20000 loss=568531.4481
+2026-02-09 20:21:27 | INFO     | phase0 | [score_train_cond] step=13600/20000 loss=557328.5281
+2026-02-09 20:21:28 | INFO     | phase0 | [score_train_cond] step=13700/20000 loss=542564.2781
+2026-02-09 20:21:29 | INFO     | phase0 | [score_train_cond] step=13800/20000 loss=567294.2747
+2026-02-09 20:21:30 | INFO     | phase0 | [score_train_cond] step=13900/20000 loss=560738.4587
+2026-02-09 20:21:31 | INFO     | phase0 | [score_train_cond] step=14000/20000 loss=552012.6931
+2026-02-09 20:21:32 | INFO     | phase0 | [score_train_cond] step=14100/20000 loss=568358.6266
+2026-02-09 20:21:33 | INFO     | phase0 | [score_train_cond] step=14200/20000 loss=555179.5547
+2026-02-09 20:21:34 | INFO     | phase0 | [score_train_cond] step=14300/20000 loss=554700.9609
+2026-02-09 20:21:35 | INFO     | phase0 | [score_train_cond] step=14400/20000 loss=560073.9566
+2026-02-09 20:21:36 | INFO     | phase0 | [score_train_cond] step=14500/20000 loss=574954.9862
+2026-02-09 20:21:37 | INFO     | phase0 | [score_train_cond] step=14600/20000 loss=561991.9109
+2026-02-09 20:21:37 | INFO     | phase0 | [score_train_cond] step=14700/20000 loss=564000.3347
+2026-02-09 20:21:38 | INFO     | phase0 | [score_train_cond] step=14800/20000 loss=549924.2875
+2026-02-09 20:21:39 | INFO     | phase0 | [score_train_cond] step=14900/20000 loss=570121.7866
+2026-02-09 20:21:40 | INFO     | phase0 | [score_train_cond] step=15000/20000 loss=549844.1006
+2026-02-09 20:21:41 | INFO     | phase0 | [score_train_cond] step=15100/20000 loss=567558.3678
+2026-02-09 20:21:42 | INFO     | phase0 | [score_train_cond] step=15200/20000 loss=554119.4297
+2026-02-09 20:21:43 | INFO     | phase0 | [score_train_cond] step=15300/20000 loss=568490.6566
+2026-02-09 20:21:44 | INFO     | phase0 | [score_train_cond] step=15400/20000 loss=550210.3953
+2026-02-09 20:21:45 | INFO     | phase0 | [score_train_cond] step=15500/20000 loss=553308.1700
+2026-02-09 20:21:46 | INFO     | phase0 | [score_train_cond] step=15600/20000 loss=549115.1534
+2026-02-09 20:21:47 | INFO     | phase0 | [score_train_cond] step=15700/20000 loss=553330.8506
+2026-02-09 20:21:48 | INFO     | phase0 | [score_train_cond] step=15800/20000 loss=542767.5475
+2026-02-09 20:21:49 | INFO     | phase0 | [score_train_cond] step=15900/20000 loss=550605.9297
+2026-02-09 20:21:50 | INFO     | phase0 | [score_train_cond] step=16000/20000 loss=548048.3375
+2026-02-09 20:21:51 | INFO     | phase0 | [score_train_cond] step=16100/20000 loss=556590.0731
+2026-02-09 20:21:51 | INFO     | phase0 | [score_train_cond] step=16200/20000 loss=552384.7944
+2026-02-09 20:21:52 | INFO     | phase0 | [score_train_cond] step=16300/20000 loss=561078.7734
+2026-02-09 20:21:53 | INFO     | phase0 | [score_train_cond] step=16400/20000 loss=540312.0006
+2026-02-09 20:21:54 | INFO     | phase0 | [score_train_cond] step=16500/20000 loss=566936.2428
+2026-02-09 20:21:55 | INFO     | phase0 | [score_train_cond] step=16600/20000 loss=555377.6338
+2026-02-09 20:21:56 | INFO     | phase0 | [score_train_cond] step=16700/20000 loss=546503.2578
+2026-02-09 20:21:57 | INFO     | phase0 | [score_train_cond] step=16800/20000 loss=555998.0391
+2026-02-09 20:21:58 | INFO     | phase0 | [score_train_cond] step=16900/20000 loss=573189.4313
+2026-02-09 20:21:59 | INFO     | phase0 | [score_train_cond] step=17000/20000 loss=554574.0700
+2026-02-09 20:22:00 | INFO     | phase0 | [score_train_cond] step=17100/20000 loss=544185.4203
+2026-02-09 20:22:01 | INFO     | phase0 | [score_train_cond] step=17200/20000 loss=560763.1950
+2026-02-09 20:22:02 | INFO     | phase0 | [score_train_cond] step=17300/20000 loss=545720.0159
+2026-02-09 20:22:03 | INFO     | phase0 | [score_train_cond] step=17400/20000 loss=556737.3231
+2026-02-09 20:22:04 | INFO     | phase0 | [score_train_cond] step=17500/20000 loss=556711.5813
+2026-02-09 20:22:05 | INFO     | phase0 | [score_train_cond] step=17600/20000 loss=549946.0394
+2026-02-09 20:22:06 | INFO     | phase0 | [score_train_cond] step=17700/20000 loss=554559.6459
+2026-02-09 20:22:07 | INFO     | phase0 | [score_train_cond] step=17800/20000 loss=547245.8819
+2026-02-09 20:22:08 | INFO     | phase0 | [score_train_cond] step=17900/20000 loss=554126.9884
+2026-02-09 20:22:09 | INFO     | phase0 | [score_train_cond] step=18000/20000 loss=567657.6866
+2026-02-09 20:22:10 | INFO     | phase0 | [score_train_cond] step=18100/20000 loss=553339.0259
+2026-02-09 20:22:11 | INFO     | phase0 | [score_train_cond] step=18200/20000 loss=550462.3728
+2026-02-09 20:22:12 | INFO     | phase0 | [score_train_cond] step=18300/20000 loss=561258.3284
+2026-02-09 20:22:13 | INFO     | phase0 | [score_train_cond] step=18400/20000 loss=554448.6647
+2026-02-09 20:22:14 | INFO     | phase0 | [score_train_cond] step=18500/20000 loss=556415.9962
+2026-02-09 20:22:14 | INFO     | phase0 | [score_train_cond] step=18600/20000 loss=551919.6219
+2026-02-09 20:22:15 | INFO     | phase0 | [score_train_cond] step=18700/20000 loss=558874.8084
+2026-02-09 20:22:16 | INFO     | phase0 | [score_train_cond] step=18800/20000 loss=538568.5809
+2026-02-09 20:22:17 | INFO     | phase0 | [score_train_cond] step=18900/20000 loss=560920.8147
+2026-02-09 20:22:18 | INFO     | phase0 | [score_train_cond] step=19000/20000 loss=555240.1103
+2026-02-09 20:22:19 | INFO     | phase0 | [score_train_cond] step=19100/20000 loss=553433.1041
+2026-02-09 20:22:20 | INFO     | phase0 | [score_train_cond] step=19200/20000 loss=545764.5944
+2026-02-09 20:22:21 | INFO     | phase0 | [score_train_cond] step=19300/20000 loss=550616.1347
+2026-02-09 20:22:22 | INFO     | phase0 | [score_train_cond] step=19400/20000 loss=542355.0603
+2026-02-09 20:22:23 | INFO     | phase0 | [score_train_cond] step=19500/20000 loss=556048.3228
+2026-02-09 20:22:23 | INFO     | phase0 | [score_train_cond] step=19600/20000 loss=561976.9803
+2026-02-09 20:22:24 | INFO     | phase0 | [score_train_cond] step=19700/20000 loss=548306.1631
+2026-02-09 20:22:25 | INFO     | phase0 | [score_train_cond] step=19800/20000 loss=553021.4897
+2026-02-09 20:22:26 | INFO     | phase0 | [score_train_cond] step=19900/20000 loss=557814.9056
+2026-02-09 20:22:27 | INFO     | phase0 | [score_train_cond] step=20000/20000 loss=566304.1678
+2026-02-09 20:22:27 | INFO     | phase0 | [score_train_cond] Done. Final checkpoint: outputs/tier2/exp6_score_correction/20260209_201831/score_model/checkpoints/score_cond_final.pt
+2026-02-09 20:22:27 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.01 scale=0.25
+2026-02-09 20:22:33 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:22:33 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0137
+2026-02-09 20:22:33 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.01 scale=0.5
+2026-02-09 20:22:39 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:22:39 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0137
+2026-02-09 20:22:39 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.01 scale=1.0
+2026-02-09 20:22:46 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:22:46 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0137
+2026-02-09 20:22:46 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.01 scale=2.0
+2026-02-09 20:22:52 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:22:52 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0136
+2026-02-09 20:22:52 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.05 scale=0.25
+2026-02-09 20:22:58 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:22:58 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0135
+2026-02-09 20:22:58 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.05 scale=0.5
+2026-02-09 20:23:05 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:23:05 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0132
+2026-02-09 20:23:05 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.05 scale=1.0
+2026-02-09 20:23:11 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:23:11 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0127
+2026-02-09 20:23:11 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.05 scale=2.0
+2026-02-09 20:23:17 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:23:17 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0118
+2026-02-09 20:23:17 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.1 scale=0.25
+2026-02-09 20:23:24 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:23:24 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0127
+2026-02-09 20:23:24 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.1 scale=0.5
+2026-02-09 20:23:30 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:23:30 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0118
+2026-02-09 20:23:30 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.1 scale=1.0
+2026-02-09 20:23:36 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:23:36 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=80.0098
+2026-02-09 20:23:36 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.1 scale=2.0
+2026-02-09 20:23:43 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:23:43 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=80.0061
+2026-02-09 20:23:43 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.25 scale=0.25
+2026-02-09 20:23:49 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:23:49 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=80.0077
+2026-02-09 20:23:49 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.25 scale=0.5
+2026-02-09 20:23:55 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:23:55 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=80.0021
+2026-02-09 20:23:55 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.25 scale=1.0
+2026-02-09 20:24:02 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:02 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=79.9919
+2026-02-09 20:24:02 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.25 scale=2.0
+2026-02-09 20:24:08 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:08 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=79.9760
+2026-02-09 20:24:08 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.5 scale=0.25
+2026-02-09 20:24:14 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:14 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=79.9919
+2026-02-09 20:24:14 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.5 scale=0.5
+2026-02-09 20:24:21 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:21 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=79.9760
+2026-02-09 20:24:21 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.5 scale=1.0
+2026-02-09 20:24:27 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:27 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=79.9619
+2026-02-09 20:24:27 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=0.5 scale=2.0
+2026-02-09 20:24:33 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:33 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0054
+2026-02-09 20:24:33 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=1.0 scale=0.25
+2026-02-09 20:24:39 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:39 | INFO     | phase0 |   D_corrected: cos=0.0654 state_err=79.9619
+2026-02-09 20:24:39 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=1.0 scale=0.5
+2026-02-09 20:24:46 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:46 | INFO     | phase0 |   D_corrected: cos=0.0655 state_err=80.0054
+2026-02-09 20:24:46 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=1.0 scale=1.0
+2026-02-09 20:24:52 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:52 | INFO     | phase0 |   D_corrected: cos=0.0657 state_err=80.3757
+2026-02-09 20:24:52 | INFO     | phase0 | [exp6] Correction sweep: method=tweedie sigma=1.0 scale=2.0
+2026-02-09 20:24:58 | INFO     | phase0 |   D_rollout: cos=0.0655 state_err=80.0137
+2026-02-09 20:24:58 | INFO     | phase0 |   D_corrected: cos=0.0662 state_err=82.2009
+2026-02-09 20:24:58 | INFO     | phase0 | [exp6] Summary: outputs/tier2/exp6_score_correction/20260209_201831/summary.csv
+2026-02-09 20:24:58 | INFO     | phase0 | [tracking] Finalized run: experiment=exp6_score_correction run_id=20260209_201831 status=completed duration=387s score_checkpoint=outputs/tier2/exp6_score_correction/20260209_201831/score_model/checkpoints/score_cond_final.pt score_conditional=True n_sweep_configs=24 best_corrected_state_err=79.96192722488195 best_corrected_cos=0.06538475317631409 best_method=tweedie best_sigma=0.5 best_tweedie_scale=1.0 best_n_steps=0 best_step_size=0.0

@@ -1,0 +1,13 @@
+{
+  "final_step": 20000,
+  "final_train_nll": 4.095472438335419,
+  "eval": {
+    "n": 5000,
+    "dir_top1_acc": 0.154,
+    "dir_top5_acc": 0.4356,
+    "dir_ce": 3.566787927246094,
+    "mag_nll": 0.3966383834838867,
+    "total_nll": 3.9634263107299805
+  },
+  "checkpoint": "outputs/tier3/exp10_direction_ar/20260207_064253/checkpoints/direction_ar_final.pt"
+}

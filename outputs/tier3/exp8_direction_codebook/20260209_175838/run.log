@@ -1,0 +1,56 @@
+2026-02-09 17:58:38 | INFO     | phase0 | [tracking] Registered run: experiment=exp8_direction_codebook run_id=20260209_175838 git=a1a1bc2 out=outputs/tier3/exp8_direction_codebook/20260209_175838
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Using VAE latents from config: /workspace/audioEngram/outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/latents.zarr
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Loading latents index and splits...
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] 4047 train utterances for direction extraction
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 200/4047 utterances
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 400/4047 utterances
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 600/4047 utterances
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 800/4047 utterances
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 1000/4047 utterances
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 1200/4047 utterances
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 1400/4047 utterances
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 1600/4047 utterances
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 1800/4047 utterances
+2026-02-09 17:58:38 | INFO     | phase0 | [exp8] Extracted 2000/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 2200/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 2400/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 2600/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 2800/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 3000/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 3200/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 3400/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 3600/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 3800/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 4000/4047 utterances
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Extracted 657086 direction vectors, 661133 raw vectors from 4047 utterances, D=32
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Latent dimensionality: D=32
+2026-02-09 17:58:39 | INFO     | phase0 | [exp8] Running Exp 9: near-zero magnitude analysis...
+2026-02-09 17:58:40 | INFO     | phase0 | [exp8] Exp 9 recommendation: floor_clamp_sufficient. Magnitude median=6.6842
+2026-02-09 17:58:40 | INFO     | phase0 | [exp8]   eps=0.001*median -> threshold=0.006684, fraction=0.0000 (0 frames)
+2026-02-09 17:58:40 | INFO     | phase0 | [exp8]   eps=0.01*median -> threshold=0.066842, fraction=0.0000 (7 frames)
+2026-02-09 17:58:40 | INFO     | phase0 | [exp8]   eps=0.1*median -> threshold=0.668420, fraction=0.0002 (149 frames)
+2026-02-09 17:58:40 | INFO     | phase0 | [exp8]   eps=0.5*median -> threshold=3.342101, fraction=0.0620 (40763 frames)
+2026-02-09 17:58:40 | INFO     | phase0 | [exp8] Filtering near-zero: 7 removed (0.0%), 657079 directions for k-means
+2026-02-09 17:58:40 | INFO     | phase0 | [exp8] Running spherical MiniBatchKMeans K=64 (n_init=1, batch_size=4096)...
+2026-02-09 17:58:40 | INFO     | phase0 | [exp8] K=64: angular_err=54.4° (median 55.1°), utilization=64/64 (100%), entropy_ratio=0.997
+2026-02-09 17:58:40 | INFO     | phase0 | [exp8] Running unnormalized MiniBatchKMeans K=64 (n_init=1, batch_size=4096)...
+2026-02-09 17:58:41 | INFO     | phase0 | [exp8] Unnorm K=64: angular_err=56.2° (median 56.0°), utilization=64/64 (100%), centroid_mag range=[0.832, 14.179]
+2026-02-09 17:58:41 | INFO     | phase0 | [exp8] Running state VQ MiniBatchKMeans K=64 (n_init=1, batch_size=4096)...
+2026-02-09 17:58:41 | INFO     | phase0 | [exp8] State VQ K=64: recon_err=4.1096 (median 3.9998), utilization=64/64 (100%), entropy_ratio=0.984
+2026-02-09 17:58:41 | INFO     | phase0 | [exp8] === Normalized vs Unnormalized vs State VQ comparison ===
+2026-02-09 17:58:41 | INFO     | phase0 | [exp8]   K=64: norm_ang=54.4° unnorm_ang=56.2° state_recon_err=4.1096 (util: 100% / 100% / 100%)
+2026-02-09 17:58:42 | INFO     | phase0 | [exp8] Loading Exp9 PocketMimiVAE decoder (dec_proj + Mimi decoder) ...
+2026-02-09 17:58:42 | INFO     | phase0 | Skipping pretrained Mimi load (expected to load from checkpoint)
+2026-02-09 17:58:42 | INFO     | phase0 | [exp8] Loaded PocketMimiVAE checkpoint from /workspace/audioEngram/outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/checkpoints/vae_gan_final.pt (latent_dim=32)
+2026-02-09 17:58:42 | INFO     | phase0 | [exp8] Sampling eval utterances for perceptual evaluation...
+2026-02-09 17:58:42 | INFO     | phase0 | [exp8] 10 eval utterances for reconstruction + audio decode
+2026-02-09 17:58:44 | INFO     | phase0 | [exp8] [1/10] 4297-13009-0038: T=176 frames
+2026-02-09 17:58:44 | INFO     | phase0 | [exp8] [2/10] 233-155990-0026: T=155 frames
+2026-02-09 17:58:44 | INFO     | phase0 | [exp8] [3/10] 374-180298-0015: T=186 frames
+2026-02-09 17:58:44 | INFO     | phase0 | [exp8] [4/10] 6529-62556-0033: T=196 frames
+2026-02-09 17:58:45 | INFO     | phase0 | [exp8] [5/10] 5322-7680-0021: T=190 frames
+2026-02-09 17:58:45 | INFO     | phase0 | [exp8] [6/10] 4297-13006-0034: T=161 frames
+2026-02-09 17:58:45 | INFO     | phase0 | [exp8] [7/10] 6367-74004-0034: T=129 frames
+2026-02-09 17:58:45 | INFO     | phase0 | [exp8] [8/10] 6529-62556-0031: T=174 frames
+2026-02-09 17:58:45 | INFO     | phase0 | [exp8] [9/10] 7113-86041-0004: T=185 frames
+2026-02-09 17:58:46 | INFO     | phase0 | [exp8] [10/10] 5322-7679-0018: T=196 frames

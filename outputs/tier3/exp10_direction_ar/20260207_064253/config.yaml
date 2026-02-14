@@ -1,0 +1,58 @@
+seed: 42
+data:
+  latents_dir: ./outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/latents.zarr
+  latents_index: ./outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/latents_index.parquet
+  frames_index: ./outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/phase0_frames.parquet
+  splits_dir: ./outputs/phase0/splits
+codebook:
+  exp8_dir: ./outputs/tier3/exp8_direction_codebook/20260206_233223
+  K: 256
+  near_zero_threshold_frac: 0.01
+model:
+  hidden_dim: 1024
+  n_hidden_layers: 2
+  dropout: 0.0
+  min_log_sigma_logm: -5.0
+  max_log_sigma_logm: 0.7
+context:
+  window_size: 8
+  horizon_k: 1
+train:
+  batch_size: 256
+  lr: 0.0003
+  weight_decay: 0.0001
+  grad_clip_norm: 1.0
+  max_steps: 20000
+  log_every: 100
+  eval_every: 2000
+  save_every: 5000
+  shuffle_buffer: 100000
+  num_workers: 2
+  device: auto
+rollout:
+  k_values:
+  - 1
+  - 2
+  - 4
+  - 8
+  - 16
+  n_eval_utterances: 20
+  segments_per_utt: 5
+  max_frames_per_utt: 500
+  sampling_strategies:
+  - argmax
+  - categorical
+  - top_p
+  top_p: 0.9
+eval:
+  n_utterances: 10
+  output_sample_rate: 48000
+  mimi_checkpoint: null
+  vae_checkpoint: ./outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/checkpoints/vae_final.pt
+  rollout_audio_k_values:
+  - 1
+  - 2
+  - 4
+  - 8
+output:
+  out_dir: ./outputs/tier3/exp10_direction_ar

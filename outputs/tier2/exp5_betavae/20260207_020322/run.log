@@ -1,0 +1,21 @@
+2026-02-07 02:03:22 | INFO     | phase0 | [tracking] Registered run: experiment=exp5_betavae run_id=20260207_020322 git=a1a1bc2 out=outputs/tier2/exp5_betavae/20260207_020322
+2026-02-07 02:05:01 | INFO     | phase0 | [exp5] Run id: 20260207_020322, device: cuda, utterances: 5000
+2026-02-07 02:05:01 | INFO     | phase0 | [exp5] === Variant: baseline_betavae ===
+2026-02-07 02:05:01 | INFO     | phase0 | [exp5] Training VAE for baseline_betavae...
+2026-02-07 02:05:03 | INFO     | phase0 | [vae_train] latent_dim=32 beta=0.01 lambda_smooth=0.0 lambda_pred=0.0 batch=4 lr=0.0001 steps=50000 amp=True
+2026-02-07 02:05:22 | INFO     | phase0 | [vae_train] step=100/50000 loss=17.5176 recon=8.5512 kl=896.6450 smooth=0.0000 pred=0.0000
+2026-02-07 02:05:40 | INFO     | phase0 | [vae_train] step=200/50000 loss=16.8145 recon=8.1804 kl=863.4105 smooth=0.0000 pred=0.0000
+2026-02-07 02:05:58 | INFO     | phase0 | [vae_train] step=300/50000 loss=16.3306 recon=7.9998 kl=833.0864 smooth=0.0000 pred=0.0000
+2026-02-07 02:06:18 | INFO     | phase0 | [vae_train] step=400/50000 loss=15.9867 recon=7.9425 kl=804.4177 smooth=0.0000 pred=0.0000
+2026-02-07 02:06:38 | INFO     | phase0 | [vae_train] step=500/50000 loss=15.6418 recon=7.8530 kl=778.8857 smooth=0.0000 pred=0.0000
+2026-02-07 02:06:58 | INFO     | phase0 | [vae_train] step=600/50000 loss=15.2365 recon=7.6796 kl=755.6909 smooth=0.0000 pred=0.0000
+2026-02-07 02:07:18 | INFO     | phase0 | [vae_train] step=700/50000 loss=14.7852 recon=7.5104 kl=727.4842 smooth=0.0000 pred=0.0000
+2026-02-07 02:07:39 | INFO     | phase0 | [vae_train] step=800/50000 loss=14.5329 recon=7.4995 kl=703.3404 smooth=0.0000 pred=0.0000
+2026-02-07 02:07:59 | INFO     | phase0 | [vae_train] step=900/50000 loss=14.0726 recon=7.3121 kl=676.0457 smooth=0.0000 pred=0.0000
+2026-02-07 02:08:19 | INFO     | phase0 | [vae_train] step=1000/50000 loss=13.7398 recon=7.2853 kl=645.4484 smooth=0.0000 pred=0.0000
+2026-02-07 02:08:39 | INFO     | phase0 | [vae_train] step=1100/50000 loss=13.2740 recon=7.0993 kl=617.4786 smooth=0.0000 pred=0.0000
+2026-02-07 02:08:59 | INFO     | phase0 | [vae_train] step=1200/50000 loss=12.8400 recon=6.9969 kl=584.3068 smooth=0.0000 pred=0.0000
+2026-02-07 02:09:20 | INFO     | phase0 | [vae_train] step=1300/50000 loss=12.3771 recon=6.8240 kl=555.3070 smooth=0.0000 pred=0.0000
+2026-02-07 02:09:40 | INFO     | phase0 | [vae_train] step=1400/50000 loss=11.8880 recon=6.6955 kl=519.2403 smooth=0.0000 pred=0.0000
+2026-02-07 02:10:00 | INFO     | phase0 | [vae_train] step=1500/50000 loss=11.4892 recon=6.6241 kl=486.5089 smooth=0.0000 pred=0.0000
+2026-02-07 02:10:21 | INFO     | phase0 | [vae_train] step=1600/50000 loss=11.0969 recon=6.5426 kl=455.4361 smooth=0.0000 pred=0.0000

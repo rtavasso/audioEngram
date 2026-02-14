@@ -1,0 +1,36 @@
+{
+  "experiment": "exp6_score_correction",
+  "run_id": "20260209_200813",
+  "config_path": "configs/tier2_exp6_score_correction.yaml",
+  "cli_args": [
+    "--config",
+    "configs/tier2_exp6_score_correction.yaml",
+    "--checkpoint",
+    "outputs/phase1/checkpoints/mdn_k1_final.pt"
+  ],
+  "git_commit": "a1a1bc2",
+  "start_time": "2026-02-09T20:08:13+00:00",
+  "status": "completed",
+  "environment": {
+    "python_version": "3.11.14",
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA TITAN X (Pascal)",
+    "platform": "Linux-6.8.0-94-generic-x86_64-with-glibc2.39"
+  },
+  "output_dir": "outputs/tier2/exp6_score_correction/20260209_200813",
+  "end_time": "2026-02-09T20:12:11+00:00",
+  "duration_sec": 238.0,
+  "key_metrics": {
+    "score_checkpoint": "outputs/tier2/exp6_score_correction/20260209_200813/score_model/checkpoints/score_final.pt",
+    "score_conditional": false,
+    "n_sweep_configs": 9,
+    "best_corrected_state_err": 80.01404671976343,
+    "best_corrected_cos": 0.0654517228031164,
+    "best_method": "langevin",
+    "best_sigma": 0.1,
+    "best_tweedie_scale": 1.0,
+    "best_n_steps": 1,
+    "best_step_size": 0.001
+  }
+}

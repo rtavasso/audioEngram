@@ -27,6 +27,7 @@ sys.path.insert(0, str(project_root / "src"))
 import pandas as pd
 import yaml
 
+from experiment import register_run, finalize_run
 from phase0.utils.logging import setup_logging
 from phase1.checkpoints import load_phase1_checkpoint
 from phase1.injection_diag import run_injection_diagnostic
@@ -81,6 +82,11 @@ def main() -> int:
     out_root = Path(cfg["output"]["out_dir"])
     out_dir = out_root / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    run = register_run(
+        experiment="exp2_injection", run_id=run_id, config_path=args.config,
+        config=cfg, cli_args=sys.argv[1:], out_dir=out_dir, log_name="tier1-exp2-injection",
+    )
 
     device = _device_from_config(cfg["device"])
 
@@ -176,6 +182,16 @@ def main() -> int:
     logger.info(f"Wrote: {metrics_path}")
     logger.info(f"Wrote: {per_step_path}")
     logger.info(f"Wrote: {out_dir / 'plots'}")
+
+    # Extract key metrics from mode D (pure rollout) last step
+    km = {}
+    d_mode = res.get("modes", {}).get("D_rollout", {})
+    d_steps = d_mode.get("per_step", [])
+    if d_steps:
+        last = d_steps[-1]
+        km["D_rollout_cos_final"] = last.get("cos")
+        km["D_rollout_state_err_final"] = last.get("state_err")
+    finalize_run(run, key_metrics=km)
     return 0
 
 

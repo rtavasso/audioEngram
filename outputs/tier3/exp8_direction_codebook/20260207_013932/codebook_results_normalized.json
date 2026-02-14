@@ -1,0 +1,16 @@
+{
+  "64": {
+    "k": 64,
+    "angular_error_mean_deg": 57.77959442138672,
+    "angular_error_median_deg": 57.573055267333984,
+    "angular_error_p95_deg": 74.16236114501953,
+    "codebook_utilization": 64,
+    "codebook_utilization_frac": 1.0,
+    "entropy": 4.102034634420049,
+    "max_entropy": 4.1588830833596715,
+    "entropy_ratio": 0.9863308374387628,
+    "cluster_sizes_min": 21667,
+    "cluster_sizes_max": 105578,
+    "cluster_sizes_mean": 55903.203125
+  }
+}

@@ -1,0 +1,8 @@
+2026-02-09 20:01:42 | INFO     | phase0 | [tracking] Registered run: experiment=exp6_score_correction run_id=20260209_200142 git=a1a1bc2 out=outputs/tier2/exp6_score_correction/20260209_200142
+2026-02-09 20:01:42 | INFO     | phase0 | [exp6] Loading Phase 1 checkpoint: outputs/phase1/checkpoints/mdn_k1_final.pt
+2026-02-09 20:02:37 | INFO     | phase0 | [exp6] 22216 train utterances for score model
+2026-02-09 20:02:37 | INFO     | phase0 | [exp6] Training score model... (conditional=False)
+2026-02-09 20:02:38 | INFO     | phase0 | [score_train] dim=512 hidden=1024 layers=4 sigma=[0.01,1.0] batch=256 steps=20000
+2026-02-09 20:02:39 | INFO     | phase0 | [score_train] step=100/20000 loss=550311.0494
+2026-02-09 20:02:40 | INFO     | phase0 | [score_train] step=200/20000 loss=549752.4738
+2026-02-09 20:02:40 | INFO     | phase0 | [score_train] step=300/20000 loss=561558.9109

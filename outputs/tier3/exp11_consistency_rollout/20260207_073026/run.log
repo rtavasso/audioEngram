@@ -1,0 +1,64 @@
+2026-02-07 07:30:26 | INFO     | phase0 | [tracking] Registered run: experiment=exp11_consistency_rollout run_id=20260207_073026 git=a1a1bc2 out=outputs/tier3/exp11_consistency_rollout/20260207_073026
+2026-02-07 07:30:26 | INFO     | phase0 | [exp11] Step 1: Loading pre-trained models...
+2026-02-07 07:30:26 | INFO     | phase0 | [exp11] Loaded codebook: outputs/tier3/exp8_direction_codebook/20260206_233223/codebook_K0256.npy shape=(256, 32)
+2026-02-07 07:30:26 | INFO     | phase0 | [exp11] Loaded Direction AR: K=256 D=32
+2026-02-07 07:30:26 | INFO     | phase0 | [exp11] Step 2: Score model...
+2026-02-07 07:30:26 | INFO     | phase0 | [exp11] 4047 train utterances for score model
+2026-02-07 07:30:27 | INFO     | phase0 | [score_train] dim=32 hidden=512 layers=4 sigma=[0.01,1.0] batch=512 steps=100
+2026-02-07 07:30:28 | INFO     | phase0 | [score_train] step=100/100 loss=34819.4095
+2026-02-07 07:30:28 | INFO     | phase0 | [score_train] Done. Final checkpoint: outputs/tier3/exp11_consistency_rollout/20260207_073026/score_model/checkpoints/score_final.pt
+2026-02-07 07:30:28 | INFO     | phase0 | [exp11] Score model trained. Checkpoint: outputs/tier3/exp11_consistency_rollout/20260207_073026/score_model/checkpoints/score_final.pt
+2026-02-07 07:30:28 | INFO     | phase0 | [exp11] Score model: 1,149,984 parameters
+2026-02-07 07:30:28 | INFO     | phase0 | [exp11] Step 2.5: Joint training with sigma=0.1...
+2026-02-07 07:30:29 | INFO     | phase0 | [exp11] Joint training: 4047 utterances, unroll_k=4, sigma=0.1, batch=64, steps=50, lr=0.0001
+2026-02-07 07:30:30 | INFO     | phase0 | [exp11] Joint training done. Checkpoint: outputs/tier3/exp11_consistency_rollout/20260207_073026/checkpoints/direction_ar_joint_final.pt
+2026-02-07 07:30:30 | INFO     | phase0 | [exp11] Step 3-4: Rollout evaluation...
+2026-02-07 07:30:30 | INFO     | phase0 | [exp11] Rollout: 100 segments from 20 utterances
+2026-02-07 07:30:30 | INFO     | phase0 | [exp11] === Sigma=0.1 ===
+2026-02-07 07:30:30 | INFO     | phase0 | [exp11] dir_ar_argmax sigma=  N/A k= 1: state_err=0.9029 cos=0.6626 nan=0
+2026-02-07 07:30:30 | INFO     | phase0 | [exp11] dir_ar_argmax sigma=  N/A k= 2: state_err=1.3156 cos=0.6218 nan=0
+2026-02-07 07:30:30 | INFO     | phase0 | [exp11] dir_ar_argmax sigma=  N/A k= 4: state_err=1.3353 cos=0.1325 nan=0
+2026-02-07 07:30:31 | INFO     | phase0 | [exp11] dir_ar_argmax sigma=  N/A k= 8: state_err=3.5005 cos=0.1415 nan=0
+2026-02-07 07:30:32 | INFO     | phase0 | [exp11] dir_ar_argmax sigma=  N/A k=16: state_err=101.0425 cos=0.0679 nan=0
+2026-02-07 07:30:32 | INFO     | phase0 | [exp11] dir_ar_argmax_tweedie sigma=  0.1 k= 1: state_err=0.8944 cos=0.6626 nan=0
+2026-02-07 07:30:32 | INFO     | phase0 | [exp11] dir_ar_argmax_tweedie sigma=  0.1 k= 2: state_err=1.4034 cos=0.6218 nan=0
+2026-02-07 07:30:33 | INFO     | phase0 | [exp11] dir_ar_argmax_tweedie sigma=  0.1 k= 4: state_err=1.8231 cos=0.0153 nan=0
+2026-02-07 07:30:34 | INFO     | phase0 | [exp11] dir_ar_argmax_tweedie sigma=  0.1 k= 8: state_err=409.7297 cos=-0.0418 nan=0
+2026-02-07 07:30:36 | INFO     | phase0 | [exp11] dir_ar_argmax_tweedie sigma=  0.1 k=16: state_err=12150.8219 cos=0.0703 nan=0
+2026-02-07 07:30:36 | INFO     | phase0 | [exp11] dir_ar_categorical sigma=  N/A k= 1: state_err=0.9826 cos=0.3998 nan=0
+2026-02-07 07:30:36 | INFO     | phase0 | [exp11] dir_ar_categorical sigma=  N/A k= 2: state_err=1.3129 cos=0.4925 nan=0
+2026-02-07 07:30:36 | INFO     | phase0 | [exp11] dir_ar_categorical sigma=  N/A k= 4: state_err=3316.4789 cos=-0.1470 nan=0
+2026-02-07 07:30:37 | INFO     | phase0 | [exp11] dir_ar_categorical sigma=  N/A k= 8: state_err=6985.5747 cos=-0.1757 nan=0
+2026-02-07 07:30:39 | INFO     | phase0 | [exp11] dir_ar_categorical sigma=  N/A k=16: state_err=42758.2457 cos=-0.0147 nan=0
+2026-02-07 07:30:39 | INFO     | phase0 | [exp11] dir_ar_categorical_tweedie sigma=  0.1 k= 1: state_err=0.9076 cos=0.5273 nan=0
+2026-02-07 07:30:39 | INFO     | phase0 | [exp11] dir_ar_categorical_tweedie sigma=  0.1 k= 2: state_err=1.3880 cos=0.5184 nan=0
+2026-02-07 07:30:40 | INFO     | phase0 | [exp11] dir_ar_categorical_tweedie sigma=  0.1 k= 4: state_err=34.6768 cos=0.0862 nan=0
+2026-02-07 07:30:41 | INFO     | phase0 | [exp11] dir_ar_categorical_tweedie sigma=  0.1 k= 8: state_err=8535.7741 cos=-0.0700 nan=0
+2026-02-07 07:30:43 | INFO     | phase0 | [exp11] dir_ar_categorical_tweedie sigma=  0.1 k=16: state_err=33927.3504 cos=-0.0630 nan=0
+2026-02-07 07:30:43 | INFO     | phase0 | [exp11] Step 5: Finding best sigma per condition...
+2026-02-07 07:30:43 | INFO     | phase0 | [exp11] Best sigma for dir_ar_argmax_tweedie: sigma=0.1 state_err=1.8231 cos=0.0153
+2026-02-07 07:30:43 | INFO     | phase0 | [exp11] Best sigma for dir_ar_categorical_tweedie: sigma=0.1 state_err=34.6768 cos=0.0862
+2026-02-07 07:30:43 | INFO     | phase0 | [exp11] Summary (20 rows):
+                 condition  sigma  k_max    n    state_err  direction_cosine  nan_count
+             dir_ar_argmax    NaN      1  100     0.902855          0.662612          0
+             dir_ar_argmax    NaN      2  200     1.315644          0.621789          0
+             dir_ar_argmax    NaN      4  400     1.335253          0.132515          0
+             dir_ar_argmax    NaN      8  800     3.500526          0.141505          0
+             dir_ar_argmax    NaN     16 1600   101.042534          0.067889          0
+     dir_ar_argmax_tweedie    0.1      1  100     0.894449          0.662612          0
+     dir_ar_argmax_tweedie    0.1      2  200     1.403434          0.621789          0
+     dir_ar_argmax_tweedie    0.1      4  400     1.823075          0.015325          0
+     dir_ar_argmax_tweedie    0.1      8  800   409.729673         -0.041826          0
+     dir_ar_argmax_tweedie    0.1     16 1600 12150.821941          0.070286          0
+        dir_ar_categorical    NaN      1  100     0.982555          0.399798          0
+        dir_ar_categorical    NaN      2  200     1.312922          0.492530          0
+        dir_ar_categorical    NaN      4  400  3316.478917         -0.146963          0
+        dir_ar_categorical    NaN      8  800  6985.574711         -0.175709          0
+        dir_ar_categorical    NaN     16 1600 42758.245653         -0.014687          0
+dir_ar_categorical_tweedie    0.1      1  100     0.907638          0.527341          0
+dir_ar_categorical_tweedie    0.1      2  200     1.387952          0.518430          0
+dir_ar_categorical_tweedie    0.1      4  400    34.676759          0.086238          0
+dir_ar_categorical_tweedie    0.1      8  800  8535.774082         -0.069973          0
+dir_ar_categorical_tweedie    0.1     16 1600 33927.350425         -0.062977          0
+2026-02-07 07:30:43 | INFO     | phase0 | [exp11] Skipping audio eval (--skip-audio)
+2026-02-07 07:30:43 | INFO     | phase0 | [tracking] Finalized run: experiment=exp11_consistency_rollout run_id=20260207_073026 status=completed duration=17s n_score_params=1149984 n_sigma_values=1 n_conditions=4 best_sigma_dir_ar_argmax_tweedie=0.1 best_state_err_dir_ar_argmax_tweedie=1.8230745682865381 best_sigma_dir_ar_categorical_tweedie=0.1 best_state_err_dir_ar_categorical_tweedie=34.67675894409418 baseline_dir_ar_k4_state_err=1.3352525414526462 joint_trained=True joint_final_loss=0.9648602390289307 joint_sigma=0.1 joint_unroll_k=4

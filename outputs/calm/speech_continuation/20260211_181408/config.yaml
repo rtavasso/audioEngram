@@ -1,0 +1,55 @@
+seed: 42
+data:
+  latents_dir: outputs/tier2/exp9_pocket_mimi_vae/20260210_064617/latents.zarr
+  latents_index_path: outputs/tier2/exp9_pocket_mimi_vae/20260210_064617/latents_index.parquet
+  splits_dir: outputs/phase0/splits
+  seq_len: 64
+  min_utterance_len: 32
+vae:
+  checkpoint: outputs/tier2/exp9_pocket_mimi_vae/20260210_064617/checkpoints/vae_gan_step40000.pt
+  latent_dim: 32
+model:
+  d_model: 256
+  n_backbone_layers: 4
+  n_short_ctx_layers: 2
+  n_heads: 4
+  d_ff: 1024
+  dropout: 0.1
+  short_ctx_k: 10
+  head_hidden_dim: 512
+  head_n_layers: 4
+  ema_decay: 0.999
+  normalize_latents: true
+  norm_momentum: 0.01
+  norm_eps: 1.0e-05
+  use_noise_injection: true
+  use_short_context: true
+  consistency_dt: 0.001
+train:
+  device: auto
+  batch_size: 16
+  num_workers: 2
+  max_steps: 10000
+  lr: 0.0003
+  weight_decay: 0.0001
+  grad_clip_norm: 1.0
+  head_batch_mult: 4
+  amp: true
+  log_every: 100
+  save_every: 5000
+  sample_every: 10000
+generation:
+  prompt_sec: 3.0
+  generate_sec: 10.0
+  temperature: 0.8
+  n_samples: 10
+eval:
+  rollout_lengths:
+  - 1
+  - 2
+  - 4
+  - 8
+  - 16
+  n_utterances: 20
+output:
+  out_dir: outputs/calm/speech_continuation

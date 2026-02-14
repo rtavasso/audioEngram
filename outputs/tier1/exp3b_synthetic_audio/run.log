@@ -1,0 +1,35 @@
+2026-02-05 23:01:28 | INFO     | tier1-exp3b-synthetic | [tracking] Registered run: experiment=exp3b_synthetic run_id=20260205_230128 git=a1a1bc2 out=outputs/tier1/exp3b_synthetic_audio
+2026-02-05 23:01:28 | INFO     | tier1-exp3b-synthetic | [exp3b] Loading Mimi autoencoder...
+2026-02-05 23:01:51 | INFO     | tier1-exp3b-synthetic | [tracking] Registered run: experiment=exp3b_synthetic run_id=20260205_230151 git=a1a1bc2 out=outputs/tier1/exp3b_synthetic_audio
+2026-02-05 23:01:51 | INFO     | tier1-exp3b-synthetic | [exp3b] Loading Mimi autoencoder...
+2026-02-05 23:01:54 | INFO     | tier1-exp3b-synthetic | [exp3b] 10 utterances, max_frames=200, alphas=[0.25, 0.5, 0.75]
+2026-02-05 23:03:37 | INFO     | tier1-exp3b-synthetic | [tracking] Registered run: experiment=exp3b_synthetic run_id=20260205_230337 git=a1a1bc2 out=outputs/tier1/exp3b_synthetic_audio
+2026-02-05 23:03:37 | INFO     | tier1-exp3b-synthetic | [exp3b] Loading Mimi autoencoder...
+2026-02-05 23:03:38 | INFO     | tier1-exp3b-synthetic | [exp3b] 10 utterances, max_frames=200, alphas=[0.25, 0.5, 0.75]
+2026-02-05 23:03:40 | INFO     | tier1-exp3b-synthetic | [exp3b] [1/10] 5393-19218-0044: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_000_5393-19218-0044
+2026-02-05 23:03:40 | INFO     | tier1-exp3b-synthetic | [exp3b] [2/10] 8324-286682-0037: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_001_8324-286682-0037
+2026-02-05 23:03:40 | INFO     | tier1-exp3b-synthetic | [exp3b] [3/10] 8770-295463-0025: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_002_8770-295463-0025
+2026-02-05 23:03:40 | INFO     | tier1-exp3b-synthetic | [exp3b] [4/10] 4830-25898-0053: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_003_4830-25898-0053
+2026-02-05 23:03:41 | INFO     | tier1-exp3b-synthetic | [exp3b] [5/10] 1447-17506-0008: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_004_1447-17506-0008
+2026-02-05 23:03:41 | INFO     | tier1-exp3b-synthetic | [exp3b] [6/10] 6078-54013-0032: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_005_6078-54013-0032
+2026-02-05 23:03:41 | INFO     | tier1-exp3b-synthetic | [exp3b] [7/10] 8098-278278-0031: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_006_8098-278278-0031
+2026-02-05 23:03:41 | INFO     | tier1-exp3b-synthetic | [exp3b] [8/10] 3235-28452-0009: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_007_3235-28452-0009
+2026-02-05 23:03:42 | INFO     | tier1-exp3b-synthetic | [exp3b] [9/10] 298-126791-0033: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_008_298-126791-0033
+2026-02-05 23:03:42 | INFO     | tier1-exp3b-synthetic | [exp3b] [10/10] 83-9960-0046: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_009_83-9960-0046
+2026-02-05 23:03:42 | INFO     | tier1-exp3b-synthetic | [exp3b] Done. Outputs in outputs/tier1/exp3b_synthetic_audio
+2026-02-05 23:03:42 | INFO     | tier1-exp3b-synthetic | [tracking] Finalized run: experiment=exp3b_synthetic run_id=20260205_230337 status=completed duration=5s n_utterances=10 n_modes=6
+2026-02-06 06:18:47 | INFO     | tier1-exp3b-synthetic | [tracking] Registered run: experiment=exp3b_synthetic run_id=20260206_061847 git=a1a1bc2 out=outputs/tier1/exp3b_synthetic_audio
+2026-02-06 06:18:47 | INFO     | tier1-exp3b-synthetic | [exp3b] Loading Mimi autoencoder...
+2026-02-06 06:18:48 | INFO     | tier1-exp3b-synthetic | [exp3b] 10 utterances, max_frames=200, alphas=[0.25, 0.5, 0.75]
+2026-02-06 06:18:50 | INFO     | tier1-exp3b-synthetic | [exp3b] [1/10] 5393-19218-0044: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_000_5393-19218-0044
+2026-02-06 06:18:50 | INFO     | tier1-exp3b-synthetic | [exp3b] [2/10] 8324-286682-0037: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_001_8324-286682-0037
+2026-02-06 06:18:50 | INFO     | tier1-exp3b-synthetic | [exp3b] [3/10] 8770-295463-0025: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_002_8770-295463-0025
+2026-02-06 06:18:50 | INFO     | tier1-exp3b-synthetic | [exp3b] [4/10] 4830-25898-0053: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_003_4830-25898-0053
+2026-02-06 06:18:51 | INFO     | tier1-exp3b-synthetic | [exp3b] [5/10] 1447-17506-0008: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_004_1447-17506-0008
+2026-02-06 06:18:51 | INFO     | tier1-exp3b-synthetic | [exp3b] [6/10] 6078-54013-0032: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_005_6078-54013-0032
+2026-02-06 06:18:51 | INFO     | tier1-exp3b-synthetic | [exp3b] [7/10] 8098-278278-0031: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_006_8098-278278-0031
+2026-02-06 06:18:52 | INFO     | tier1-exp3b-synthetic | [exp3b] [8/10] 3235-28452-0009: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_007_3235-28452-0009
+2026-02-06 06:18:52 | INFO     | tier1-exp3b-synthetic | [exp3b] [9/10] 298-126791-0033: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_008_298-126791-0033
+2026-02-06 06:18:52 | INFO     | tier1-exp3b-synthetic | [exp3b] [10/10] 83-9960-0046: 6 modes -> outputs/tier1/exp3b_synthetic_audio/utt_009_83-9960-0046
+2026-02-06 06:18:52 | INFO     | tier1-exp3b-synthetic | [exp3b] Done. Outputs in outputs/tier1/exp3b_synthetic_audio
+2026-02-06 06:18:52 | INFO     | tier1-exp3b-synthetic | [tracking] Finalized run: experiment=exp3b_synthetic run_id=20260206_061847 status=completed duration=5s n_utterances=10 n_modes=6

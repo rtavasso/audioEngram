@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-02-09T22:31:42Z",
+  "latents_dir": "./outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/latents.zarr",
+  "latents_index": "./outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/latents_index.parquet",
+  "splits_dir": "./outputs/phase0/splits",
+  "n_utterances": 5000,
+  "latent_dim": 32,
+  "n_frames_total": 822279,
+  "n_deltas_total": 817279,
+  "delta_mag_median": 6.699100494384766,
+  "near_zero_eps_mult": 0.0001,
+  "near_zero_eps": 0.0006699100494384765,
+  "delta_mag_percentiles": {
+    "p5": 3.0943377017974854,
+    "p25": 5.302309036254883,
+    "p50": 6.699100494384766,
+    "p75": 8.112163543701172,
+    "p95": 10.366642951965332
+  }
+}

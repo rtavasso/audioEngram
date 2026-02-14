@@ -1,0 +1,16 @@
+{
+  "dir_ar_argmax_tweedie": {
+    "best_sigma": 0.1,
+    "state_err": 1.8230745682865381,
+    "direction_cosine": 0.015324956016666981,
+    "nan_total": 0,
+    "k_max": 4
+  },
+  "dir_ar_categorical_tweedie": {
+    "best_sigma": 0.1,
+    "state_err": 34.67675894409418,
+    "direction_cosine": 0.0862379099992209,
+    "nan_total": 0,
+    "k_max": 4
+  }
+}

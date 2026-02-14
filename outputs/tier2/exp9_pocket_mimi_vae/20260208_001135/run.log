@@ -1,0 +1,59 @@
+2026-02-08 00:11:35 | INFO     | phase0 | [tracking] Registered run: experiment=exp9_pocket_mimi_vae run_id=20260208_001135 git=a1a1bc2 out=outputs/tier2/exp9_pocket_mimi_vae/20260208_001135
+2026-02-08 00:13:15 | INFO     | phase0 | [exp9] Run id: 20260208_001135, device: cuda, utterances: 5000
+2026-02-08 00:13:15 | INFO     | phase0 | [exp9] Building PocketMimiVAE...
+2026-02-08 00:13:16 | INFO     | phase0 | Overriding seanet ratios: [6, 5, 4] -> [6, 5, 4, 4, 4]
+2026-02-08 00:13:16 | INFO     | phase0 | Overriding transformer num_layers: 2 -> 8
+2026-02-08 00:13:16 | INFO     | phase0 | Overriding transformer context: 250 -> 125
+2026-02-08 00:13:17 | INFO     | phase0 | Loading Mimi weights from full TTS model: hf://kyutai/pocket-tts/tts_b6369a24.safetensors@427e3d61b276ed69fdd03de0d185fa8a8d97fc5b
+2026-02-08 00:13:17 | INFO     | phase0 | Partial weight load — loaded: 59, shape mismatch: 22, missing: 170, unexpected: 0
+2026-02-08 00:13:17 | INFO     | phase0 | Mimi weights loaded successfully
+2026-02-08 00:13:17 | INFO     | phase0 | [exp9] VAE built. Trainable params: 67,288,929
+2026-02-08 00:13:17 | INFO     | phase0 | [exp9] Discriminator built. Params: 10,539,276
+2026-02-08 00:13:20 | INFO     | phase0 | [exp9] WavLM distillation loaded (device=cuda, layer=7)
+2026-02-08 00:13:20 | INFO     | phase0 | [exp9] Training VAE-GAN...
+2026-02-08 00:13:20 | INFO     | phase0 | [exp9] latent_dim=32 lambda_recon=0.0 beta_kl=0.01 lambda_adv=0.0 lambda_feat=0.0 lambda_distill=25.0 batch=4 lr_g=0.0008 lr_d=0.0008 lr_schedule=cosine steps=50000 gan_warmup=1000 amp=True
+2026-02-08 00:14:49 | INFO     | phase0 | [exp9] step=100/50000 [warmup] g=15.6696 recon=451.5021 kl=1013.70 adv_g=0.0000 feat=0.0000 distill=0.2213 d=0.0000
+2026-02-08 00:16:23 | INFO     | phase0 | [exp9] step=200/50000 [warmup] g=9.0741 recon=537.8156 kl=399.67 adv_g=0.0000 feat=0.0000 distill=0.2031 d=0.0000
+2026-02-08 00:17:55 | INFO     | phase0 | [exp9] step=300/50000 [warmup] g=5.6494 recon=605.1049 kl=61.25 adv_g=0.0000 feat=0.0000 distill=0.2015 d=0.0000
+2026-02-08 00:19:27 | INFO     | phase0 | [exp9] step=400/50000 [warmup] g=5.0773 recon=743.8971 kl=7.13 adv_g=0.0000 feat=0.0000 distill=0.2002 d=0.0000
+2026-02-08 00:20:59 | INFO     | phase0 | [exp9] step=500/50000 [warmup] g=5.0371 recon=757.6823 kl=5.54 adv_g=0.0000 feat=0.0000 distill=0.1993 d=0.0000
+2026-02-08 00:22:30 | INFO     | phase0 | [exp9] step=600/50000 [warmup] g=4.9944 recon=819.3310 kl=5.08 adv_g=0.0000 feat=0.0000 distill=0.1977 d=0.0000
+2026-02-08 00:24:03 | INFO     | phase0 | [exp9] step=700/50000 [warmup] g=4.9769 recon=798.7141 kl=4.61 adv_g=0.0000 feat=0.0000 distill=0.1972 d=0.0000
+2026-02-08 00:25:35 | INFO     | phase0 | [exp9] step=800/50000 [warmup] g=4.9625 recon=815.6067 kl=4.16 adv_g=0.0000 feat=0.0000 distill=0.1968 d=0.0000
+2026-02-08 00:27:07 | INFO     | phase0 | [exp9] step=900/50000 [warmup] g=4.9454 recon=822.7551 kl=3.72 adv_g=0.0000 feat=0.0000 distill=0.1963 d=0.0000
+2026-02-08 00:28:39 | INFO     | phase0 | [exp9] step=1000/50000 [warmup] g=4.9376 recon=834.7353 kl=3.30 adv_g=0.0000 feat=0.0000 distill=0.1962 d=0.0000
+2026-02-08 00:33:34 | INFO     | phase0 | [exp9] step=1100/50000 g=4.9171 recon=853.2328 kl=2.90 adv_g=342.8303 feat=25.1838 distill=0.1955 d=1.9114
+2026-02-08 00:38:26 | INFO     | phase0 | [exp9] step=1200/50000 g=4.9022 recon=845.7635 kl=2.52 adv_g=440.3681 feat=27.1573 distill=0.1951 d=0.0004
+2026-02-08 00:43:16 | INFO     | phase0 | [exp9] step=1300/50000 g=4.9039 recon=841.9071 kl=2.18 adv_g=488.0273 feat=29.5949 distill=0.1953 d=0.0018
+2026-02-08 00:48:07 | INFO     | phase0 | [exp9] step=1400/50000 g=nan recon=843.5051 kl=1.87 adv_g=inf feat=53.4528 distill=0.1951 d=3.0392
+2026-02-08 00:52:58 | INFO     | phase0 | [exp9] step=1500/50000 g=nan recon=854.5065 kl=1.58 adv_g=inf feat=115.3289 distill=0.1947 d=0.0000
+2026-02-08 00:57:50 | INFO     | phase0 | [exp9] step=1600/50000 g=nan recon=902.8142 kl=1.34 adv_g=inf feat=125.1061 distill=0.1955 d=0.0020
+2026-02-08 01:02:41 | INFO     | phase0 | [exp9] step=1700/50000 g=nan recon=921.9373 kl=1.12 adv_g=inf feat=131.3437 distill=0.1949 d=0.0001
+2026-02-08 01:07:32 | INFO     | phase0 | [exp9] step=1800/50000 g=nan recon=910.7618 kl=0.93 adv_g=inf feat=126.7157 distill=0.1946 d=0.0000
+2026-02-08 01:12:24 | INFO     | phase0 | [exp9] step=1900/50000 g=nan recon=934.3611 kl=0.77 adv_g=inf feat=129.5340 distill=0.1956 d=0.0000
+2026-02-08 01:17:18 | INFO     | phase0 | [exp9] step=2000/50000 g=nan recon=956.5715 kl=0.64 adv_g=inf feat=131.8824 distill=0.1943 d=0.0000
+2026-02-08 01:22:11 | INFO     | phase0 | [exp9] step=2100/50000 g=nan recon=951.0133 kl=0.53 adv_g=inf feat=128.2881 distill=0.1942 d=0.0000
+2026-02-08 01:27:04 | INFO     | phase0 | [exp9] step=2200/50000 g=nan recon=966.1828 kl=0.44 adv_g=inf feat=128.7472 distill=0.1944 d=0.0000
+2026-02-08 01:31:57 | INFO     | phase0 | [exp9] step=2300/50000 g=nan recon=984.6685 kl=0.36 adv_g=inf feat=131.2410 distill=0.1942 d=0.0004
+2026-02-08 01:36:51 | INFO     | phase0 | [exp9] step=2400/50000 g=nan recon=984.7526 kl=0.30 adv_g=inf feat=140.7081 distill=0.1942 d=9.7509
+2026-02-08 01:41:43 | INFO     | phase0 | [exp9] step=2500/50000 g=nan recon=1000.9780 kl=0.25 adv_g=inf feat=205.8478 distill=0.1942 d=1.6911
+2026-02-08 01:46:35 | INFO     | phase0 | [exp9] step=2600/50000 g=nan recon=999.0574 kl=0.22 adv_g=inf feat=172.7603 distill=0.1940 d=0.0000
+2026-02-08 01:51:29 | INFO     | phase0 | [exp9] step=2700/50000 g=nan recon=1009.6621 kl=0.19 adv_g=inf feat=174.7447 distill=0.1940 d=0.0000
+2026-02-08 01:56:21 | INFO     | phase0 | [exp9] step=2800/50000 g=nan recon=1042.7411 kl=0.16 adv_g=inf feat=180.9061 distill=0.1942 d=0.0000
+2026-02-08 02:01:14 | INFO     | phase0 | [exp9] step=2900/50000 g=nan recon=1044.2479 kl=0.14 adv_g=inf feat=208.5427 distill=0.1939 d=0.0025
+2026-02-08 02:06:08 | INFO     | phase0 | [exp9] step=3000/50000 g=nan recon=1073.5827 kl=0.12 adv_g=inf feat=224.4789 distill=0.1940 d=0.0000
+2026-02-08 02:11:01 | INFO     | phase0 | [exp9] step=3100/50000 g=nan recon=1067.6615 kl=0.11 adv_g=inf feat=220.7879 distill=0.1938 d=0.0000
+2026-02-08 02:15:55 | INFO     | phase0 | [exp9] step=3200/50000 g=nan recon=1072.6722 kl=0.10 adv_g=inf feat=221.1707 distill=0.1936 d=0.0000
+2026-02-08 02:20:46 | INFO     | phase0 | [exp9] step=3300/50000 g=nan recon=1084.6179 kl=0.08 adv_g=inf feat=222.9006 distill=0.1937 d=0.0000
+2026-02-08 02:25:38 | INFO     | phase0 | [exp9] step=3400/50000 g=nan recon=1115.8827 kl=0.10 adv_g=nan feat=inf distill=0.1944 d=nan
+2026-02-08 02:30:29 | INFO     | phase0 | [exp9] step=3500/50000 g=nan recon=1280.0391 kl=0.13 adv_g=inf feat=276.0692 distill=0.1954 d=0.0014
+2026-02-08 02:35:21 | INFO     | phase0 | [exp9] step=3600/50000 g=nan recon=1264.0132 kl=0.07 adv_g=inf feat=284.5305 distill=0.1939 d=0.0000
+2026-02-08 02:40:13 | INFO     | phase0 | [exp9] step=3700/50000 g=nan recon=1255.8606 kl=0.05 adv_g=nan feat=inf distill=0.1938 d=nan
+2026-02-08 02:45:04 | INFO     | phase0 | [exp9] step=3800/50000 g=nan recon=1257.1796 kl=0.05 adv_g=nan feat=inf distill=0.1937 d=nan
+2026-02-08 02:49:56 | INFO     | phase0 | [exp9] step=3900/50000 g=nan recon=1255.7215 kl=0.04 adv_g=nan feat=inf distill=0.1936 d=nan
+2026-02-08 02:54:49 | INFO     | phase0 | [exp9] step=4000/50000 g=nan recon=1267.7746 kl=0.03 adv_g=nan feat=inf distill=0.1936 d=nan
+2026-02-08 02:59:40 | INFO     | phase0 | [exp9] step=4100/50000 g=nan recon=1272.5939 kl=0.03 adv_g=nan feat=inf distill=0.1935 d=nan
+2026-02-08 03:04:32 | INFO     | phase0 | [exp9] step=4200/50000 g=nan recon=1273.6201 kl=0.03 adv_g=nan feat=inf distill=0.1934 d=nan
+2026-02-08 03:09:23 | INFO     | phase0 | [exp9] step=4300/50000 g=nan recon=1290.3647 kl=0.02 adv_g=nan feat=inf distill=0.1934 d=nan
+2026-02-08 03:14:15 | INFO     | phase0 | [exp9] step=4400/50000 g=nan recon=1302.4154 kl=0.02 adv_g=nan feat=inf distill=0.1936 d=nan
+2026-02-08 03:19:08 | INFO     | phase0 | [exp9] step=4500/50000 g=nan recon=1313.9290 kl=0.02 adv_g=nan feat=inf distill=0.1934 d=nan

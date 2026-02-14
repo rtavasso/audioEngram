@@ -621,6 +621,8 @@ def rollout_context_gap(
             # Advance rollout state with sampled or mean delta under ctx_hat
             if sample_from_mixture and hasattr(model, "sample_delta"):
                 dx_hat = model.sample_delta(ctx_hat_t)[0].detach().cpu().numpy()
+            elif hasattr(model, "rollout_mean"):
+                dx_hat = model.rollout_mean(ctx_hat_t)[0].detach().cpu().numpy()
             else:
                 dx_hat = model.expected_mean(ctx_hat_t)[0].detach().cpu().numpy()
             x_hat[t] = x_hat[t - 1] + dx_hat.astype(np.float32, copy=False)

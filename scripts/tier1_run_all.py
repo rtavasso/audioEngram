@@ -17,6 +17,11 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root / "src"))
+
+from experiment import register_run, finalize_run
+
 
 def _default_run_id() -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -38,8 +43,20 @@ def main() -> int:
 
     run_id = args.run_id or _default_run_id()
 
-    # Exp1
     import yaml
+
+    # Tracking: create a combined output dir for the orchestrator
+    run_all_dir = Path("outputs/tier1/run_all") / run_id
+    run_all_dir.mkdir(parents=True, exist_ok=True)
+    run = register_run(
+        experiment="tier1_run_all", run_id=run_id, config_path="(orchestrator)",
+        config={"exp1_config": args.exp1_config, "exp2_config": args.exp2_config, "exp3_config": args.exp3_config},
+        cli_args=sys.argv[1:], out_dir=run_all_dir,
+    )
+
+    # Exp1
+
+    n_experiments_run = 0
 
     with open(args.exp1_config) as f:
         exp1_cfg = yaml.safe_load(f)
@@ -53,6 +70,7 @@ def main() -> int:
         subprocess.check_call(
             [sys.executable, "scripts/tier1_exp1_vmf.py", "--config", args.exp1_config, "--run-id", run_id],
         )
+        n_experiments_run += 1
 
     # Locate the k=... final checkpoint for Exp2
     ckpt = exp1_out / "checkpoints" / f"vmf_k{int(args.exp2_horizon_k)}_final.pt"
@@ -81,6 +99,7 @@ def main() -> int:
                 str(ckpt),
             ],
         )
+        n_experiments_run += 1
 
     # Exp3
     with open(args.exp3_config) as f:
@@ -95,7 +114,9 @@ def main() -> int:
         subprocess.check_call(
             [sys.executable, "scripts/tier1_exp3_rep_compare.py", "--config", args.exp3_config, "--run-id", run_id],
         )
+        n_experiments_run += 1
 
+    finalize_run(run, key_metrics={"n_experiments_run": n_experiments_run})
     return 0
 
 

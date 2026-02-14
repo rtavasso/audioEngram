@@ -1,3 +1,6 @@
 [submodule "moshi"]
 	path = moshi
 	url = https://github.com/kyutai-labs/moshi.git
+[submodule "pocket-tts"]
+	path = pocket-tts
+	url = https://github.com/kyutai-labs/pocket-tts

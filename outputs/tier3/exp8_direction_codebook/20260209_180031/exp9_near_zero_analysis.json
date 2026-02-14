@@ -1,0 +1,63 @@
+{
+  "magnitude_distribution": {
+    "n_total": 657086,
+    "mean": 6.704473972320557,
+    "median": 6.684202194213867,
+    "std": 2.1879334449768066,
+    "skew": 0.34649690985679626,
+    "log_mean": 1.8400849103927612,
+    "log_std": 0.38004183769226074,
+    "percentiles": {
+      "p5": 3.076331853866577,
+      "p25": 5.301926612854004,
+      "p50": 6.684202194213867,
+      "p75": 8.068958282470703,
+      "p95": 10.229328155517578
+    }
+  },
+  "epsilon_analysis": {
+    "0.001": {
+      "threshold": 0.006684202194213867,
+      "fraction": 0.0,
+      "n_near_zero": 0,
+      "temporal_clustering": {}
+    },
+    "0.01": {
+      "threshold": 0.06684202194213867,
+      "fraction": 1.065309563740515e-05,
+      "n_near_zero": 7,
+      "temporal_clustering": {
+        "n_runs": 7,
+        "mean_run_length": 1.0,
+        "median_run_length": 1.0,
+        "max_run_length": 1,
+        "p90_run_length": 1.0
+      }
+    },
+    "0.1": {
+      "threshold": 0.6684202194213867,
+      "fraction": 0.00022675874999619533,
+      "n_near_zero": 149,
+      "temporal_clustering": {
+        "n_runs": 101,
+        "mean_run_length": 1.4752475247524752,
+        "median_run_length": 1.0,
+        "max_run_length": 7,
+        "p90_run_length": 3.0
+      }
+    },
+    "0.5": {
+      "threshold": 3.3421010971069336,
+      "fraction": 0.06203601963822087,
+      "n_near_zero": 40763,
+      "temporal_clustering": {
+        "n_runs": 17577,
+        "mean_run_length": 2.319110200830631,
+        "median_run_length": 1.0,
+        "max_run_length": 37,
+        "p90_run_length": 5.0
+      }
+    }
+  },
+  "recommendation": "floor_clamp_sufficient"
+}

@@ -1,0 +1,2 @@
+2026-02-09 22:04:16 | INFO     | phase0 | [tracking] Registered run: experiment=exp6b_projector_correction run_id=20260209_220416 git=a1a1bc2 out=outputs/tier2/exp6b_projector_correction/20260209_220416
+2026-02-09 22:04:16 | INFO     | phase0 | [exp6b] Loading Phase 1 checkpoint: outputs/phase1/checkpoints/mdn_k1_final.pt

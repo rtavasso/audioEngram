@@ -1,0 +1,7 @@
+2026-02-07 19:07:51 | INFO     | phase0 | [tracking] Registered run: experiment=exp9_pocket_mimi_vae run_id=20260207_190751 git=a1a1bc2 out=outputs/tier2/exp9_pocket_mimi_vae/20260207_190751
+2026-02-07 19:09:32 | INFO     | phase0 | [exp9] Run id: 20260207_190751, device: cuda, utterances: 5000
+2026-02-07 19:09:32 | INFO     | phase0 | [exp9] Building PocketMimiVAE...
+2026-02-07 19:09:33 | INFO     | phase0 | Overriding seanet ratios: [6, 5, 4] -> [6, 5, 4, 4, 4]
+2026-02-07 19:09:33 | INFO     | phase0 | Overriding transformer num_layers: 2 -> 8
+2026-02-07 19:09:33 | INFO     | phase0 | Overriding transformer context: 250 -> 125
+2026-02-07 19:09:34 | INFO     | phase0 | Loading Mimi weights from full TTS model: hf://kyutai/pocket-tts/tts_b6369a24.safetensors@427e3d61b276ed69fdd03de0d185fa8a8d97fc5b

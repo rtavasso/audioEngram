@@ -1,0 +1,34 @@
+2026-02-08 21:54:34 | INFO     | phase0 | [tracking] Registered run: experiment=exp9_pocket_mimi_vae run_id=exp9_rescue_smoke git=a1a1bc2 out=outputs/tier2/exp9_pocket_mimi_vae/exp9_rescue_smoke
+2026-02-08 21:56:12 | INFO     | phase0 | [exp9] Run id: exp9_rescue_smoke, device: cuda, utterances: 5000
+2026-02-08 21:56:12 | INFO     | phase0 | [exp9] Building PocketMimiVAE...
+2026-02-08 21:56:14 | INFO     | phase0 | Loading Mimi weights from full TTS model: hf://kyutai/pocket-tts/tts_b6369a24.safetensors@427e3d61b276ed69fdd03de0d185fa8a8d97fc5b
+2026-02-08 21:56:14 | INFO     | phase0 | Mimi weights loaded successfully
+2026-02-08 21:56:14 | INFO     | phase0 | [exp9] VAE built. Trainable params: 10,461,793
+2026-02-08 21:56:14 | INFO     | phase0 | [exp9] Discriminator built. Params: 7,026,184
+2026-02-08 21:56:16 | INFO     | phase0 | [exp9] WavLM distillation loaded (device=cuda, layer=7)
+2026-02-08 21:56:16 | INFO     | phase0 | [exp9] Benchmarking pretrained reconstruction (before training)...
+2026-02-08 21:56:21 | INFO     | phase0 | [exp9] Pretrain benchmark: mimi_pretrained mel=3.7470 l1=0.0486 | vae_mu_init mel=5.2116 l1=0.0630
+2026-02-08 21:56:22 | INFO     | phase0 | [exp9] Saved 8 audio samples at step 0 -> outputs/tier2/exp9_pocket_mimi_vae/exp9_rescue_smoke/samples/pretrain_mimi
+2026-02-08 21:56:23 | INFO     | phase0 | [exp9] Saved 8 audio samples at step 0 -> outputs/tier2/exp9_pocket_mimi_vae/exp9_rescue_smoke/samples/pretrain_vae_mu
+2026-02-08 21:56:23 | INFO     | phase0 | [exp9] Wrote pretrain audio samples (n=8) to outputs/tier2/exp9_pocket_mimi_vae/exp9_rescue_smoke/samples/pretrain_mimi and outputs/tier2/exp9_pocket_mimi_vae/exp9_rescue_smoke/samples/pretrain_vae_mu
+2026-02-08 21:56:23 | INFO     | phase0 | [exp9] Training VAE-GAN...
+2026-02-08 21:56:23 | INFO     | phase0 | [exp9] latent_dim=32 lambda_recon=1.0 beta_kl=0.02 kl_norm=True kl_start=2000 kl_ramp=4000 distill_start=2000 det_warmup=2000 lambda_adv=1.0 lambda_feat=0.0 lambda_distill=0.25 batch=4 lr_g=0.0001 lr_d=0.0001 lr_schedule=constant steps=2500 gan_warmup=1000 amp=True
+2026-02-08 21:56:40 | INFO     | phase0 | [exp9] step=100/2500 [warmup] g=8.1525 recon=8.1525 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 21:56:58 | INFO     | phase0 | [exp9] step=200/2500 [warmup] g=7.4869 recon=7.4869 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 21:57:16 | INFO     | phase0 | [exp9] step=300/2500 [warmup] g=7.4027 recon=7.4027 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 21:57:34 | INFO     | phase0 | [exp9] step=400/2500 [warmup] g=7.3117 recon=7.3117 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 21:57:52 | INFO     | phase0 | [exp9] step=500/2500 [warmup] g=7.3599 recon=7.3599 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 21:58:10 | INFO     | phase0 | [exp9] step=600/2500 [warmup] g=7.1368 recon=7.1368 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 21:58:28 | INFO     | phase0 | [exp9] step=700/2500 [warmup] g=7.2644 recon=7.2644 kl=0.5679 kl_raw=908.71 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 21:58:47 | INFO     | phase0 | [exp9] step=800/2500 [warmup] g=7.1818 recon=7.1818 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 21:59:05 | INFO     | phase0 | [exp9] step=900/2500 [warmup] g=7.2965 recon=7.2965 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 21:59:24 | INFO     | phase0 | [exp9] step=1000/2500 [warmup] g=7.2096 recon=7.2096 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=0.0000 feat=0.0000 distill=0.0000 d=0.0000
+2026-02-08 22:01:05 | INFO     | phase0 | [exp9] step=1100/2500 g=8.9795 recon=7.3464 kl=0.5679 kl_raw=908.71 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=1.6330 feat=0.0000 distill=0.0000 d=1.5507
+2026-02-08 22:02:46 | INFO     | phase0 | [exp9] step=1200/2500 g=9.2333 recon=7.2937 kl=0.5679 kl_raw=908.71 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=1.9395 feat=0.0000 distill=0.0000 d=1.2333
+2026-02-08 22:04:28 | INFO     | phase0 | [exp9] step=1300/2500 g=9.2924 recon=7.3668 kl=0.5679 kl_raw=908.71 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=1.9256 feat=0.0000 distill=0.0000 d=1.2405
+2026-02-08 22:06:10 | INFO     | phase0 | [exp9] step=1400/2500 g=9.6243 recon=7.4403 kl=0.5679 kl_raw=908.71 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=2.1840 feat=0.0000 distill=0.0000 d=1.0160
+2026-02-08 22:07:52 | INFO     | phase0 | [exp9] step=1500/2500 g=10.1109 recon=7.6429 kl=0.5679 kl_raw=908.71 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=2.4680 feat=0.0000 distill=0.0000 d=0.8781
+2026-02-08 22:09:34 | INFO     | phase0 | [exp9] step=1600/2500 g=10.5691 recon=7.8371 kl=0.5679 kl_raw=908.71 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=2.7321 feat=0.0000 distill=0.0000 d=0.7906
+2026-02-08 22:11:17 | INFO     | phase0 | [exp9] step=1700/2500 g=10.7517 recon=7.7870 kl=0.5679 kl_raw=908.71 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=2.9646 feat=0.0000 distill=0.0000 d=0.7488
+2026-02-08 22:13:00 | INFO     | phase0 | [exp9] step=1800/2500 g=11.0803 recon=7.9621 kl=0.5679 kl_raw=908.71 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=3.1182 feat=0.0000 distill=0.0000 d=0.7398
+2026-02-08 22:14:43 | INFO     | phase0 | [exp9] step=1900/2500 g=10.9180 recon=7.7977 kl=0.5679 kl_raw=908.70 mu_bt_std=0.000e+00 kl_mult=0.000 adv_g=3.1203 feat=0.0000 distill=0.0000 d=0.7214

@@ -1,0 +1,238 @@
+[
+  {
+    "horizon_k": 1,
+    "slice_name": "all",
+    "model_type": "mdn",
+    "train": {
+      "n": 200000,
+      "nll": 182.97067073242187,
+      "nll_per_dim": 2.8589167301940916,
+      "nll_baseline": 210.42343399414062,
+      "nll_baseline_per_dim": 3.2878661561584472,
+      "dnll": -27.452763261718758,
+      "dnll_per_dim": -0.4289494259643556,
+      "direction_cosine": 0.7142805237960815,
+      "logmag_mse": 0.17012253089904786,
+      "logmag_r2": 0.2873951926839987
+    },
+    "eval": {
+      "n": 200000,
+      "nll": 182.1090689746094,
+      "nll_per_dim": 2.8454542027282717,
+      "nll_baseline": 208.84236338867188,
+      "nll_baseline_per_dim": 3.263161927947998,
+      "dnll": -26.7332944140625,
+      "dnll_per_dim": -0.41770772521972654,
+      "direction_cosine": 0.702475795249939,
+      "logmag_mse": 0.16501638926982878,
+      "logmag_r2": 0.3108533040478486
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2562,
+        "nll": 182.03219477917233,
+        "nll_per_dim": 2.8442530434245676,
+        "nll_baseline": 210.0587030212736,
+        "nll_baseline_per_dim": 3.2821672347074,
+        "dnll": -28.026508242101272,
+        "dnll_per_dim": -0.4379141912828324,
+        "direction_cosine": 0.7016446582279964,
+        "logmag_mse": 0.16694409177109854,
+        "logmag_r2": 0.4070036912534122
+      },
+      "rollout_context": {
+        "n": 2562,
+        "nll": 328.1999884835451,
+        "nll_per_dim": 5.128124820055392,
+        "nll_baseline": 210.0587030212736,
+        "nll_baseline_per_dim": 3.2821672347074,
+        "dnll": 118.1412854622715,
+        "dnll_per_dim": 1.8459575853479921,
+        "direction_cosine": 0.00946356589747062,
+        "logmag_mse": 10.966414290528299,
+        "logmag_r2": -37.95341922843012
+      },
+      "gap_nll": 146.16779370437277,
+      "gap_dnll": 146.16779370437277
+    },
+    "final_checkpoint": "outputs/tier1/exp4_linear_readout/stage1/pca_64/phase1/checkpoints/mdn_k1_final.pt"
+  },
+  {
+    "horizon_k": 2,
+    "slice_name": "all",
+    "model_type": "mdn",
+    "train": {
+      "n": 200000,
+      "nll": 202.60483295410157,
+      "nll_per_dim": 3.165700514907837,
+      "nll_baseline": 210.42343399414062,
+      "nll_baseline_per_dim": 3.2878661561584472,
+      "dnll": -7.818601040039056,
+      "dnll_per_dim": -0.12216564125061025,
+      "direction_cosine": 0.4296829002952576,
+      "logmag_mse": 0.8511947715377808,
+      "logmag_r2": -2.56546239322062
+    },
+    "eval": {
+      "n": 200000,
+      "nll": 200.52027771484376,
+      "nll_per_dim": 3.1331293392944337,
+      "nll_baseline": 208.84236338867188,
+      "nll_baseline_per_dim": 3.263161927947998,
+      "dnll": -8.322085673828127,
+      "dnll_per_dim": -0.13003258865356448,
+      "direction_cosine": 0.4312535366439819,
+      "logmag_mse": 0.8439321629142761,
+      "logmag_r2": -2.5244563540238802
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2442,
+        "nll": 199.7423261333742,
+        "nll_per_dim": 3.120973845833972,
+        "nll_baseline": 208.19095041710855,
+        "nll_baseline_per_dim": 3.252983600267321,
+        "dnll": -8.448624283734347,
+        "dnll_per_dim": -0.13200975443334917,
+        "direction_cosine": 0.4267486370949543,
+        "logmag_mse": 0.8408563646876823,
+        "logmag_r2": -2.329711282488826
+      },
+      "rollout_context": {
+        "n": 2442,
+        "nll": 4104811201508724.5,
+        "nll_per_dim": 64137675023573.82,
+        "nll_baseline": 208.19095041710855,
+        "nll_baseline_per_dim": 3.252983600267321,
+        "dnll": 4104811201508516.5,
+        "dnll_per_dim": 64137675023570.57,
+        "direction_cosine": 0.011761931905494434,
+        "logmag_mse": 50.970597317946016,
+        "logmag_r2": -200.83872072823917
+      },
+      "gap_nll": 4104811201508525.0,
+      "gap_dnll": 4104811201508525.0
+    },
+    "final_checkpoint": "outputs/tier1/exp4_linear_readout/stage1/pca_64/phase1/checkpoints/mdn_k2_final.pt"
+  },
+  {
+    "horizon_k": 4,
+    "slice_name": "all",
+    "model_type": "mdn",
+    "train": {
+      "n": 200000,
+      "nll": 210.39591928710936,
+      "nll_per_dim": 3.287436238861084,
+      "nll_baseline": 210.42343399414062,
+      "nll_baseline_per_dim": 3.2878661561584472,
+      "dnll": -0.027514707031258467,
+      "dnll_per_dim": -0.00042991729736341355,
+      "direction_cosine": 0.10500576124191284,
+      "logmag_mse": 7.074759194641113,
+      "logmag_r2": -28.63456625093364
+    },
+    "eval": {
+      "n": 200000,
+      "nll": 208.2402341748047,
+      "nll_per_dim": 3.2537536589813234,
+      "nll_baseline": 208.84236338867188,
+      "nll_baseline_per_dim": 3.263161927947998,
+      "dnll": -0.6021292138671868,
+      "dnll_per_dim": -0.009408268966674793,
+      "direction_cosine": 0.11175547548770905,
+      "logmag_mse": 6.954887783813477,
+      "logmag_r2": -28.04522367833295
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2414,
+        "nll": 211.37099099356772,
+        "nll_per_dim": 3.3026717342744956,
+        "nll_baseline": 210.81403469664062,
+        "nll_baseline_per_dim": 3.2939692921350097,
+        "dnll": 0.5569562969270976,
+        "dnll_per_dim": 0.0087024421394859,
+        "direction_cosine": 0.10123177432239942,
+        "logmag_mse": 7.032984980763533,
+        "logmag_r2": -31.103722113998415
+      },
+      "rollout_context": {
+        "n": 2414,
+        "nll": 64724049.77067384,
+        "nll_per_dim": 1011313.2776667788,
+        "nll_baseline": 210.81403469664062,
+        "nll_baseline_per_dim": 3.2939692921350097,
+        "dnll": 64723838.95663915,
+        "dnll_per_dim": 1011309.9836974867,
+        "direction_cosine": 0.004347393208696656,
+        "logmag_mse": 10.49533140361197,
+        "logmag_r2": -46.90842064890915
+      },
+      "gap_nll": 64723838.39968285,
+      "gap_dnll": 64723838.39968285
+    },
+    "final_checkpoint": "outputs/tier1/exp4_linear_readout/stage1/pca_64/phase1/checkpoints/mdn_k4_final.pt"
+  },
+  {
+    "horizon_k": 8,
+    "slice_name": "all",
+    "model_type": "mdn",
+    "train": {
+      "n": 200000,
+      "nll": 213.11596605957033,
+      "nll_per_dim": 3.3299369696807863,
+      "nll_baseline": 210.42343399414062,
+      "nll_baseline_per_dim": 3.2878661561584472,
+      "dnll": 2.6925320654297025,
+      "dnll_per_dim": 0.0420708135223391,
+      "direction_cosine": 0.03176966355025768,
+      "logmag_mse": 10.749078957214355,
+      "logmag_r2": -44.025460758490816
+    },
+    "eval": {
+      "n": 200000,
+      "nll": 210.73110805664064,
+      "nll_per_dim": 3.29267356338501,
+      "nll_baseline": 208.84236338867188,
+      "nll_baseline_per_dim": 3.263161927947998,
+      "dnll": 1.8887446679687514,
+      "dnll_per_dim": 0.02951163543701174,
+      "direction_cosine": 0.036013430058658126,
+      "logmag_mse": 10.413322658081055,
+      "logmag_r2": -42.48844945313764
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2214,
+        "nll": 211.85835056942437,
+        "nll_per_dim": 3.310286727647256,
+        "nll_baseline": 208.85593492185737,
+        "nll_baseline_per_dim": 3.2633739831540214,
+        "dnll": 3.0024156475670054,
+        "dnll_per_dim": 0.04691274449323446,
+        "direction_cosine": 0.03397985208274423,
+        "logmag_mse": 10.608346792632863,
+        "logmag_r2": -58.25991940195899
+      },
+      "rollout_context": {
+        "n": 2214,
+        "nll": 30503560.980553225,
+        "nll_per_dim": 476618.14032114414,
+        "nll_baseline": 208.85593492185737,
+        "nll_baseline_per_dim": 3.2633739831540214,
+        "dnll": 30503352.124618303,
+        "dnll_per_dim": 476614.876947161,
+        "direction_cosine": 0.00839209010435498,
+        "logmag_mse": 14.572769851710872,
+        "logmag_r2": -80.40581975274526
+      },
+      "gap_nll": 30503349.122202653,
+      "gap_dnll": 30503349.122202657
+    },
+    "final_checkpoint": "outputs/tier1/exp4_linear_readout/stage1/pca_64/phase1/checkpoints/mdn_k8_final.pt"
+  }
+]

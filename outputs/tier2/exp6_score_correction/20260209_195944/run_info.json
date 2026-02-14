@@ -1,0 +1,22 @@
+{
+  "experiment": "exp6_score_correction",
+  "run_id": "20260209_195944",
+  "config_path": "configs/tier2_exp6_score_correction.yaml",
+  "cli_args": [
+    "--config",
+    "configs/tier2_exp6_score_correction.yaml",
+    "--checkpoint",
+    "outputs/phase1/checkpoints/mdn_k1_final.pt"
+  ],
+  "git_commit": "a1a1bc2",
+  "start_time": "2026-02-09T19:59:44+00:00",
+  "status": "started",
+  "environment": {
+    "python_version": "3.11.14",
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA TITAN X (Pascal)",
+    "platform": "Linux-6.8.0-94-generic-x86_64-with-glibc2.39"
+  },
+  "output_dir": "outputs/tier2/exp6_score_correction/20260209_195944"
+}

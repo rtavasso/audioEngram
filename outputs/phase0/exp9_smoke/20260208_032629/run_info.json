@@ -1,0 +1,21 @@
+{
+  "experiment": "exp9_pocket_mimi_vae",
+  "run_id": "20260208_032629",
+  "config_path": "/tmp/exp9_benchmark_smoke.yaml",
+  "cli_args": [
+    "--config",
+    "/tmp/exp9_benchmark_smoke.yaml",
+    "--benchmark-pretrained-only"
+  ],
+  "git_commit": "a1a1bc2",
+  "start_time": "2026-02-08T03:26:29+00:00",
+  "status": "started",
+  "environment": {
+    "python_version": "3.11.14",
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": false,
+    "cuda_device": null,
+    "platform": "Linux-6.8.0-94-generic-x86_64-with-glibc2.39"
+  },
+  "output_dir": "/workspace/audioEngram/outputs/phase0/exp9_smoke/20260208_032629"
+}

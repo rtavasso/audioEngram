@@ -1,0 +1,11 @@
+idx,utterance_id,speaker_id,audio_path,l1,gt_wav,recon_wav
+0,6367-74004-0011,6367,data/LibriSpeech/train-clean-100/6367/74004/6367-74004-0011.flac,0.039514508098363876,sample_00_gt.wav,sample_00_recon.wav
+1,233-134440-0046,233,data/LibriSpeech/train-clean-100/233/134440/233-134440-0046.flac,0.030665116384625435,sample_01_gt.wav,sample_01_recon.wav
+2,7367-86737-0111,7367,data/LibriSpeech/train-clean-100/7367/86737/7367-86737-0111.flac,0.022313695400953293,sample_02_gt.wav,sample_02_recon.wav
+3,5322-7679-0035,5322,data/LibriSpeech/train-clean-100/5322/7679/5322-7679-0035.flac,0.02100309543311596,sample_03_gt.wav,sample_03_recon.wav
+4,374-180298-0038,374,data/LibriSpeech/train-clean-100/374/180298/374-180298-0038.flac,0.02897932380437851,sample_04_gt.wav,sample_04_recon.wav
+5,4297-13009-0046,4297,data/LibriSpeech/train-clean-100/4297/13009/4297-13009-0046.flac,0.030101537704467773,sample_05_gt.wav,sample_05_recon.wav
+6,6367-74004-0010,6367,data/LibriSpeech/train-clean-100/6367/74004/6367-74004-0010.flac,0.03867034241557121,sample_06_gt.wav,sample_06_recon.wav
+7,7367-86737-0095,7367,data/LibriSpeech/train-clean-100/7367/86737/7367-86737-0095.flac,0.018705155700445175,sample_07_gt.wav,sample_07_recon.wav
+8,374-180299-0043,374,data/LibriSpeech/train-clean-100/374/180299/374-180299-0043.flac,0.033385034650564194,sample_08_gt.wav,sample_08_recon.wav
+9,7113-86041-0109,7113,data/LibriSpeech/train-clean-100/7113/86041/7113-86041-0109.flac,0.038228265941143036,sample_09_gt.wav,sample_09_recon.wav

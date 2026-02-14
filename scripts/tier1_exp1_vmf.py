@@ -18,6 +18,7 @@ sys.path.insert(0, str(project_root / "src"))
 
 import yaml
 
+from experiment import register_run, finalize_run
 from phase0.utils.logging import setup_logging
 from phase1.train_eval import _device_from_config, train_and_eval_for_k, write_results
 
@@ -56,6 +57,11 @@ def main() -> int:
     out_root = Path(cfg["output"]["out_dir"])
     out_dir = out_root / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    run = register_run(
+        experiment="exp1_vmf", run_id=run_id, config_path=args.config,
+        config=cfg, cli_args=sys.argv[1:], out_dir=out_dir, log_name="tier1-exp1-vmf",
+    )
 
     metrics_path = out_dir / "metrics.json"
     tables_path = out_dir / "tables.csv"
@@ -122,6 +128,15 @@ def main() -> int:
     write_results(results, metrics_path=str(metrics_path), tables_path=str(tables_path))
     logger.info(f"Wrote metrics to: {metrics_path}")
     logger.info(f"Wrote table to: {tables_path}")
+
+    # Extract key metrics from k=1 result for tracking
+    km = {}
+    k1 = [r for r in results if r.horizon_k == 1]
+    if k1:
+        km["eval_dnll"] = k1[0].eval.get("dnll")
+        if k1[0].rollout:
+            km["rollout_gap_nll"] = k1[0].rollout.get("gap_nll")
+    finalize_run(run, key_metrics=km)
     return 0
 
 

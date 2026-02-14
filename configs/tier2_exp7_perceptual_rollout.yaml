@@ -1,0 +1,32 @@
+# Stage 2 - Experiment 7: Perceptual rollout evaluation
+#
+# Decodes actual MDN rollout trajectories through Mimi decoder to produce
+# WAV files for perceptual evaluation.
+
+seed: 42
+
+data:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: ./outputs/phase0/latents_index.parquet
+  splits_dir: ./outputs/phase0/splits
+  # Phase 1 checkpoint (MDN k=1 from Exp 1)
+  phase1_checkpoint: null  # must be provided via --checkpoint
+
+mimi_checkpoint: null  # null = HF download
+
+rollout:
+  # Rollout lengths to evaluate (number of dynamics steps)
+  lengths: [1, 2, 4, 8, 16]
+  # Number of eval utterances
+  n_utterances: 10
+  # Max frames per utterance
+  max_frames: 200
+  # Context window size (must match Phase 1 model)
+  window_size: 8
+
+output:
+  out_dir: ./outputs/tier2/exp7_perceptual_rollout
+  sample_rate: 48000  # output WAV sample rate (resampled from 24kHz)
+
+train:
+  device: auto

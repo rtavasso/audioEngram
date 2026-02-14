@@ -63,12 +63,20 @@ representations:
     amp: true
     amp_dtype: bf16
 
-  - name: encodec
+  - name: encodec_encoder
     type: encodec
     # HuggingFace transformers EnCodec (24kHz). Outputs either discrete codebooks ("codes")
     # or encoder features ("encoder").
     model_id: facebook/encodec_24khz
-    representation: codes
+    representation: encoder
+
+injection:
+  k_steps: 16
+  n_eval_utterances: 16
+  segments_per_utt: 8
+  max_frames_per_utterance: 2000
+  inject_after_steps_periodic: [4, 8, 12]
+  inject_after_steps_one_shot: [1]
 
 output:
   out_dir: ./outputs/tier1/exp3_rep_compare

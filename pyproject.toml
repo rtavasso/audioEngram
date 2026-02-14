@@ -32,6 +32,10 @@ dependencies = [
     # HF model/dataset utilities (used for EnCodec in Tier1 Exp3)
     "datasets>=2.18,<4.0",
     "transformers>=4.41,<5.0",
+
+    # Perceptual audio metrics (Stage 2 Exp 7)
+    "pesq>=0.0.4,<0.1",
+    "pystoi>=0.4,<0.5",
 ]
 
 [project.optional-dependencies]

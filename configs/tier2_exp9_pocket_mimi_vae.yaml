@@ -1,0 +1,145 @@
+# Stage 2 - Experiment 9: Pocket-TTS Mimi VAE-GAN
+#
+# Trains pocket-tts Mimi with 32D VAE bottleneck using full VAE-GAN loss:
+#   L = lambda_t*L_t + lambda_f*L_f + lambda_adv*L_adv + lambda_feat*L_feat
+#     + beta_kl*L_KL + lambda_distill*L_distill
+#
+# Pretrained encoder (frozen), decoder (fine-tuned), MS-STFT discriminator,
+# WavLM semantic distillation.
+
+seed: 42
+slice: all
+
+data:
+  librispeech_path: ./data/LibriSpeech
+  subset: train-clean-100
+  min_duration_sec: 3.0
+  splits_dir: ./outputs/phase0/splits
+  max_utterances: 5000
+
+vae:
+  latent_dim: 32
+  dec_hidden_dim: 256
+  # Train end-to-end from scratch (no pretrained Mimi weights).
+  load_pretrained_mimi: false
+  freeze_encoder: false
+  freeze_decoder: false
+  # Keep pretrained Mimi architecture unchanged so weights load strictly.
+  allow_partial_pretrained_load: false
+
+vae_train:
+  segment_sec: 4.0
+  sample_rate: 24000
+  batch_size: 4
+  num_workers: 2
+  max_steps: 50000
+  lr_generator: 1.0e-4
+  lr_discriminator: 1.0e-4
+  lr_schedule: constant
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+  gan_warmup_steps: 1000
+  log_every: 100
+  save_every: 10000
+  sample_every: 5000
+  sample_n_samples: 8
+  sample_output_sr: 48000
+  sample_mode: mu
+  # Train from scratch: keep AMP off for stability on Titan X (no bf16).
+  amp: false
+  amp_dtype: fp16
+  # Loss weights
+  lambda_recon: 1.0
+  # Observed at step~4000: recon~4.83, kl~5.36 with kl_mult~0.5.
+  # Increase beta_kl so KL is no longer negligible vs recon.
+  beta_kl: 0.10
+  kl_normalize_by_elements: true
+  kl_start_steps: 2000
+  kl_ramp_steps: 4000
+  lambda_adv: 1.0
+  lambda_feat: 0.0
+  # Keep pretrained WavLM teacher distillation (Mimi still trained from scratch).
+  lambda_distill: 1.0
+  # Reduce latent align so it doesn't overpower KL shaping of the bottleneck.
+  lambda_latent_align: 2.0
+  # Temporal latent prediction loss (short-context, causal).
+  # L_pred = lambda_pred * (alpha*(1 - cos_sim(delta_pred, delta_true)) + (1-alpha)*||z_{t+1}-z_hat_{t+1}||^2)
+  # Enabled by default (small short-context causal conv).
+  lambda_pred: 1.0
+  pred_alpha: 0.5
+  pred_kind: causal_conv   # causal_conv | mlp
+  pred_kernel_size: 6      # causal_conv: kernel size (suggest 4-8)
+  pred_window_size: 6      # mlp: context window size (suggest 4-8)
+  pred_hidden_dim: 256     # mlp: hidden dim
+  pred_start_steps: 5000   # delay the loss so recon/KL stabilize first
+  pred_use_mu: true        # use posterior mean (mu) vs sampled z
+  distill_start_steps: 2000
+  deterministic_warmup_steps: 2000
+  # Discriminator
+  disc_n_ffts: [256, 512, 1024, 2048]
+  disc_channels: 32
+  # WavLM distillation
+  wavlm_device: auto
+  wavlm_layer: 7
+
+pretrain_benchmark:
+  enabled: false
+  n_utterances: 50
+  max_duration_sec: 10.0
+  save_audio: true
+  n_samples: 8
+
+# Phase 1 diagnostic battery settings (reused from exp5)
+context:
+  window_size: 8
+  horizons_k: [1, 2, 4, 8]
+
+model:
+  n_components: 8
+  hidden_dim: 1024
+  n_hidden_layers: 2
+  dropout: 0.0
+  min_log_sigma: -7.0
+  max_log_sigma: 2.0
+
+train:
+  device: auto
+  seed: 42
+  batch_size: 256
+  num_workers: 0
+  compile: false
+  compile_mode: default
+  amp: false
+  amp_dtype: bf16
+  max_steps: 15000
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+  log_every: 200
+  eval_every: 2000
+  save_every: 5000
+  max_train_samples: null
+  max_eval_samples: 200000
+  shuffle_buffer: 8192
+
+rollout:
+  enabled: true
+  n_eval_utterances: 16
+  max_frames_per_utterance: 2000
+  sample_from_mixture: false
+
+injection:
+  k_steps: 16
+  n_eval_utterances: 16
+  segments_per_utt: 8
+  max_frames_per_utterance: 2000
+  inject_after_steps_periodic: [4, 8, 12]
+  inject_after_steps_one_shot: [1]
+
+recon_eval:
+  mode: mu
+  n_utterances: 50
+  max_duration_sec: 10.0
+
+output:
+  out_dir: ./outputs/tier2/exp9_pocket_mimi_vae

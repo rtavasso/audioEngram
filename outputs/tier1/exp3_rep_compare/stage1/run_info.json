@@ -1,0 +1,28 @@
+{
+  "experiment": "exp3_rep_compare",
+  "run_id": "stage1",
+  "config_path": "configs/tier1_exp3_rep_compare.yaml",
+  "cli_args": [
+    "--config",
+    "configs/tier1_exp3_rep_compare.yaml",
+    "--run-id",
+    "stage1"
+  ],
+  "git_commit": "a1a1bc2",
+  "start_time": "2026-02-06T02:06:12+00:00",
+  "status": "completed",
+  "environment": {
+    "python_version": "3.11.14",
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA TITAN X (Pascal)",
+    "platform": "Linux-6.8.0-94-generic-x86_64-with-glibc2.39"
+  },
+  "output_dir": "outputs/tier1/exp3_rep_compare/stage1",
+  "end_time": "2026-02-06T04:11:41+00:00",
+  "duration_sec": 7529.0,
+  "key_metrics": {
+    "mimi12_best_dnll": -184.4466583203125,
+    "encodec_encoder_best_dnll": -93.5953357928467
+  }
+}

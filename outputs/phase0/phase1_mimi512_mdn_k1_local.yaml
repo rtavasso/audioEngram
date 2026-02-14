@@ -1,0 +1,51 @@
+# Phase 1 (local) — train a fresh MDN k=1 checkpoint on Mimi 512D latents.
+#
+# This is intended to be run from `outputs/phase0/` so paths are local.
+
+data:
+  latents_dir: ./latents.zarr
+  latents_index: ./latents_index.parquet
+  frames_index: ./phase0_frames.parquet
+  splits_dir: ./splits
+
+context:
+  window_size: 8
+  horizons_k: [1]
+
+model:
+  # Mixture Density Network (diagonal Gaussian mixture)
+  n_components: 8
+  hidden_dim: 1024
+  n_hidden_layers: 2
+  dropout: 0.0
+  min_log_sigma: -7.0
+  max_log_sigma: 2.0
+
+train:
+  device: auto
+  seed: 42
+  batch_size: 256
+  num_workers: 0
+  # Bump this up if you want a stronger checkpoint.
+  max_steps: 200
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+  log_every: 50
+  eval_every: 100
+  save_every: 100
+  # Cap streams so CPU training finishes in a reasonable time.
+  max_train_samples: 20000
+  max_eval_samples: 10000
+  shuffle_buffer: 8192
+
+rollout:
+  enabled: true
+  n_eval_utterances: 16
+  max_frames_per_utterance: 2000
+  sample_from_mixture: false
+
+output:
+  out_dir: ./phase1_mimi512_mdn_k1
+  metrics_file: ./phase1_mimi512_mdn_k1/metrics.json
+  tables_file: ./phase1_mimi512_mdn_k1/tables.csv

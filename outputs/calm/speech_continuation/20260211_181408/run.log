@@ -1,0 +1,154 @@
+2026-02-11 18:14:08 | INFO     | phase0 | [tracking] Registered run: experiment=calm_speech_continuation run_id=20260211_181408 git=a1a1bc2 out=outputs/calm/speech_continuation/20260211_181408
+2026-02-11 18:14:08 | INFO     | phase0 | [calm] Run id: 20260211_181408, device: cuda
+2026-02-11 18:14:09 | INFO     | phase0 | [calm_data] train split: 4047 utterances (seq_len=64, min_len=32)
+2026-02-11 18:14:09 | INFO     | phase0 | [calm_data] eval split: 953 utterances (seq_len=64, min_len=32)
+2026-02-11 18:14:09 | INFO     | phase0 | [calm] Model built: {'backbone': 3233280, 'short_ctx': 1653760, 'head': 1281568, 'w_psi': 193, 'total_trainable': 6168801}
+2026-02-11 18:14:09 | INFO     | phase0 | [calm] Training: max_steps=10000 lr=0.0003 head_batch_mult=4 amp=True params={'backbone': 3233280, 'short_ctx': 1653760, 'head': 1281568, 'w_psi': 193, 'total_trainable': 6168801}
+2026-02-11 18:14:22 | INFO     | phase0 | [calm] step=100/10000 loss=0.035494 consistency_res_mse=0.305941
+2026-02-11 18:14:34 | INFO     | phase0 | [calm] step=200/10000 loss=-0.386387 consistency_res_mse=0.215048
+2026-02-11 18:14:47 | INFO     | phase0 | [calm] step=300/10000 loss=-0.590691 consistency_res_mse=0.193865
+2026-02-11 18:14:59 | INFO     | phase0 | [calm] step=400/10000 loss=-0.776354 consistency_res_mse=0.176977
+2026-02-11 18:15:12 | INFO     | phase0 | [calm] step=500/10000 loss=-0.923770 consistency_res_mse=0.165249
+2026-02-11 18:15:25 | INFO     | phase0 | [calm] step=600/10000 loss=-1.021872 consistency_res_mse=0.159537
+2026-02-11 18:15:39 | INFO     | phase0 | [calm] step=700/10000 loss=-1.068473 consistency_res_mse=0.157861
+2026-02-11 18:15:52 | INFO     | phase0 | [calm] step=800/10000 loss=-1.124708 consistency_res_mse=0.152501
+2026-02-11 18:16:06 | INFO     | phase0 | [calm] step=900/10000 loss=-1.151069 consistency_res_mse=0.150629
+2026-02-11 18:16:19 | INFO     | phase0 | [calm] step=1000/10000 loss=-1.172620 consistency_res_mse=0.149465
+2026-02-11 18:16:33 | INFO     | phase0 | [calm] step=1100/10000 loss=-1.197004 consistency_res_mse=0.147798
+2026-02-11 18:16:46 | INFO     | phase0 | [calm] step=1200/10000 loss=-1.214804 consistency_res_mse=0.146685
+2026-02-11 18:17:00 | INFO     | phase0 | [calm] step=1300/10000 loss=-1.234074 consistency_res_mse=0.145332
+2026-02-11 18:17:13 | INFO     | phase0 | [calm] step=1400/10000 loss=-1.258037 consistency_res_mse=0.143494
+2026-02-11 18:17:27 | INFO     | phase0 | [calm] step=1500/10000 loss=-1.272954 consistency_res_mse=0.142832
+2026-02-11 18:17:40 | INFO     | phase0 | [calm] step=1600/10000 loss=-1.279054 consistency_res_mse=0.143178
+2026-02-11 18:17:54 | INFO     | phase0 | [calm] step=1700/10000 loss=-1.301856 consistency_res_mse=0.141089
+2026-02-11 18:18:07 | INFO     | phase0 | [calm] step=1800/10000 loss=-1.320422 consistency_res_mse=0.139089
+2026-02-11 18:18:21 | INFO     | phase0 | [calm] step=1900/10000 loss=-1.325809 consistency_res_mse=0.139803
+2026-02-11 18:18:35 | INFO     | phase0 | [calm] step=2000/10000 loss=-1.339101 consistency_res_mse=0.138441
+2026-02-11 18:18:48 | INFO     | phase0 | [calm] step=2100/10000 loss=-1.343303 consistency_res_mse=0.138635
+2026-02-11 18:19:02 | INFO     | phase0 | [calm] step=2200/10000 loss=-1.350269 consistency_res_mse=0.138673
+2026-02-11 18:19:15 | INFO     | phase0 | [calm] step=2300/10000 loss=-1.360874 consistency_res_mse=0.137305
+2026-02-11 18:19:29 | INFO     | phase0 | [calm] step=2400/10000 loss=-1.367361 consistency_res_mse=0.137036
+2026-02-11 18:19:43 | INFO     | phase0 | [calm] step=2500/10000 loss=-1.372374 consistency_res_mse=0.136810
+2026-02-11 18:19:56 | INFO     | phase0 | [calm] step=2600/10000 loss=-1.379165 consistency_res_mse=0.135835
+2026-02-11 18:20:09 | INFO     | phase0 | [calm] step=2700/10000 loss=-1.381055 consistency_res_mse=0.136202
+2026-02-11 18:20:23 | INFO     | phase0 | [calm] step=2800/10000 loss=-1.386218 consistency_res_mse=0.135676
+2026-02-11 18:20:37 | INFO     | phase0 | [calm] step=2900/10000 loss=-1.392866 consistency_res_mse=0.134864
+2026-02-11 18:20:51 | INFO     | phase0 | [calm] step=3000/10000 loss=-1.401970 consistency_res_mse=0.133875
+2026-02-11 18:21:04 | INFO     | phase0 | [calm] step=3100/10000 loss=-1.397166 consistency_res_mse=0.134302
+2026-02-11 18:21:18 | INFO     | phase0 | [calm] step=3200/10000 loss=-1.401545 consistency_res_mse=0.134214
+2026-02-11 18:21:31 | INFO     | phase0 | [calm] step=3300/10000 loss=-1.413732 consistency_res_mse=0.133050
+2026-02-11 18:21:45 | INFO     | phase0 | [calm] step=3400/10000 loss=-1.413827 consistency_res_mse=0.132859
+2026-02-11 18:21:59 | INFO     | phase0 | [calm] step=3500/10000 loss=-1.416653 consistency_res_mse=0.133002
+2026-02-11 18:22:12 | INFO     | phase0 | [calm] step=3600/10000 loss=-1.416324 consistency_res_mse=0.132716
+2026-02-11 18:22:25 | INFO     | phase0 | [calm] step=3700/10000 loss=-1.416164 consistency_res_mse=0.133237
+2026-02-11 18:22:39 | INFO     | phase0 | [calm] step=3800/10000 loss=-1.430407 consistency_res_mse=0.131406
+2026-02-11 18:22:53 | INFO     | phase0 | [calm] step=3900/10000 loss=-1.420081 consistency_res_mse=0.132876
+2026-02-11 18:23:06 | INFO     | phase0 | [calm] step=4000/10000 loss=-1.428085 consistency_res_mse=0.132188
+2026-02-11 18:23:20 | INFO     | phase0 | [calm] step=4100/10000 loss=-1.432984 consistency_res_mse=0.131982
+2026-02-11 18:23:34 | INFO     | phase0 | [calm] step=4200/10000 loss=-1.439323 consistency_res_mse=0.130788
+2026-02-11 18:23:47 | INFO     | phase0 | [calm] step=4300/10000 loss=-1.444910 consistency_res_mse=0.130091
+2026-02-11 18:24:01 | INFO     | phase0 | [calm] step=4400/10000 loss=-1.441515 consistency_res_mse=0.130843
+2026-02-11 18:24:14 | INFO     | phase0 | [calm] step=4500/10000 loss=-1.447759 consistency_res_mse=0.130398
+2026-02-11 18:24:28 | INFO     | phase0 | [calm] step=4600/10000 loss=-1.453259 consistency_res_mse=0.129478
+2026-02-11 18:24:41 | INFO     | phase0 | [calm] step=4700/10000 loss=-1.453556 consistency_res_mse=0.129940
+2026-02-11 18:24:55 | INFO     | phase0 | [calm] step=4800/10000 loss=-1.451986 consistency_res_mse=0.130143
+2026-02-11 18:25:08 | INFO     | phase0 | [calm] step=4900/10000 loss=-1.456153 consistency_res_mse=0.129788
+2026-02-11 18:25:22 | INFO     | phase0 | [calm] step=5000/10000 loss=-1.461426 consistency_res_mse=0.128785
+2026-02-11 18:25:22 | INFO     | phase0 | [calm] Saved checkpoint at step 5000: outputs/calm/speech_continuation/20260211_181408/checkpoints/calm_step5000.pt
+2026-02-11 18:25:36 | INFO     | phase0 | [calm] step=5100/10000 loss=-1.460458 consistency_res_mse=0.129385
+2026-02-11 18:25:49 | INFO     | phase0 | [calm] step=5200/10000 loss=-1.473154 consistency_res_mse=0.127729
+2026-02-11 18:26:03 | INFO     | phase0 | [calm] step=5300/10000 loss=-1.465889 consistency_res_mse=0.129184
+2026-02-11 18:26:17 | INFO     | phase0 | [calm] step=5400/10000 loss=-1.466937 consistency_res_mse=0.129135
+2026-02-11 18:26:30 | INFO     | phase0 | [calm] step=5500/10000 loss=-1.466398 consistency_res_mse=0.129124
+2026-02-11 18:26:44 | INFO     | phase0 | [calm] step=5600/10000 loss=-1.474538 consistency_res_mse=0.128162
+2026-02-11 18:26:57 | INFO     | phase0 | [calm] step=5700/10000 loss=-1.480525 consistency_res_mse=0.127594
+2026-02-11 18:27:11 | INFO     | phase0 | [calm] step=5800/10000 loss=-1.477999 consistency_res_mse=0.128046
+2026-02-11 18:27:24 | INFO     | phase0 | [calm] step=5900/10000 loss=-1.477344 consistency_res_mse=0.127926
+2026-02-11 18:27:38 | INFO     | phase0 | [calm] step=6000/10000 loss=-1.485460 consistency_res_mse=0.127080
+2026-02-11 18:27:51 | INFO     | phase0 | [calm] step=6100/10000 loss=-1.480721 consistency_res_mse=0.127806
+2026-02-11 18:28:05 | INFO     | phase0 | [calm] step=6200/10000 loss=-1.484844 consistency_res_mse=0.127319
+2026-02-11 18:28:18 | INFO     | phase0 | [calm] step=6300/10000 loss=-1.484330 consistency_res_mse=0.127333
+2026-02-11 18:28:32 | INFO     | phase0 | [calm] step=6400/10000 loss=-1.484546 consistency_res_mse=0.127387
+2026-02-11 18:28:45 | INFO     | phase0 | [calm] step=6500/10000 loss=-1.497184 consistency_res_mse=0.125633
+2026-02-11 18:28:59 | INFO     | phase0 | [calm] step=6600/10000 loss=-1.488618 consistency_res_mse=0.127459
+2026-02-11 18:29:12 | INFO     | phase0 | [calm] step=6700/10000 loss=-1.485422 consistency_res_mse=0.127341
+2026-02-11 18:29:26 | INFO     | phase0 | [calm] step=6800/10000 loss=-1.496809 consistency_res_mse=0.126140
+2026-02-11 18:29:39 | INFO     | phase0 | [calm] step=6900/10000 loss=-1.493865 consistency_res_mse=0.126689
+2026-02-11 18:29:52 | INFO     | phase0 | [calm] step=7000/10000 loss=-1.497370 consistency_res_mse=0.126358
+2026-02-11 18:30:05 | INFO     | phase0 | [calm] step=7100/10000 loss=-1.494851 consistency_res_mse=0.126720
+2026-02-11 18:30:19 | INFO     | phase0 | [calm] step=7200/10000 loss=-1.503829 consistency_res_mse=0.125693
+2026-02-11 18:30:33 | INFO     | phase0 | [calm] step=7300/10000 loss=-1.502496 consistency_res_mse=0.125959
+2026-02-11 18:30:46 | INFO     | phase0 | [calm] step=7400/10000 loss=-1.495956 consistency_res_mse=0.126602
+2026-02-11 18:30:59 | INFO     | phase0 | [calm] step=7500/10000 loss=-1.509327 consistency_res_mse=0.125201
+2026-02-11 18:31:13 | INFO     | phase0 | [calm] step=7600/10000 loss=-1.506974 consistency_res_mse=0.125551
+2026-02-11 18:31:26 | INFO     | phase0 | [calm] step=7700/10000 loss=-1.512943 consistency_res_mse=0.124514
+2026-02-11 18:31:39 | INFO     | phase0 | [calm] step=7800/10000 loss=-1.504251 consistency_res_mse=0.126061
+2026-02-11 18:31:53 | INFO     | phase0 | [calm] step=7900/10000 loss=-1.518675 consistency_res_mse=0.124441
+2026-02-11 18:32:06 | INFO     | phase0 | [calm] step=8000/10000 loss=-1.507874 consistency_res_mse=0.125301
+2026-02-11 18:32:19 | INFO     | phase0 | [calm] step=8100/10000 loss=-1.516277 consistency_res_mse=0.124747
+2026-02-11 18:32:33 | INFO     | phase0 | [calm] step=8200/10000 loss=-1.515011 consistency_res_mse=0.124764
+2026-02-11 18:32:46 | INFO     | phase0 | [calm] step=8300/10000 loss=-1.518452 consistency_res_mse=0.124394
+2026-02-11 18:32:59 | INFO     | phase0 | [calm] step=8400/10000 loss=-1.522531 consistency_res_mse=0.123673
+2026-02-11 18:33:13 | INFO     | phase0 | [calm] step=8500/10000 loss=-1.514084 consistency_res_mse=0.125056
+2026-02-11 18:33:26 | INFO     | phase0 | [calm] step=8600/10000 loss=-1.518252 consistency_res_mse=0.124644
+2026-02-11 18:33:39 | INFO     | phase0 | [calm] step=8700/10000 loss=-1.516397 consistency_res_mse=0.124736
+2026-02-11 18:33:52 | INFO     | phase0 | [calm] step=8800/10000 loss=-1.527338 consistency_res_mse=0.123357
+2026-02-11 18:34:06 | INFO     | phase0 | [calm] step=8900/10000 loss=-1.526231 consistency_res_mse=0.123933
+2026-02-11 18:34:19 | INFO     | phase0 | [calm] step=9000/10000 loss=-1.523856 consistency_res_mse=0.124469
+2026-02-11 18:34:32 | INFO     | phase0 | [calm] step=9100/10000 loss=-1.532008 consistency_res_mse=0.123049
+2026-02-11 18:34:46 | INFO     | phase0 | [calm] step=9200/10000 loss=-1.524512 consistency_res_mse=0.124344
+2026-02-11 18:34:59 | INFO     | phase0 | [calm] step=9300/10000 loss=-1.532065 consistency_res_mse=0.123310
+2026-02-11 18:35:12 | INFO     | phase0 | [calm] step=9400/10000 loss=-1.531571 consistency_res_mse=0.123362
+2026-02-11 18:35:25 | INFO     | phase0 | [calm] step=9500/10000 loss=-1.530253 consistency_res_mse=0.123740
+2026-02-11 18:35:39 | INFO     | phase0 | [calm] step=9600/10000 loss=-1.534549 consistency_res_mse=0.123281
+2026-02-11 18:35:52 | INFO     | phase0 | [calm] step=9700/10000 loss=-1.535271 consistency_res_mse=0.122922
+2026-02-11 18:36:05 | INFO     | phase0 | [calm] step=9800/10000 loss=-1.531195 consistency_res_mse=0.124160
+2026-02-11 18:36:19 | INFO     | phase0 | [calm] step=9900/10000 loss=-1.538244 consistency_res_mse=0.122318
+2026-02-11 18:36:32 | INFO     | phase0 | [calm] step=10000/10000 loss=-1.543124 consistency_res_mse=0.122151
+2026-02-11 18:36:32 | INFO     | phase0 | [calm] Saved checkpoint at step 10000: outputs/calm/speech_continuation/20260211_181408/checkpoints/calm_step10000.pt
+2026-02-11 18:36:33 | INFO     | phase0 | [calm] Saved 10 latent samples at step 10000 -> outputs/calm/speech_continuation/20260211_181408/samples/step_010000
+2026-02-11 18:36:33 | INFO     | phase0 | [calm] Saved checkpoint at step 10000: outputs/calm/speech_continuation/20260211_181408/checkpoints/calm_final.pt
+2026-02-11 18:36:34 | INFO     | phase0 | [calm] Saved 10 latent samples at step 10000 -> outputs/calm/speech_continuation/20260211_181408/samples/step_010000
+2026-02-11 18:36:34 | INFO     | phase0 | [calm] Training done at step 10000. Final checkpoint: outputs/calm/speech_continuation/20260211_181408/checkpoints/calm_final.pt
+2026-02-11 18:36:34 | INFO     | phase0 | [calm] Evaluating rollout quality...
+2026-02-11 18:37:00 | INFO     | phase0 | [calm] Rollout metrics: {
+  "k=1": {
+    "mse_mean": 0.045794479265168775,
+    "mse_std": 0.027651267787507906,
+    "cos_mean": 0.9623404862359166,
+    "cos_std": 0.03630694306877011,
+    "n_samples": 320
+  },
+  "k=2": {
+    "mse_mean": 0.10641815961280372,
+    "mse_std": 0.06548027442392776,
+    "cos_mean": 0.8793947547674179,
+    "cos_std": 0.11809632092562598,
+    "n_samples": 320
+  },
+  "k=4": {
+    "mse_mean": 0.22023076749173925,
+    "mse_std": 0.11091697949623758,
+    "cos_mean": 0.7128219435922801,
+    "cos_std": 0.22675379038755572,
+    "n_samples": 320
+  },
+  "k=8": {
+    "mse_mean": 0.31438359238673,
+    "mse_std": 0.10519714956541462,
+    "cos_mean": 0.6849573453975608,
+    "cos_std": 0.19455326379244994,
+    "n_samples": 320
+  },
+  "k=16": {
+    "mse_mean": 0.37597847753204405,
+    "mse_std": 0.0929959285127541,
+    "cos_mean": 0.6696448359871283,
+    "cos_std": 0.19253688931916313,
+    "n_samples": 320
+  }
+}
+2026-02-11 18:37:00 | INFO     | phase0 | [calm] Loading VAE for audio generation...
+2026-02-11 18:37:01 | INFO     | phase0 | Skipping pretrained Mimi load (expected to load from checkpoint)
+2026-02-11 18:37:03 | INFO     | phase0 | [calm] Generated 10 audio samples -> outputs/calm/speech_continuation/20260211_181408/audio_samples
+2026-02-11 18:37:03 | INFO     | phase0 | [tracking] Finalized run: experiment=calm_speech_continuation run_id=20260211_181408 status=completed duration=1375s rollout_mse_k1=0.045794479265168775 rollout_cos_k1=0.9623404862359166 rollout_mse_k2=0.10641815961280372 rollout_cos_k2=0.8793947547674179 rollout_mse_k4=0.22023076749173925 rollout_cos_k4=0.7128219435922801 rollout_mse_k8=0.31438359238673 rollout_cos_k8=0.6849573453975608 rollout_mse_k16=0.37597847753204405 rollout_cos_k16=0.6696448359871283

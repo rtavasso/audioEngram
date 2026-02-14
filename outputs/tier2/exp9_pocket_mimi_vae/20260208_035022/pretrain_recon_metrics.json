@@ -1,0 +1,16 @@
+{
+  "mimi_pretrained": {
+    "n_utterances": 50,
+    "l1_mean": 0.04777511969208717,
+    "l1_std": 0.009461384778036448,
+    "mel_distance_mean": 3.768765859603882,
+    "mel_distance_std": 0.4360905376453599
+  },
+  "vae_mu_init": {
+    "n_utterances": 50,
+    "l1_mean": 0.055307028889656065,
+    "l1_std": 0.008845387018373103,
+    "mel_distance_mean": 3.8081822633743285,
+    "mel_distance_std": 0.5344485280082824
+  }
+}

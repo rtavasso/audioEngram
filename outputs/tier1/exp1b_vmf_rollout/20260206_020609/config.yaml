@@ -1,0 +1,35 @@
+checkpoint: null
+data:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: ./outputs/phase0/latents_index.parquet
+  frames_index: ./outputs/phase0/phase0_frames.parquet
+  splits_dir: ./outputs/phase0/splits
+  min_duration_sec: 3.0
+context:
+  window_size: 8
+  horizon_k: 1
+rollout_train:
+  k: 16
+  batch_size: 256
+  max_steps: 5000
+  lr: 0.0002
+  weight_decay: 0.0001
+  grad_clip_norm: 1.0
+  clip_dz_l2: 5.0
+  rollout_weight: 1.0
+  teacher_weight: 0.1
+  sched_teacher_prob:
+    start: 0.2
+    end: 0.0
+    warmup: 2000
+  segments_per_utt: 8
+  log_every: 100
+  save_every: 1000
+  seed: 42
+eval:
+  n_eval_utterances: 16
+  k_steps: 16
+  max_frames_per_utterance: 2000
+  segments_per_utt: 8
+output:
+  out_dir: ./outputs/tier1/exp1b_vmf_rollout

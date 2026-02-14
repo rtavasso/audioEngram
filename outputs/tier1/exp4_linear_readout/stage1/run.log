@@ -1,0 +1,37 @@
+2026-02-05 23:01:20 | INFO     | tier1-exp4-linear-readout | [tracking] Registered run: experiment=exp4_linear_readout run_id=stage1 git=a1a1bc2 out=outputs/tier1/exp4_linear_readout/stage1
+2026-02-05 23:01:20 | INFO     | tier1-exp4-linear-readout | Run id: stage1
+2026-02-05 23:01:20 | INFO     | tier1-exp4-linear-readout | Device: cuda
+2026-02-05 23:01:20 | INFO     | tier1-exp4-linear-readout | PCA dims: [32, 64]
+2026-02-05 23:01:20 | INFO     | tier1-exp4-linear-readout | Train utterances for PCA: 22216
+2026-02-05 23:01:20 | INFO     | tier1-exp4-linear-readout | [exp4] Running raw 512-dim Phase 1 baseline
+2026-02-05 23:03:38 | INFO     | tier1-exp4-linear-readout | [tracking] Registered run: experiment=exp4_linear_readout run_id=stage1 git=a1a1bc2 out=outputs/tier1/exp4_linear_readout/stage1
+2026-02-05 23:03:38 | INFO     | tier1-exp4-linear-readout | Run id: stage1
+2026-02-05 23:03:38 | INFO     | tier1-exp4-linear-readout | Device: cuda
+2026-02-05 23:03:38 | INFO     | tier1-exp4-linear-readout | PCA dims: [32, 64]
+2026-02-05 23:03:38 | INFO     | tier1-exp4-linear-readout | Train utterances for PCA: 22216
+2026-02-05 23:03:38 | INFO     | tier1-exp4-linear-readout | [exp4] Running raw 512-dim Phase 1 baseline
+2026-02-05 23:46:06 | INFO     | tier1-exp4-linear-readout | [exp4] Wrote injection diagnostic: outputs/tier1/exp4_linear_readout/stage1/raw_512/injection_diag.json
+2026-02-05 23:46:06 | INFO     | tier1-exp4-linear-readout | [exp4] === PCA d=32 ===
+2026-02-06 01:34:36 | INFO     | tier1-exp4-linear-readout | [exp4] PCA d=32: fitted on 3600034 frames, explained_var_ratio=0.6584 (top-5: [0.13659869 0.1028563  0.05520519 0.03504146 0.02483602])
+2026-02-06 01:38:15 | INFO     | tier1-exp4-linear-readout | [exp4] Projected 27952 utterances -> outputs/tier1/exp4_linear_readout/stage1/pca_32/latents.zarr
+2026-02-06 01:55:47 | INFO     | tier1-exp4-linear-readout | [exp4] Wrote injection diagnostic: outputs/tier1/exp4_linear_readout/stage1/pca_32/phase1/injection_diag.json
+2026-02-06 01:55:47 | INFO     | tier1-exp4-linear-readout | [exp4] === PCA d=64 ===
+2026-02-06 02:25:32 | INFO     | tier1-exp4-linear-readout | [exp4] PCA d=64: fitted on 3600034 frames, explained_var_ratio=0.7913 (top-5: [0.13660227 0.10285728 0.05521056 0.03506149 0.02501872])
+2026-02-06 02:35:53 | INFO     | tier1-exp4-linear-readout | [exp4] Projected 27952 utterances -> outputs/tier1/exp4_linear_readout/stage1/pca_64/latents.zarr
+2026-02-06 02:59:25 | INFO     | tier1-exp4-linear-readout | [exp4] Wrote injection diagnostic: outputs/tier1/exp4_linear_readout/stage1/pca_64/phase1/injection_diag.json
+2026-02-06 02:59:25 | INFO     | tier1-exp4-linear-readout | [exp4] Summary table:
+   representation  pca_dim  horizon_k   eval_dnll     eval_nll  eval_nll_baseline  rollout_gap_nll
+0         raw_512      512          1 -176.948305  1086.710373        1263.658678              inf
+1         raw_512      512          2 -121.974132  1141.684546        1263.658678              NaN
+2         raw_512      512          4  -83.380458  1180.278220        1263.658678     2.552694e+19
+3         raw_512      512          8  -70.105189  1192.216008        1262.321197     7.118645e+00
+4          pca_32       32          1  -14.716035    98.809356         113.525391     1.385234e+02
+5          pca_32       32          2   -3.902800   109.622591         113.525391     8.288878e+02
+6          pca_32       32          4    0.003146   113.528537         113.525391     5.895205e+11
+7          pca_32       32          8    3.472450   116.997841         113.525391     9.146290e+06
+8          pca_64       64          1  -26.733294   182.109069         208.842363     1.461678e+02
+9          pca_64       64          2   -8.322086   200.520278         208.842363     4.104811e+15
+10         pca_64       64          4   -0.602129   208.240234         208.842363     6.472384e+07
+11         pca_64       64          8    1.888745   210.731108         208.842363     3.050335e+07
+2026-02-06 02:59:25 | INFO     | tier1-exp4-linear-readout | [exp4] Wrote summary: outputs/tier1/exp4_linear_readout/stage1/summary.csv
+2026-02-06 02:59:25 | INFO     | tier1-exp4-linear-readout | [tracking] Finalized run: experiment=exp4_linear_readout run_id=stage1 status=completed duration=14147s raw_512_dnll_k1=-176.94830494140615 pca_32_dnll_k1=-14.71603497314453 pca_64_dnll_k1=-26.7332944140625

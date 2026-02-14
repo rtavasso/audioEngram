@@ -10,7 +10,17 @@
       "Bash(cat:*)",
       "Bash(codex exec:*)",
       "Skill(codex-chat)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)",
+      "Bash(du:*)",
+      "Bash(PYTHONPATH=src:. uv run python:*)",
+      "Bash(git log:*)",
+      "Bash(NO_TORCH_COMPILE=1 uv run python:*)",
+      "Bash(nvidia-smi:*)",
+      "Bash(find:*)",
+      "Bash(sort:*)",
+      "Bash(git add:*)"
     ]
   }
 }

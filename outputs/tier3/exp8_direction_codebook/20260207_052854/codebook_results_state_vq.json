@@ -1,0 +1,16 @@
+{
+  "32": {
+    "k": 32,
+    "recon_error_mean": 53.48392105102539,
+    "recon_error_median": 54.17951583862305,
+    "recon_error_p95": 71.99716186523438,
+    "codebook_utilization": 32,
+    "codebook_utilization_frac": 1.0,
+    "entropy": 3.4069529810605643,
+    "max_entropy": 3.4657359027997265,
+    "entropy_ratio": 0.9830388340635893,
+    "cluster_sizes_min": 16598,
+    "cluster_sizes_max": 177423,
+    "cluster_sizes_mean": 112501.0625
+  }
+}

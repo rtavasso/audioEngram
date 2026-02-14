@@ -1,0 +1,32 @@
+{
+  "experiment": "exp5_betavae",
+  "run_id": "20260206_174326",
+  "config_path": "configs/tier2_exp5_betavae.yaml",
+  "cli_args": [
+    "--config",
+    "configs/tier2_exp5_betavae.yaml"
+  ],
+  "git_commit": "a1a1bc2",
+  "start_time": "2026-02-06T17:43:26+00:00",
+  "status": "completed",
+  "environment": {
+    "python_version": "3.11.14",
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA TITAN X (Pascal)",
+    "platform": "Linux-6.8.0-94-generic-x86_64-with-glibc2.39"
+  },
+  "output_dir": "outputs/tier2/exp5_betavae/20260206_174326",
+  "end_time": "2026-02-06T21:12:17+00:00",
+  "duration_sec": 12531.0,
+  "key_metrics": {
+    "baseline_betavae_best_dnll": -41.35287969578725,
+    "baseline_betavae_recon_mel": 2.4794901752471925,
+    "betavae_smooth_best_dnll": -44.721497834105854,
+    "betavae_smooth_recon_mel": 2.4620414900779726,
+    "betavae_pred_best_dnll": -44.72567752374425,
+    "betavae_pred_recon_mel": 2.4707065773010255,
+    "betavae_smooth_pred_best_dnll": -44.72828958916601,
+    "betavae_smooth_pred_recon_mel": 2.4684942150115967
+  }
+}

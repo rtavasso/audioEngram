@@ -1,0 +1,10 @@
+2026-02-07 17:54:48 | INFO     | phase0 | [tracking] Registered run: experiment=exp9_pocket_mimi_vae run_id=20260207_175448 git=a1a1bc2 out=outputs/tier2/exp9_pocket_mimi_vae/20260207_175448
+2026-02-07 17:56:33 | INFO     | phase0 | [exp9] Run id: 20260207_175448, device: cuda, utterances: 5000
+2026-02-07 17:56:33 | INFO     | phase0 | [exp9] Building PocketMimiVAE...
+2026-02-07 17:56:34 | INFO     | phase0 | Loading Mimi weights from full TTS model: hf://kyutai/pocket-tts/tts_b6369a24.safetensors@427e3d61b276ed69fdd03de0d185fa8a8d97fc5b
+2026-02-07 17:56:34 | INFO     | phase0 | Mimi weights loaded successfully
+2026-02-07 17:56:34 | INFO     | phase0 | [exp9] VAE built. Trainable params: 10,461,793
+2026-02-07 17:56:34 | INFO     | phase0 | [exp9] Discriminator built. Params: 10,539,276
+2026-02-07 17:56:37 | INFO     | phase0 | [exp9] WavLM distillation loaded (device=cpu, layer=7)
+2026-02-07 17:56:37 | INFO     | phase0 | [exp9] Training VAE-GAN...
+2026-02-07 17:56:37 | INFO     | phase0 | [exp9] latent_dim=32 beta_kl=0.01 lambda_adv=1.0 lambda_feat=2.0 lambda_distill=1.0 batch=4 lr_g=0.0001 lr_d=0.0001 steps=10 gan_warmup=1000 amp=True

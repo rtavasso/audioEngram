@@ -1,0 +1,65 @@
+# Stage 2 - Experiment 6: Score-based manifold correction
+#
+# Trains a score model on Mimi latents, then applies Langevin correction
+# during rollout to keep predictions on the data manifold.
+
+seed: 42
+
+data:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: ./outputs/phase0/latents_index.parquet
+  frames_index: ./outputs/phase0/phase0_frames.parquet
+  splits_dir: ./outputs/phase0/splits
+  # Phase 1 checkpoint to use for rollout (MDN k=1 from Exp 1)
+  phase1_checkpoint: null  # must be provided via --checkpoint
+
+score_model:
+  latent_dim: 512
+  hidden_dim: 1024
+  n_layers: 4
+  sigma_min: 0.01
+  sigma_max: 1.0
+  # If true, trains score model on p(z_t | context_flat) instead of p(z_t).
+  # This tends to act more like an "on-manifold, on-context" projector during rollout.
+  conditional: true
+  # Output skip connection (for backward compatibility with older score checkpoints).
+  output_skip: false
+
+score_train:
+  batch_size: 256
+  num_workers: 0
+  max_steps: 20000
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+  log_every: 100
+  save_every: 5000
+  # sigma2 is strongly recommended; unweighted loss is dominated by tiny sigmas.
+  loss_weighting: sigma2
+  # Optional: limit training samples per utterance for conditional score model.
+  max_frames_per_utt: 200
+
+# Correction hyperparameter sweep
+correction_sweep:
+  # method: [langevin, tweedie]
+  method: [tweedie]
+  n_steps: [1, 3, 5]
+  step_size: [0.001, 0.01, 0.1]
+  sigma: [0.01, 0.05, 0.1, 0.25, 0.5, 1.0]
+  # Tweedie-only: z <- z + scale*sigma^2*score(z,sigma)
+  tweedie_scale: [0.25, 0.5, 1.0, 2.0]
+
+# Injection diagnostic settings
+injection:
+  window_size: 8
+  horizon_k: 1
+  k_steps: 16
+  n_eval_utterances: 16
+  segments_per_utt: 8
+  max_frames_per_utterance: 2000
+
+train:
+  device: auto
+
+output:
+  out_dir: ./outputs/tier2/exp6_score_correction

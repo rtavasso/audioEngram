@@ -1,0 +1,8 @@
+{
+  "n_train_speakers": 200,
+  "n_eval_speakers": 51,
+  "n_train_utterances": 22673,
+  "n_eval_utterances": 5866,
+  "n_train_utt_train": 20406,
+  "n_train_utt_val": 2267
+}

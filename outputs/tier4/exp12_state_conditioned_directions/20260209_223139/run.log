@@ -1,0 +1,194 @@
+2026-02-09 22:31:39 | INFO     | tier4-exp12 | [tracking] Registered run: experiment=exp12_state_cond_dirs run_id=20260209_223139 git=a1a1bc2 out=outputs/tier4/exp12_state_conditioned_directions/20260209_223139
+2026-02-09 22:31:39 | INFO     | tier4-exp12 | [exp12] Building cache (this may take a while)...
+2026-02-09 22:31:39 | INFO     | tier4-exp12 | [exp12] Cache input utterances: 5000
+2026-02-09 22:31:39 | INFO     | tier4-exp12 | [exp12] Total frames M=822279, deltas N≈817279, D=32
+2026-02-09 22:31:39 | INFO     | tier4-exp12 | [exp12] Cached 200/5000 utterances
+2026-02-09 22:31:39 | INFO     | tier4-exp12 | [exp12] Cached 400/5000 utterances
+2026-02-09 22:31:39 | INFO     | tier4-exp12 | [exp12] Cached 600/5000 utterances
+2026-02-09 22:31:40 | INFO     | tier4-exp12 | [exp12] Cached 800/5000 utterances
+2026-02-09 22:31:40 | INFO     | tier4-exp12 | [exp12] Cached 1000/5000 utterances
+2026-02-09 22:31:40 | INFO     | tier4-exp12 | [exp12] Cached 1200/5000 utterances
+2026-02-09 22:31:40 | INFO     | tier4-exp12 | [exp12] Cached 1400/5000 utterances
+2026-02-09 22:31:40 | INFO     | tier4-exp12 | [exp12] Cached 1600/5000 utterances
+2026-02-09 22:31:40 | INFO     | tier4-exp12 | [exp12] Cached 1800/5000 utterances
+2026-02-09 22:31:40 | INFO     | tier4-exp12 | [exp12] Cached 2000/5000 utterances
+2026-02-09 22:31:40 | INFO     | tier4-exp12 | [exp12] Cached 2200/5000 utterances
+2026-02-09 22:31:40 | INFO     | tier4-exp12 | [exp12] Cached 2400/5000 utterances
+2026-02-09 22:31:41 | INFO     | tier4-exp12 | [exp12] Cached 2600/5000 utterances
+2026-02-09 22:31:41 | INFO     | tier4-exp12 | [exp12] Cached 2800/5000 utterances
+2026-02-09 22:31:41 | INFO     | tier4-exp12 | [exp12] Cached 3000/5000 utterances
+2026-02-09 22:31:41 | INFO     | tier4-exp12 | [exp12] Cached 3200/5000 utterances
+2026-02-09 22:31:41 | INFO     | tier4-exp12 | [exp12] Cached 3400/5000 utterances
+2026-02-09 22:31:41 | INFO     | tier4-exp12 | [exp12] Cached 3600/5000 utterances
+2026-02-09 22:31:41 | INFO     | tier4-exp12 | [exp12] Cached 3800/5000 utterances
+2026-02-09 22:31:41 | INFO     | tier4-exp12 | [exp12] Cached 4000/5000 utterances
+2026-02-09 22:31:41 | INFO     | tier4-exp12 | [exp12] Cached 4200/5000 utterances
+2026-02-09 22:31:42 | INFO     | tier4-exp12 | [exp12] Cached 4400/5000 utterances
+2026-02-09 22:31:42 | INFO     | tier4-exp12 | [exp12] Cached 4600/5000 utterances
+2026-02-09 22:31:42 | INFO     | tier4-exp12 | [exp12] Cached 4800/5000 utterances
+2026-02-09 22:31:42 | INFO     | tier4-exp12 | [exp12] Cached 5000/5000 utterances
+2026-02-09 22:31:42 | INFO     | tier4-exp12 | [exp12] Cache built: M=822279 frames, N=817279 deltas, near_zero_eps=6.699e-04, kept=817279
+2026-02-09 22:31:42 | INFO     | tier4-exp12 | [exp12][exp1] Running global baseline...
+2026-02-09 22:34:18 | INFO     | tier4-exp12 | [exp12][exp1] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp1_global.csv
+2026-02-09 22:34:18 | INFO     | tier4-exp12 | [exp12][exp1] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp1_primary_table.csv
+2026-02-09 22:34:18 | INFO     | tier4-exp12 | [exp12][exp2] Running state quantization...
+2026-02-09 22:36:36 | INFO     | tier4-exp12 | [exp12][exp2] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp2_states.csv
+2026-02-09 22:36:36 | INFO     | tier4-exp12 | [exp12][exp2] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp2_states_summary.csv
+2026-02-09 22:36:36 | INFO     | tier4-exp12 | [exp12][exp3] Running state-conditioned directional analysis...
+2026-02-09 22:42:09 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=64 seed=11
+2026-02-09 22:47:42 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=64 seed=22
+2026-02-09 22:53:15 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=64 seed=33
+2026-02-09 23:00:21 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=128 seed=11
+2026-02-09 23:07:32 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=128 seed=22
+2026-02-09 23:14:48 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=128 seed=33
+2026-02-09 23:24:27 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=256 seed=11
+2026-02-09 23:34:05 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=256 seed=22
+2026-02-09 23:43:38 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=256 seed=33
+2026-02-09 23:58:10 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=512 seed=11
+2026-02-10 00:12:18 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=512 seed=22
+2026-02-10 00:26:20 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=512 seed=33
+2026-02-10 00:48:34 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=1024 seed=11
+2026-02-10 01:10:43 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=1024 seed=22
+2026-02-10 01:32:43 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=1024 seed=33
+2026-02-10 02:10:35 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=2048 seed=11
+2026-02-10 02:48:18 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=2048 seed=22
+2026-02-10 03:26:05 | INFO     | tier4-exp12 | [exp12][exp3] Done k1=2048 seed=33
+2026-02-10 03:26:05 | INFO     | tier4-exp12 | [exp12][exp3] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp3_conditional.csv
+2026-02-10 03:26:05 | INFO     | tier4-exp12 | [exp12][exp3] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp3_primary_table.csv
+2026-02-10 03:26:05 | INFO     | tier4-exp12 | [exp12][exp3] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp3_primary_table_means.csv
+2026-02-10 03:26:05 | INFO     | tier4-exp12 | [exp12][exp3] Best config: K1=2048 K2=4 Δ=22.78°
+2026-02-10 03:27:07 | INFO     | tier4-exp12 | [exp12][exp4] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp4_bigram.csv
+2026-02-10 03:27:07 | INFO     | tier4-exp12 | [exp12][exp4] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp4_bigram_summary.csv
+2026-02-10 03:31:20 | INFO     | tier4-exp12 | [exp12][exp5] Fitting per-state delta codebooks (K1=2048, K2=4)...
+2026-02-10 03:31:49 | INFO     | tier4-exp12 | [exp12][exp5] Loaded PocketMimiVAE from outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/checkpoints/vae_gan_final.pt
+2026-02-10 03:31:53 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0015
+2026-02-10 03:31:57 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0053
+2026-02-10 03:31:59 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13009-0063
+2026-02-10 03:32:01 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13006-0037
+2026-02-10 03:32:04 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7679-0029
+2026-02-10 03:32:06 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7367-86737-0042
+2026-02-10 03:32:09 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180299-0046
+2026-02-10 03:32:12 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7680-0005
+2026-02-10 03:32:15 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6529-62554-0053
+2026-02-10 03:32:17 | INFO     | tier4-exp12 | [exp12][exp5] Scored 8226-274369-0026
+2026-02-10 03:32:19 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13009-0015
+2026-02-10 03:32:23 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7679-0008
+2026-02-10 03:32:25 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180298-0035
+2026-02-10 03:32:27 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0006
+2026-02-10 03:32:29 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7367-86737-0041
+2026-02-10 03:32:32 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0036
+2026-02-10 03:32:35 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0010
+2026-02-10 03:32:37 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180298-0061
+2026-02-10 03:32:39 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6529-62556-0044
+2026-02-10 03:32:44 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7678-0007
+2026-02-10 03:32:44 | INFO     | tier4-exp12 | [exp12][exp5] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp5_perceptual.csv
+2026-02-10 03:32:44 | INFO     | tier4-exp12 | [exp12][exp5] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp5_perceptual_summary.csv
+2026-02-10 03:32:44 | ERROR    | tier4-exp12 | [tier4-exp12] Failed: 'Missing column for delta_structure_deg/mean'
+Traceback (most recent call last):
+  File "/workspace/audioEngram/scripts/tier4_exp12_state_conditioned_directions.py", line 102, in main
+    results = runner.run(
+              ^^^^^^^^^^^
+  File "/workspace/audioEngram/src/tier4/state_conditioned_directions.py", line 582, in run
+    self._run_exp6_scaling()
+  File "/workspace/audioEngram/src/tier4/state_conditioned_directions.py", line 1437, in _run_exp6_scaling
+    c_delta = find_col("delta_structure_deg", "mean")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/audioEngram/src/tier4/state_conditioned_directions.py", line 1435, in find_col
+    raise KeyError(f"Missing column for {prefix}/{suffix}")
+KeyError: 'Missing column for delta_structure_deg/mean'
+2026-02-10 03:32:44 | INFO     | tier4-exp12 | [tracking] Finalized run: experiment=exp12_state_cond_dirs run_id=20260209_223139 status=completed duration=18065s status=failed error='Missing column for delta_structure_deg/mean'
+2026-02-10 04:38:24 | INFO     | tier4-exp12 | [tracking] Registered run: experiment=exp12_state_cond_dirs run_id=20260209_223139 git=a1a1bc2 out=outputs/tier4/exp12_state_conditioned_directions/20260209_223139
+2026-02-10 04:38:24 | INFO     | tier4-exp12 | [exp12][exp6] Wrote scaling plots.
+2026-02-10 04:38:24 | INFO     | tier4-exp12 | [tracking] Finalized run: experiment=exp12_state_cond_dirs run_id=20260209_223139 status=completed duration=0s 
+2026-02-10 04:39:13 | INFO     | tier4-exp12 | [tracking] Registered run: experiment=exp12_state_cond_dirs run_id=20260209_223139 git=a1a1bc2 out=outputs/tier4/exp12_state_conditioned_directions/20260209_223139
+2026-02-10 04:39:13 | INFO     | tier4-exp12 | [exp12][exp6] Wrote scaling plots.
+2026-02-10 04:39:13 | INFO     | tier4-exp12 | [tracking] Finalized run: experiment=exp12_state_cond_dirs run_id=20260209_223139 status=completed duration=0s 
+2026-02-10 05:17:20 | INFO     | tier4-exp12 | [tracking] Registered run: experiment=exp12_state_cond_dirs run_id=20260209_223139 git=a1a1bc2 out=outputs/tier4/exp12_state_conditioned_directions/20260209_223139
+2026-02-10 05:17:20 | INFO     | tier4-exp12 | [exp12] Using existing cache at outputs/tier4/exp12_state_conditioned_directions/20260209_223139/cache
+2026-02-10 05:17:20 | INFO     | tier4-exp12 | [exp12][exp2] Running state quantization...
+2026-02-10 05:18:29 | INFO     | tier4-exp12 | [tracking] Finalized run: experiment=exp12_state_cond_dirs run_id=20260209_223139 status=completed duration=69s 
+2026-02-10 05:19:36 | INFO     | tier4-exp12 | [tracking] Registered run: experiment=exp12_state_cond_dirs run_id=20260209_223139 git=a1a1bc2 out=outputs/tier4/exp12_state_conditioned_directions/20260209_223139
+2026-02-10 05:19:36 | INFO     | tier4-exp12 | [exp12] Using existing cache at outputs/tier4/exp12_state_conditioned_directions/20260209_223139/cache
+2026-02-10 05:19:36 | INFO     | tier4-exp12 | [exp12][exp2] Running state quantization...
+2026-02-10 05:24:27 | INFO     | tier4-exp12 | [exp12][exp5] Loaded PocketMimiVAE from outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/checkpoints/vae_gan_final.pt
+2026-02-10 05:24:27 | INFO     | tier4-exp12 | [exp12][exp5] Fitting per-state delta codebooks (K1=2048, K2=16)...
+2026-02-10 05:25:09 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0015 (K2=16)
+2026-02-10 05:25:31 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0053 (K2=16)
+2026-02-10 05:25:49 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13009-0063 (K2=16)
+2026-02-10 05:26:03 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13006-0037 (K2=16)
+2026-02-10 05:26:19 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7679-0029 (K2=16)
+2026-02-10 05:26:35 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7367-86737-0042 (K2=16)
+2026-02-10 05:27:03 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180299-0046 (K2=16)
+2026-02-10 05:27:28 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7680-0005 (K2=16)
+2026-02-10 05:27:52 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6529-62554-0053 (K2=16)
+2026-02-10 05:29:18 | INFO     | tier4-exp12 | [tracking] Registered run: experiment=exp12_state_cond_dirs run_id=20260209_223139 git=a1a1bc2 out=outputs/tier4/exp12_state_conditioned_directions/20260209_223139
+2026-02-10 05:29:18 | INFO     | tier4-exp12 | [exp12] Using existing cache at outputs/tier4/exp12_state_conditioned_directions/20260209_223139/cache
+2026-02-10 05:29:18 | INFO     | tier4-exp12 | [exp12][exp2] Running state quantization...
+2026-02-10 05:29:18 | INFO     | tier4-exp12 | [exp12][exp2] Reusing state artifacts for k1=2048 seed=11
+2026-02-10 05:33:45 | INFO     | tier4-exp12 | [exp12][exp5] Loaded PocketMimiVAE from outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/checkpoints/vae_gan_final.pt
+2026-02-10 05:33:45 | INFO     | tier4-exp12 | [exp12][exp5] Fitting per-state delta codebooks (K1=2048, K2=16)...
+2026-02-10 05:34:09 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0015 (K2=16)
+2026-02-10 05:34:13 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0053 (K2=16)
+2026-02-10 05:34:16 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13009-0063 (K2=16)
+2026-02-10 05:34:18 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13006-0037 (K2=16)
+2026-02-10 05:34:20 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7679-0029 (K2=16)
+2026-02-10 05:34:22 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7367-86737-0042 (K2=16)
+2026-02-10 05:34:25 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180299-0046 (K2=16)
+2026-02-10 05:34:28 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7680-0005 (K2=16)
+2026-02-10 05:34:30 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6529-62554-0053 (K2=16)
+2026-02-10 05:34:33 | INFO     | tier4-exp12 | [exp12][exp5] Scored 8226-274369-0026 (K2=16)
+2026-02-10 05:34:35 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13009-0015 (K2=16)
+2026-02-10 05:34:39 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7679-0008 (K2=16)
+2026-02-10 05:34:41 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180298-0035 (K2=16)
+2026-02-10 05:34:43 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0006 (K2=16)
+2026-02-10 05:34:45 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7367-86737-0041 (K2=16)
+2026-02-10 05:34:48 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0036 (K2=16)
+2026-02-10 05:34:51 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0010 (K2=16)
+2026-02-10 05:34:53 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180298-0061 (K2=16)
+2026-02-10 05:34:55 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6529-62556-0044 (K2=16)
+2026-02-10 05:34:59 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7678-0007 (K2=16)
+2026-02-10 05:34:59 | INFO     | tier4-exp12 | [exp12][exp5] Fitting per-state delta codebooks (K1=2048, K2=32)...
+2026-02-10 05:35:35 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0015 (K2=32)
+2026-02-10 05:35:38 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0053 (K2=32)
+2026-02-10 05:35:41 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13009-0063 (K2=32)
+2026-02-10 05:35:43 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13006-0037 (K2=32)
+2026-02-10 05:35:46 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7679-0029 (K2=32)
+2026-02-10 05:35:48 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7367-86737-0042 (K2=32)
+2026-02-10 05:35:51 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180299-0046 (K2=32)
+2026-02-10 05:35:53 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7680-0005 (K2=32)
+2026-02-10 05:35:56 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6529-62554-0053 (K2=32)
+2026-02-10 05:35:59 | INFO     | tier4-exp12 | [exp12][exp5] Scored 8226-274369-0026 (K2=32)
+2026-02-10 05:36:01 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13009-0015 (K2=32)
+2026-02-10 05:36:05 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7679-0008 (K2=32)
+2026-02-10 05:36:07 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180298-0035 (K2=32)
+2026-02-10 05:36:09 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0006 (K2=32)
+2026-02-10 05:36:11 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7367-86737-0041 (K2=32)
+2026-02-10 05:36:14 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0036 (K2=32)
+2026-02-10 05:36:17 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0010 (K2=32)
+2026-02-10 05:36:19 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180298-0061 (K2=32)
+2026-02-10 05:36:21 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6529-62556-0044 (K2=32)
+2026-02-10 05:36:26 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7678-0007 (K2=32)
+2026-02-10 05:36:26 | INFO     | tier4-exp12 | [exp12][exp5] Fitting per-state delta codebooks (K1=2048, K2=64)...
+2026-02-10 05:37:27 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0015 (K2=64)
+2026-02-10 05:37:30 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7113-86041-0053 (K2=64)
+2026-02-10 05:37:33 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13009-0063 (K2=64)
+2026-02-10 05:37:35 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13006-0037 (K2=64)
+2026-02-10 05:37:38 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7679-0029 (K2=64)
+2026-02-10 05:37:40 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7367-86737-0042 (K2=64)
+2026-02-10 05:37:43 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180299-0046 (K2=64)
+2026-02-10 05:37:46 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7680-0005 (K2=64)
+2026-02-10 05:37:49 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6529-62554-0053 (K2=64)
+2026-02-10 05:37:51 | INFO     | tier4-exp12 | [exp12][exp5] Scored 8226-274369-0026 (K2=64)
+2026-02-10 05:37:53 | INFO     | tier4-exp12 | [exp12][exp5] Scored 4297-13009-0015 (K2=64)
+2026-02-10 05:37:57 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7679-0008 (K2=64)
+2026-02-10 05:37:59 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180298-0035 (K2=64)
+2026-02-10 05:38:02 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0006 (K2=64)
+2026-02-10 05:38:04 | INFO     | tier4-exp12 | [exp12][exp5] Scored 7367-86737-0041 (K2=64)
+2026-02-10 05:38:07 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0036 (K2=64)
+2026-02-10 05:38:09 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6367-65536-0010 (K2=64)
+2026-02-10 05:38:12 | INFO     | tier4-exp12 | [exp12][exp5] Scored 374-180298-0061 (K2=64)
+2026-02-10 05:38:13 | INFO     | tier4-exp12 | [exp12][exp5] Scored 6529-62556-0044 (K2=64)
+2026-02-10 05:38:18 | INFO     | tier4-exp12 | [exp12][exp5] Scored 5322-7678-0007 (K2=64)
+2026-02-10 05:38:18 | INFO     | tier4-exp12 | [exp12][exp5] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp5_perceptual_k2sweep.csv
+2026-02-10 05:38:18 | INFO     | tier4-exp12 | [exp12][exp5] Wrote outputs/tier4/exp12_state_conditioned_directions/20260209_223139/tables/exp5_perceptual_k2sweep_summary.csv
+2026-02-10 05:38:18 | INFO     | tier4-exp12 | [tracking] Finalized run: experiment=exp12_state_cond_dirs run_id=20260209_223139 status=completed duration=540s 

@@ -1,0 +1,82 @@
+[
+  {
+    "sample_id": 0,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_00_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_00_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  },
+  {
+    "sample_id": 1,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_01_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_01_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  },
+  {
+    "sample_id": 2,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_02_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_02_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  },
+  {
+    "sample_id": 3,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_03_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_03_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  },
+  {
+    "sample_id": 4,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_04_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_04_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  },
+  {
+    "sample_id": 5,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_05_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_05_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  },
+  {
+    "sample_id": 6,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_06_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_06_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  },
+  {
+    "sample_id": 7,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_07_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_07_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  },
+  {
+    "sample_id": 8,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_08_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_08_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  },
+  {
+    "sample_id": 9,
+    "generated_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_09_generated.wav",
+    "gt_path": "outputs/calm/speech_continuation/20260211_181408/audio_samples/sample_09_gt.wav",
+    "prompt_frames": 37,
+    "generated_frames": 27,
+    "temperature": 0.8
+  }
+]

@@ -1,0 +1,16 @@
+2026-02-06 17:20:50 | INFO     | stage2-exp7 | [tracking] Registered run: experiment=exp7_perceptual_rollout run_id=20260206_172050 git=a1a1bc2 out=outputs/tier2/exp7_perceptual_rollout/20260206_172050
+2026-02-06 17:20:50 | INFO     | stage2-exp7 | [exp7] Loading Phase 1 checkpoint: outputs/tier1/exp1_vmf/stage1/checkpoints/vmf_k1_final.pt
+2026-02-06 17:20:50 | INFO     | stage2-exp7 | [exp7] Loading Mimi autoencoder...
+2026-02-06 17:20:51 | INFO     | stage2-exp7 | [exp7] 10 utterances, rollout_lengths=[1, 2, 4, 8, 16]
+2026-02-06 17:20:52 | INFO     | stage2-exp7 | [exp7] [1/10] 5393-19218-0044: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_000_5393-19218-0044
+2026-02-06 17:20:52 | INFO     | stage2-exp7 | [exp7] [2/10] 8324-286682-0037: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_001_8324-286682-0037
+2026-02-06 17:20:53 | INFO     | stage2-exp7 | [exp7] [3/10] 8770-295463-0025: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_002_8770-295463-0025
+2026-02-06 17:20:53 | INFO     | stage2-exp7 | [exp7] [4/10] 4830-25898-0053: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_003_4830-25898-0053
+2026-02-06 17:20:53 | INFO     | stage2-exp7 | [exp7] [5/10] 1447-17506-0008: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_004_1447-17506-0008
+2026-02-06 17:20:54 | INFO     | stage2-exp7 | [exp7] [6/10] 6078-54013-0032: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_005_6078-54013-0032
+2026-02-06 17:20:54 | INFO     | stage2-exp7 | [exp7] [7/10] 8098-278278-0031: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_006_8098-278278-0031
+2026-02-06 17:20:54 | INFO     | stage2-exp7 | [exp7] [8/10] 3235-28452-0009: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_007_3235-28452-0009
+2026-02-06 17:20:55 | INFO     | stage2-exp7 | [exp7] [9/10] 298-126791-0033: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_008_298-126791-0033
+2026-02-06 17:20:55 | INFO     | stage2-exp7 | [exp7] [10/10] 83-9960-0046: 5 rollout WAVs -> outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_009_83-9960-0046
+2026-02-06 17:20:55 | INFO     | stage2-exp7 | [exp7] Done. 50 WAVs in outputs/tier2/exp7_perceptual_rollout/20260206_172050
+2026-02-06 17:20:55 | INFO     | stage2-exp7 | [tracking] Finalized run: experiment=exp7_perceptual_rollout run_id=20260206_172050 status=completed duration=5s n_utterances=10 n_wavs=50 rollout_lengths=[1, 2, 4, 8, 16]

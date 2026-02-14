@@ -1,0 +1,17 @@
+{
+  "2048": {
+    "k": 2048,
+    "angular_error_mean_deg": 50.04164505004883,
+    "angular_error_median_deg": 50.70026779174805,
+    "angular_error_p95_deg": 65.61386108398438,
+    "codebook_utilization": 389,
+    "codebook_utilization_frac": 0.18994140625,
+    "entropy": 7.213086889732485,
+    "max_entropy": 7.6246189861593985,
+    "entropy_ratio": 0.9460258804834776,
+    "centroid_magnitude_mean": 36.886112213134766,
+    "centroid_magnitude_std": 17.020246505737305,
+    "centroid_magnitude_min": 1.3766840696334839,
+    "centroid_magnitude_max": 132.70135498046875
+  }
+}

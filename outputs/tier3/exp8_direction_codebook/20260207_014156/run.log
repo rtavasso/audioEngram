@@ -1,0 +1,149 @@
+2026-02-07 01:41:56 | INFO     | phase0 | [tracking] Registered run: experiment=exp8_direction_codebook run_id=20260207_014156 git=a1a1bc2 out=outputs/tier3/exp8_direction_codebook/20260207_014156
+2026-02-07 01:41:56 | INFO     | phase0 | [exp8] Loading Mimi latents index and splits...
+2026-02-07 01:41:56 | INFO     | phase0 | [exp8] 22216 train utterances for direction extraction
+2026-02-07 01:41:57 | INFO     | phase0 | [exp8] Extracted 200/22216 utterances
+2026-02-07 01:41:57 | INFO     | phase0 | [exp8] Extracted 400/22216 utterances
+2026-02-07 01:41:57 | INFO     | phase0 | [exp8] Extracted 600/22216 utterances
+2026-02-07 01:41:57 | INFO     | phase0 | [exp8] Extracted 800/22216 utterances
+2026-02-07 01:41:58 | INFO     | phase0 | [exp8] Extracted 1000/22216 utterances
+2026-02-07 01:41:58 | INFO     | phase0 | [exp8] Extracted 1200/22216 utterances
+2026-02-07 01:41:58 | INFO     | phase0 | [exp8] Extracted 1400/22216 utterances
+2026-02-07 01:41:58 | INFO     | phase0 | [exp8] Extracted 1600/22216 utterances
+2026-02-07 01:41:58 | INFO     | phase0 | [exp8] Extracted 1800/22216 utterances
+2026-02-07 01:41:59 | INFO     | phase0 | [exp8] Extracted 2000/22216 utterances
+2026-02-07 01:41:59 | INFO     | phase0 | [exp8] Extracted 2200/22216 utterances
+2026-02-07 01:41:59 | INFO     | phase0 | [exp8] Extracted 2400/22216 utterances
+2026-02-07 01:41:59 | INFO     | phase0 | [exp8] Extracted 2600/22216 utterances
+2026-02-07 01:42:00 | INFO     | phase0 | [exp8] Extracted 2800/22216 utterances
+2026-02-07 01:42:00 | INFO     | phase0 | [exp8] Extracted 3000/22216 utterances
+2026-02-07 01:42:00 | INFO     | phase0 | [exp8] Extracted 3200/22216 utterances
+2026-02-07 01:42:00 | INFO     | phase0 | [exp8] Extracted 3400/22216 utterances
+2026-02-07 01:42:00 | INFO     | phase0 | [exp8] Extracted 3600/22216 utterances
+2026-02-07 01:42:01 | INFO     | phase0 | [exp8] Extracted 3800/22216 utterances
+2026-02-07 01:42:01 | INFO     | phase0 | [exp8] Extracted 4000/22216 utterances
+2026-02-07 01:42:01 | INFO     | phase0 | [exp8] Extracted 4200/22216 utterances
+2026-02-07 01:42:01 | INFO     | phase0 | [exp8] Extracted 4400/22216 utterances
+2026-02-07 01:42:01 | INFO     | phase0 | [exp8] Extracted 4600/22216 utterances
+2026-02-07 01:42:02 | INFO     | phase0 | [exp8] Extracted 4800/22216 utterances
+2026-02-07 01:42:02 | INFO     | phase0 | [exp8] Extracted 5000/22216 utterances
+2026-02-07 01:42:02 | INFO     | phase0 | [exp8] Extracted 5200/22216 utterances
+2026-02-07 01:42:02 | INFO     | phase0 | [exp8] Extracted 5400/22216 utterances
+2026-02-07 01:42:03 | INFO     | phase0 | [exp8] Extracted 5600/22216 utterances
+2026-02-07 01:42:03 | INFO     | phase0 | [exp8] Extracted 5800/22216 utterances
+2026-02-07 01:42:03 | INFO     | phase0 | [exp8] Extracted 6000/22216 utterances
+2026-02-07 01:42:03 | INFO     | phase0 | [exp8] Extracted 6200/22216 utterances
+2026-02-07 01:42:03 | INFO     | phase0 | [exp8] Extracted 6400/22216 utterances
+2026-02-07 01:42:04 | INFO     | phase0 | [exp8] Extracted 6600/22216 utterances
+2026-02-07 01:42:04 | INFO     | phase0 | [exp8] Extracted 6800/22216 utterances
+2026-02-07 01:42:04 | INFO     | phase0 | [exp8] Extracted 7000/22216 utterances
+2026-02-07 01:42:04 | INFO     | phase0 | [exp8] Extracted 7200/22216 utterances
+2026-02-07 01:42:05 | INFO     | phase0 | [exp8] Extracted 7400/22216 utterances
+2026-02-07 01:42:05 | INFO     | phase0 | [exp8] Extracted 7600/22216 utterances
+2026-02-07 01:42:05 | INFO     | phase0 | [exp8] Extracted 7800/22216 utterances
+2026-02-07 01:42:05 | INFO     | phase0 | [exp8] Extracted 8000/22216 utterances
+2026-02-07 01:42:05 | INFO     | phase0 | [exp8] Extracted 8200/22216 utterances
+2026-02-07 01:42:06 | INFO     | phase0 | [exp8] Extracted 8400/22216 utterances
+2026-02-07 01:42:06 | INFO     | phase0 | [exp8] Extracted 8600/22216 utterances
+2026-02-07 01:42:06 | INFO     | phase0 | [exp8] Extracted 8800/22216 utterances
+2026-02-07 01:42:06 | INFO     | phase0 | [exp8] Extracted 9000/22216 utterances
+2026-02-07 01:42:06 | INFO     | phase0 | [exp8] Extracted 9200/22216 utterances
+2026-02-07 01:42:07 | INFO     | phase0 | [exp8] Extracted 9400/22216 utterances
+2026-02-07 01:42:07 | INFO     | phase0 | [exp8] Extracted 9600/22216 utterances
+2026-02-07 01:42:07 | INFO     | phase0 | [exp8] Extracted 9800/22216 utterances
+2026-02-07 01:42:07 | INFO     | phase0 | [exp8] Extracted 10000/22216 utterances
+2026-02-07 01:42:08 | INFO     | phase0 | [exp8] Extracted 10200/22216 utterances
+2026-02-07 01:42:08 | INFO     | phase0 | [exp8] Extracted 10400/22216 utterances
+2026-02-07 01:42:08 | INFO     | phase0 | [exp8] Extracted 10600/22216 utterances
+2026-02-07 01:42:08 | INFO     | phase0 | [exp8] Extracted 10800/22216 utterances
+2026-02-07 01:42:08 | INFO     | phase0 | [exp8] Extracted 11000/22216 utterances
+2026-02-07 01:42:09 | INFO     | phase0 | [exp8] Extracted 11200/22216 utterances
+2026-02-07 01:42:09 | INFO     | phase0 | [exp8] Extracted 11400/22216 utterances
+2026-02-07 01:42:09 | INFO     | phase0 | [exp8] Extracted 11600/22216 utterances
+2026-02-07 01:42:09 | INFO     | phase0 | [exp8] Extracted 11800/22216 utterances
+2026-02-07 01:42:10 | INFO     | phase0 | [exp8] Extracted 12000/22216 utterances
+2026-02-07 01:42:10 | INFO     | phase0 | [exp8] Extracted 12200/22216 utterances
+2026-02-07 01:42:10 | INFO     | phase0 | [exp8] Extracted 12400/22216 utterances
+2026-02-07 01:42:10 | INFO     | phase0 | [exp8] Extracted 12600/22216 utterances
+2026-02-07 01:42:10 | INFO     | phase0 | [exp8] Extracted 12800/22216 utterances
+2026-02-07 01:42:11 | INFO     | phase0 | [exp8] Extracted 13000/22216 utterances
+2026-02-07 01:42:11 | INFO     | phase0 | [exp8] Extracted 13200/22216 utterances
+2026-02-07 01:42:11 | INFO     | phase0 | [exp8] Extracted 13400/22216 utterances
+2026-02-07 01:42:11 | INFO     | phase0 | [exp8] Extracted 13600/22216 utterances
+2026-02-07 01:42:11 | INFO     | phase0 | [exp8] Extracted 13800/22216 utterances
+2026-02-07 01:42:12 | INFO     | phase0 | [exp8] Extracted 14000/22216 utterances
+2026-02-07 01:42:12 | INFO     | phase0 | [exp8] Extracted 14200/22216 utterances
+2026-02-07 01:42:12 | INFO     | phase0 | [exp8] Extracted 14400/22216 utterances
+2026-02-07 01:42:12 | INFO     | phase0 | [exp8] Extracted 14600/22216 utterances
+2026-02-07 01:42:13 | INFO     | phase0 | [exp8] Extracted 14800/22216 utterances
+2026-02-07 01:42:13 | INFO     | phase0 | [exp8] Extracted 15000/22216 utterances
+2026-02-07 01:42:13 | INFO     | phase0 | [exp8] Extracted 15200/22216 utterances
+2026-02-07 01:42:13 | INFO     | phase0 | [exp8] Extracted 15400/22216 utterances
+2026-02-07 01:42:13 | INFO     | phase0 | [exp8] Extracted 15600/22216 utterances
+2026-02-07 01:42:14 | INFO     | phase0 | [exp8] Extracted 15800/22216 utterances
+2026-02-07 01:42:14 | INFO     | phase0 | [exp8] Extracted 16000/22216 utterances
+2026-02-07 01:42:14 | INFO     | phase0 | [exp8] Extracted 16200/22216 utterances
+2026-02-07 01:42:14 | INFO     | phase0 | [exp8] Extracted 16400/22216 utterances
+2026-02-07 01:42:15 | INFO     | phase0 | [exp8] Extracted 16600/22216 utterances
+2026-02-07 01:42:15 | INFO     | phase0 | [exp8] Extracted 16800/22216 utterances
+2026-02-07 01:42:15 | INFO     | phase0 | [exp8] Extracted 17000/22216 utterances
+2026-02-07 01:42:15 | INFO     | phase0 | [exp8] Extracted 17200/22216 utterances
+2026-02-07 01:42:15 | INFO     | phase0 | [exp8] Extracted 17400/22216 utterances
+2026-02-07 01:42:16 | INFO     | phase0 | [exp8] Extracted 17600/22216 utterances
+2026-02-07 01:42:16 | INFO     | phase0 | [exp8] Extracted 17800/22216 utterances
+2026-02-07 01:42:16 | INFO     | phase0 | [exp8] Extracted 18000/22216 utterances
+2026-02-07 01:42:16 | INFO     | phase0 | [exp8] Extracted 18200/22216 utterances
+2026-02-07 01:42:16 | INFO     | phase0 | [exp8] Extracted 18400/22216 utterances
+2026-02-07 01:42:17 | INFO     | phase0 | [exp8] Extracted 18600/22216 utterances
+2026-02-07 01:42:17 | INFO     | phase0 | [exp8] Extracted 18800/22216 utterances
+2026-02-07 01:42:17 | INFO     | phase0 | [exp8] Extracted 19000/22216 utterances
+2026-02-07 01:42:17 | INFO     | phase0 | [exp8] Extracted 19200/22216 utterances
+2026-02-07 01:42:17 | INFO     | phase0 | [exp8] Extracted 19400/22216 utterances
+2026-02-07 01:42:18 | INFO     | phase0 | [exp8] Extracted 19600/22216 utterances
+2026-02-07 01:42:18 | INFO     | phase0 | [exp8] Extracted 19800/22216 utterances
+2026-02-07 01:42:18 | INFO     | phase0 | [exp8] Extracted 20000/22216 utterances
+2026-02-07 01:42:18 | INFO     | phase0 | [exp8] Extracted 20200/22216 utterances
+2026-02-07 01:42:19 | INFO     | phase0 | [exp8] Extracted 20400/22216 utterances
+2026-02-07 01:42:19 | INFO     | phase0 | [exp8] Extracted 20600/22216 utterances
+2026-02-07 01:42:19 | INFO     | phase0 | [exp8] Extracted 20800/22216 utterances
+2026-02-07 01:42:19 | INFO     | phase0 | [exp8] Extracted 21000/22216 utterances
+2026-02-07 01:42:19 | INFO     | phase0 | [exp8] Extracted 21200/22216 utterances
+2026-02-07 01:42:20 | INFO     | phase0 | [exp8] Extracted 21400/22216 utterances
+2026-02-07 01:42:20 | INFO     | phase0 | [exp8] Extracted 21600/22216 utterances
+2026-02-07 01:42:20 | INFO     | phase0 | [exp8] Extracted 21800/22216 utterances
+2026-02-07 01:42:20 | INFO     | phase0 | [exp8] Extracted 22000/22216 utterances
+2026-02-07 01:42:21 | INFO     | phase0 | [exp8] Extracted 22200/22216 utterances
+2026-02-07 01:42:29 | INFO     | phase0 | [exp8] Extracted 3577818 direction vectors from 22216 utterances, D=512
+2026-02-07 01:42:29 | INFO     | phase0 | [exp8] Latent dimensionality: D=512
+2026-02-07 01:42:29 | INFO     | phase0 | [exp8] Running Exp 9: near-zero magnitude analysis...
+2026-02-07 01:42:30 | INFO     | phase0 | [exp8] Exp 9 recommendation: floor_clamp_sufficient. Magnitude median=74.2473
+2026-02-07 01:42:30 | INFO     | phase0 | [exp8]   eps=0.001*median -> threshold=0.074247, fraction=0.0000 (0 frames)
+2026-02-07 01:42:30 | INFO     | phase0 | [exp8]   eps=0.01*median -> threshold=0.742473, fraction=0.0000 (13 frames)
+2026-02-07 01:42:30 | INFO     | phase0 | [exp8]   eps=0.1*median -> threshold=7.424730, fraction=0.0038 (13597 frames)
+2026-02-07 01:42:30 | INFO     | phase0 | [exp8]   eps=0.5*median -> threshold=37.123650, fraction=0.0890 (318601 frames)
+2026-02-07 01:42:38 | INFO     | phase0 | [exp8] Filtering near-zero: 13 removed (0.0%), 3577805 directions for k-means
+2026-02-07 01:42:38 | INFO     | phase0 | [exp8] Running spherical MiniBatchKMeans K=512 (n_init=1, batch_size=4096)...
+2026-02-07 01:43:30 | INFO     | phase0 | [exp8] K=512: angular_err=51.9° (median 52.2°), utilization=445/512 (87%), entropy_ratio=0.987
+2026-02-07 01:43:30 | INFO     | phase0 | [exp8] Running unnormalized MiniBatchKMeans K=512 (n_init=1, batch_size=4096)...
+2026-02-07 01:44:10 | INFO     | phase0 | [exp8] Unnorm K=512: angular_err=52.8° (median 53.1°), utilization=331/512 (65%), centroid_mag range=[1.924, 79.884]
+2026-02-07 01:44:10 | INFO     | phase0 | [exp8] === Normalized vs Unnormalized comparison ===
+2026-02-07 01:44:10 | INFO     | phase0 | [exp8]   K=512: normalized=51.9° vs unnormalized=52.8° (util: 87% vs 65%)
+2026-02-07 01:44:10 | INFO     | phase0 | [exp8] Loading Mimi autoencoder for decoding...
+2026-02-07 01:44:11 | INFO     | phase0 | [exp8] Sampling eval utterances for perceptual evaluation...
+2026-02-07 01:44:11 | INFO     | phase0 | [exp8] 10 eval utterances for reconstruction + audio decode
+2026-02-07 01:44:13 | INFO     | phase0 | [exp8] [1/10] 5393-19218-0044: T=195 frames
+2026-02-07 01:44:13 | INFO     | phase0 | [exp8] [2/10] 8324-286682-0037: T=140 frames
+2026-02-07 01:44:13 | INFO     | phase0 | [exp8] [3/10] 8770-295463-0025: T=193 frames
+2026-02-07 01:44:13 | INFO     | phase0 | [exp8] [4/10] 4830-25898-0053: T=117 frames
+2026-02-07 01:44:14 | INFO     | phase0 | [exp8] [5/10] 1447-17506-0008: T=189 frames
+2026-02-07 01:44:14 | INFO     | phase0 | [exp8] [6/10] 6078-54013-0032: T=167 frames
+2026-02-07 01:44:14 | INFO     | phase0 | [exp8] [7/10] 8098-278278-0031: T=183 frames
+2026-02-07 01:44:15 | INFO     | phase0 | [exp8] [8/10] 3235-28452-0009: T=205 frames
+2026-02-07 01:44:15 | INFO     | phase0 | [exp8] [9/10] 298-126791-0033: T=199 frames
+2026-02-07 01:44:15 | INFO     | phase0 | [exp8] [10/10] 83-9960-0046: T=158 frames
+2026-02-07 01:44:15 | INFO     | phase0 | [exp8] Summary:
+  K       method  angular_error_mean_deg  angular_error_median_deg  angular_error_p95_deg  codebook_utilization  codebook_utilization_frac  entropy_ratio  mel_distance_mean  mel_distance_std  l1_distance_mean  trajectory_divergence_mean  trajectory_divergence_growth_rate
+512   normalized               51.925148                 52.236588              66.974670                   445                   0.869141       0.986576           6.591318          2.514160          0.283451                  392.510335                           2.574865
+512 unnormalized               52.842934                 53.076683              69.047028                   331                   0.646484       0.967177           4.962602          1.674357          0.136741                  218.619199                           1.489288
+2026-02-07 01:44:15 | INFO     | phase0 | [exp8] K=512 winner: unnormalized (normalized mel=6.5913, unnormalized mel=4.9626)
+2026-02-07 01:44:15 | INFO     | phase0 | [exp8] Done. Best method=unnormalized, angular_err=52.8°, mel_dist=4.9626
+2026-02-07 01:44:15 | INFO     | phase0 | [tracking] Finalized run: experiment=exp8_direction_codebook run_id=20260207_014156 status=completed duration=139s best_method=unnormalized best_angular_error_deg=52.842933654785156 best_mel_distance=4.962601590156555 near_zero_frac_001=3.6334995240115624e-06 exp9_recommendation=floor_clamp_sufficient latent_dim=512

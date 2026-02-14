@@ -1,0 +1,63 @@
+2026-02-07 05:37:28 | INFO     | phase0 | [tracking] Registered run: experiment=exp8_direction_codebook run_id=20260207_053728 git=a1a1bc2 out=outputs/tier3/exp8_direction_codebook/20260207_053728
+2026-02-07 05:37:28 | INFO     | phase0 | [exp8] Using β-VAE latents from outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae
+2026-02-07 05:37:28 | INFO     | phase0 | [exp8] Loading latents index and splits...
+2026-02-07 05:37:28 | INFO     | phase0 | [exp8] 4047 train utterances for direction extraction
+2026-02-07 05:37:28 | INFO     | phase0 | [exp8] Extracted 200/4047 utterances
+2026-02-07 05:37:28 | INFO     | phase0 | [exp8] Extracted 400/4047 utterances
+2026-02-07 05:37:28 | INFO     | phase0 | [exp8] Extracted 600/4047 utterances
+2026-02-07 05:37:28 | INFO     | phase0 | [exp8] Extracted 800/4047 utterances
+2026-02-07 05:37:28 | INFO     | phase0 | [exp8] Extracted 1000/4047 utterances
+2026-02-07 05:37:28 | INFO     | phase0 | [exp8] Extracted 1200/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 1400/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 1600/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 1800/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 2000/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 2200/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 2400/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 2600/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 2800/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 3000/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 3200/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 3400/4047 utterances
+2026-02-07 05:37:29 | INFO     | phase0 | [exp8] Extracted 3600/4047 utterances
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8] Extracted 3800/4047 utterances
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8] Extracted 4000/4047 utterances
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8] Extracted 657086 direction vectors, 661133 raw vectors from 4047 utterances, D=32
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8] Latent dimensionality: D=32
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8] Running Exp 9: near-zero magnitude analysis...
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8] Exp 9 recommendation: floor_clamp_sufficient. Magnitude median=0.7291
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8]   eps=0.001*median -> threshold=0.000729, fraction=0.0000 (0 frames)
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8]   eps=0.01*median -> threshold=0.007291, fraction=0.0000 (4 frames)
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8]   eps=0.1*median -> threshold=0.072912, fraction=0.0217 (14276 frames)
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8]   eps=0.5*median -> threshold=0.364561, fraction=0.2281 (149888 frames)
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8] Filtering near-zero: 4 removed (0.0%), 657082 directions for k-means
+2026-02-07 05:37:30 | INFO     | phase0 | [exp8] Running spherical MiniBatchKMeans K=64 (n_init=1, batch_size=4096)...
+2026-02-07 05:37:31 | INFO     | phase0 | [exp8] K=64: angular_err=13.5° (median 10.3°), utilization=64/64 (100%), entropy_ratio=0.916
+2026-02-07 05:37:31 | INFO     | phase0 | [exp8] Running unnormalized MiniBatchKMeans K=64 (n_init=1, batch_size=4096)...
+2026-02-07 05:37:31 | INFO     | phase0 | [exp8] Unnorm K=64: angular_err=18.8° (median 13.0°), utilization=64/64 (100%), centroid_mag range=[0.067, 3.580]
+2026-02-07 05:37:31 | INFO     | phase0 | [exp8] Running state VQ MiniBatchKMeans K=64 (n_init=1, batch_size=4096)...
+2026-02-07 05:37:32 | INFO     | phase0 | [exp8] State VQ K=64: recon_err=0.1718 (median 0.1616), utilization=64/64 (100%), entropy_ratio=0.977
+2026-02-07 05:37:32 | INFO     | phase0 | [exp8] === Normalized vs Unnormalized vs State VQ comparison ===
+2026-02-07 05:37:32 | INFO     | phase0 | [exp8]   K=64: norm_ang=13.5° unnorm_ang=18.8° state_recon_err=0.1718 (util: 100% / 100% / 100%)
+2026-02-07 05:37:32 | INFO     | phase0 | [exp8] Loading β-VAE decoder (VAE dec_proj + Mimi decoder)...
+2026-02-07 05:37:33 | INFO     | phase0 | [exp8] Loaded VAE checkpoint from outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/checkpoints/vae_final.pt (latent_dim=32)
+2026-02-07 05:37:33 | INFO     | phase0 | [exp8] Sampling eval utterances for perceptual evaluation...
+2026-02-07 05:37:33 | INFO     | phase0 | [exp8] 10 eval utterances for reconstruction + audio decode
+2026-02-07 05:37:34 | INFO     | phase0 | [exp8] [1/10] 4297-13009-0038: T=176 frames
+2026-02-07 05:37:35 | INFO     | phase0 | [exp8] [2/10] 233-155990-0026: T=155 frames
+2026-02-07 05:37:35 | INFO     | phase0 | [exp8] [3/10] 374-180298-0015: T=186 frames
+2026-02-07 05:37:35 | INFO     | phase0 | [exp8] [4/10] 6529-62556-0033: T=196 frames
+2026-02-07 05:37:35 | INFO     | phase0 | [exp8] [5/10] 5322-7680-0021: T=190 frames
+2026-02-07 05:37:36 | INFO     | phase0 | [exp8] [6/10] 4297-13006-0034: T=161 frames
+2026-02-07 05:37:36 | INFO     | phase0 | [exp8] [7/10] 6367-74004-0034: T=129 frames
+2026-02-07 05:37:36 | INFO     | phase0 | [exp8] [8/10] 6529-62556-0031: T=174 frames
+2026-02-07 05:37:36 | INFO     | phase0 | [exp8] [9/10] 7113-86041-0004: T=185 frames
+2026-02-07 05:37:36 | INFO     | phase0 | [exp8] [10/10] 5322-7679-0018: T=196 frames
+2026-02-07 05:37:36 | INFO     | phase0 | [exp8] Summary:
+ K       method  codebook_utilization  codebook_utilization_frac  entropy_ratio  mel_distance_mean  mel_distance_std  l1_distance_mean  trajectory_divergence_mean  trajectory_divergence_growth_rate  angular_error_mean_deg  angular_error_median_deg  angular_error_p95_deg  recon_error_mean  recon_error_median  recon_error_p95
+64   normalized                    64                        1.0       0.916259           0.583084          0.241524          0.001892                    0.906928                           0.006799               13.547215                 10.287918              34.155647               NaN                 NaN              NaN
+64 unnormalized                    64                        1.0       0.943373           1.658487          1.091662          0.005573                    1.594741                           0.012384               18.793932                 13.046813              53.648655               NaN                 NaN              NaN
+64     state_vq                    64                        1.0       0.976812           0.094610          0.006233          0.000375                    0.173644                          -0.000056                     NaN                       NaN                    NaN           0.17176            0.161603         0.280136
+2026-02-07 05:37:36 | INFO     | phase0 | [exp8] K=64 winner: state_vq (normalized=0.5831, unnormalized=1.6585, state_vq=0.0946)
+2026-02-07 05:37:36 | INFO     | phase0 | [exp8] Done. Best method=state_vq, mel_dist=0.0946
+2026-02-07 05:37:36 | INFO     | phase0 | [tracking] Finalized run: experiment=exp8_direction_codebook run_id=20260207_053728 status=completed duration=8s best_method=state_vq best_angular_error_deg=0.0 best_mel_distance=0.09460969865322114 near_zero_frac_001=6.087483221374371e-06 exp9_recommendation=floor_clamp_sufficient latent_dim=32

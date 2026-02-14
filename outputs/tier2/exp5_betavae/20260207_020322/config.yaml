@@ -1,0 +1,104 @@
+seed: 42
+slice: all
+data:
+  librispeech_path: ./data/LibriSpeech
+  subset: train-clean-100
+  min_duration_sec: 3.0
+  splits_dir: ./outputs/phase0/splits
+  max_utterances: 5000
+vae:
+  latent_dim: 32
+  encoder_dim: 512
+  dec_hidden_dim: 256
+  freeze_encoder: true
+  freeze_decoder: false
+  mimi_checkpoint: null
+vae_train:
+  segment_sec: 4.0
+  sample_rate: 24000
+  batch_size: 4
+  num_workers: 2
+  max_steps: 50000
+  lr: 0.0001
+  lr_predictor: 0.001
+  weight_decay: 0.0001
+  grad_clip_norm: 1.0
+  log_every: 100
+  save_every: 10000
+  sample_every: 5000
+  sample_output_sr: 48000
+  amp: true
+  amp_dtype: fp16
+  pred_window_size: 8
+  pred_hidden_dim: 256
+variants:
+- name: baseline_betavae
+  beta: 0.01
+  lambda_smooth: 0.0
+  lambda_pred: 0.0
+- name: betavae_smooth
+  beta: 0.01
+  lambda_smooth: 0.1
+  lambda_pred: 0.0
+- name: betavae_pred
+  beta: 0.01
+  lambda_smooth: 0.0
+  lambda_pred: 0.01
+- name: betavae_smooth_pred
+  beta: 0.01
+  lambda_smooth: 0.1
+  lambda_pred: 0.01
+context:
+  window_size: 8
+  horizons_k:
+  - 1
+  - 2
+  - 4
+  - 8
+model:
+  n_components: 8
+  hidden_dim: 1024
+  n_hidden_layers: 2
+  dropout: 0.0
+  min_log_sigma: -7.0
+  max_log_sigma: 2.0
+train:
+  device: auto
+  seed: 42
+  batch_size: 256
+  num_workers: 0
+  compile: false
+  compile_mode: default
+  amp: false
+  amp_dtype: bf16
+  max_steps: 15000
+  lr: 0.001
+  weight_decay: 0.0001
+  grad_clip_norm: 1.0
+  log_every: 200
+  eval_every: 2000
+  save_every: 5000
+  max_train_samples: null
+  max_eval_samples: 200000
+  shuffle_buffer: 8192
+rollout:
+  enabled: true
+  n_eval_utterances: 16
+  max_frames_per_utterance: 2000
+  sample_from_mixture: false
+injection:
+  k_steps: 16
+  n_eval_utterances: 16
+  segments_per_utt: 8
+  max_frames_per_utterance: 2000
+  inject_after_steps_periodic:
+  - 4
+  - 8
+  - 12
+  inject_after_steps_one_shot:
+  - 1
+recon_eval:
+  n_utterances: 50
+  max_duration_sec: 10.0
+output:
+  out_dir: ./outputs/tier2/exp5_betavae

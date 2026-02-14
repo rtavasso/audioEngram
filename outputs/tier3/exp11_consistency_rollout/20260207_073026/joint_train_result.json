@@ -1,0 +1,7 @@
+{
+  "final_step": 50,
+  "final_loss": 0.9648602390289307,
+  "checkpoint": "outputs/tier3/exp11_consistency_rollout/20260207_073026/checkpoints/direction_ar_joint_final.pt",
+  "sigma": 0.1,
+  "unroll_k": 4
+}

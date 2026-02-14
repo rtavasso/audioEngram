@@ -137,6 +137,8 @@ class VmfLogNormal(nn.Module):
         max_log_kappa: float,
         min_log_sigma_logm: float,
         max_log_sigma_logm: float,
+        min_mu_logm: float = -5.0,
+        max_mu_logm: float = 12.0,
     ):
         super().__init__()
         self.input_dim = int(input_dim)
@@ -146,6 +148,8 @@ class VmfLogNormal(nn.Module):
         self._max_log_kappa = float(max_log_kappa)
         self._min_log_sigma_logm = float(min_log_sigma_logm)
         self._max_log_sigma_logm = float(max_log_sigma_logm)
+        self._min_mu_logm = float(min_mu_logm)
+        self._max_mu_logm = float(max_mu_logm)
 
         self.mu_dir = _mlp(self.input_dim, self.output_dim, int(hidden_dim), int(n_hidden_layers), float(dropout))
         self.log_kappa = _mlp(self.input_dim, 1, int(hidden_dim), max(1, int(n_hidden_layers)), float(dropout))
@@ -166,6 +170,7 @@ class VmfLogNormal(nn.Module):
         log_kappa = torch.clamp(log_kappa, self._min_log_kappa, self._max_log_kappa)
 
         mu_logm = self.mu_logm(ctx).squeeze(-1)
+        mu_logm = torch.clamp(mu_logm, self._min_mu_logm, self._max_mu_logm)
 
         log_sigma_logm = self.log_sigma_logm(ctx).squeeze(-1)
         log_sigma_logm = torch.clamp(log_sigma_logm, self._min_log_sigma_logm, self._max_log_sigma_logm)
@@ -190,6 +195,12 @@ class VmfLogNormal(nn.Module):
         sigma = torch.exp(p.log_sigma_logm)
         m_mean = torch.exp(p.mu_logm + 0.5 * (sigma * sigma))  # [B]
         return p.mu_dir * m_mean.unsqueeze(-1)
+
+    def rollout_mean(self, ctx: torch.Tensor) -> torch.Tensor:
+        """Deterministic Δx using median magnitude: exp(mu_logm) instead of E[m]=exp(mu+0.5*sigma^2)."""
+        p = self(ctx)
+        m_median = torch.exp(p.mu_logm)  # [B] — no sigma blow-up
+        return p.mu_dir * m_median.unsqueeze(-1)
 
     @torch.no_grad()
     def sample_delta(self, ctx: torch.Tensor, *, generator: Optional[torch.Generator] = None) -> torch.Tensor:

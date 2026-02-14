@@ -1,0 +1,238 @@
+[
+  {
+    "horizon_k": 1,
+    "slice_name": "all",
+    "model_type": "vmf",
+    "train": {
+      "n": 200000,
+      "nll": -860.9344831445312,
+      "nll_per_dim": -1.6815126623916625,
+      "nll_baseline": -863.1305324609375,
+      "nll_baseline_per_dim": -1.6858018212127686,
+      "dnll": 2.196049316406288,
+      "dnll_per_dim": 0.004289158821106032,
+      "direction_cosine": 0.7396144619369507,
+      "logmag_mse": 748.2155016992187,
+      "logmag_r2": -3688.6234702627225
+    },
+    "eval": {
+      "n": 200000,
+      "nll": -860.9634056640625,
+      "nll_per_dim": -1.681569151687622,
+      "nll_baseline": -863.161692421875,
+      "nll_baseline_per_dim": -1.6858626805114747,
+      "dnll": 2.198286757812525,
+      "dnll_per_dim": 0.004293528823852588,
+      "direction_cosine": 0.7318827959632873,
+      "logmag_mse": 746.9114964453125,
+      "logmag_r2": -3685.976274741824
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2562,
+        "nll": -860.9698320994797,
+        "nll_per_dim": -1.6815817033192964,
+        "nll_baseline": -863.077370875148,
+        "nll_baseline_per_dim": -1.6856979899905233,
+        "dnll": 2.1075387756682176,
+        "dnll_per_dim": 0.0041162866712269874,
+        "direction_cosine": 0.7254773969995131,
+        "logmag_mse": 746.0429870938995,
+        "logmag_r2": -3149.379901498208
+      },
+      "rollout_context": {
+        "n": 2562,
+        "nll": NaN,
+        "nll_per_dim": NaN,
+        "nll_baseline": -863.077370875148,
+        "nll_baseline_per_dim": -1.6856979899905233,
+        "dnll": NaN,
+        "dnll_per_dim": NaN,
+        "direction_cosine": NaN,
+        "logmag_mse": NaN,
+        "logmag_r2": NaN
+      },
+      "gap_nll": NaN,
+      "gap_dnll": NaN
+    },
+    "final_checkpoint": "outputs/tier1/exp1_vmf/stage1/checkpoints/vmf_k1_final.pt"
+  },
+  {
+    "horizon_k": 2,
+    "slice_name": "all",
+    "model_type": "vmf",
+    "train": {
+      "n": 200000,
+      "nll": -860.8941584375,
+      "nll_per_dim": -1.6814339031982422,
+      "nll_baseline": -863.1305324609375,
+      "nll_baseline_per_dim": -1.6858018212127686,
+      "dnll": 2.23637402343752,
+      "dnll_per_dim": 0.004367918014526406,
+      "direction_cosine": 0.4440838868522644,
+      "logmag_mse": 750.3753675585938,
+      "logmag_r2": -3699.274267725848
+    },
+    "eval": {
+      "n": 200000,
+      "nll": -860.92409875,
+      "nll_per_dim": -1.6814923803710937,
+      "nll_baseline": -863.161692421875,
+      "nll_baseline_per_dim": -1.6858626805114747,
+      "dnll": 2.237593671875061,
+      "dnll_per_dim": 0.004370300140380978,
+      "direction_cosine": 0.4439841113471985,
+      "logmag_mse": 748.775928046875,
+      "logmag_r2": -3695.1796611049404
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2442,
+        "nll": -860.9516352623042,
+        "nll_per_dim": -1.6815461626216879,
+        "nll_baseline": -863.1712458530086,
+        "nll_baseline_per_dim": -1.6858813395566574,
+        "dnll": 2.2196105907044057,
+        "dnll_per_dim": 0.004335176934969542,
+        "direction_cosine": 0.45193480195360186,
+        "logmag_mse": 749.2173773588263,
+        "logmag_r2": -3607.2450585302972
+      },
+      "rollout_context": {
+        "n": 2442,
+        "nll": NaN,
+        "nll_per_dim": NaN,
+        "nll_baseline": -863.1712458530086,
+        "nll_baseline_per_dim": -1.6858813395566574,
+        "dnll": NaN,
+        "dnll_per_dim": NaN,
+        "direction_cosine": NaN,
+        "logmag_mse": NaN,
+        "logmag_r2": NaN
+      },
+      "gap_nll": NaN,
+      "gap_dnll": NaN
+    },
+    "final_checkpoint": "outputs/tier1/exp1_vmf/stage1/checkpoints/vmf_k2_final.pt"
+  },
+  {
+    "horizon_k": 4,
+    "slice_name": "all",
+    "model_type": "vmf",
+    "train": {
+      "n": 200000,
+      "nll": -860.8533828515625,
+      "nll_per_dim": -1.681354263381958,
+      "nll_baseline": -863.1305324609375,
+      "nll_baseline_per_dim": -1.6858018212127686,
+      "dnll": 2.2771496093749874,
+      "dnll_per_dim": 0.004447557830810522,
+      "direction_cosine": 0.14506649349212647,
+      "logmag_mse": 745.4304445117187,
+      "logmag_r2": -3674.8897099467613
+    },
+    "eval": {
+      "n": 200000,
+      "nll": -860.8840802148437,
+      "nll_per_dim": -1.6814142191696166,
+      "nll_baseline": -863.161692421875,
+      "nll_baseline_per_dim": -1.6858626805114747,
+      "dnll": 2.277612207031325,
+      "dnll_per_dim": 0.0044484613418580565,
+      "direction_cosine": 0.15126425366401672,
+      "logmag_mse": 744.5513290234375,
+      "logmag_r2": -3674.3257896036444
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2414,
+        "nll": -860.8625427347229,
+        "nll_per_dim": -1.6813721537787556,
+        "nll_baseline": -863.1974056721128,
+        "nll_baseline_per_dim": -1.6859324329533454,
+        "dnll": 2.334862937389971,
+        "dnll_per_dim": 0.0045602791745897875,
+        "direction_cosine": 0.13897827905163243,
+        "logmag_mse": 745.3403192882016,
+        "logmag_r2": -4101.091853558143
+      },
+      "rollout_context": {
+        "n": 2414,
+        "nll": NaN,
+        "nll_per_dim": NaN,
+        "nll_baseline": -863.1974056721128,
+        "nll_baseline_per_dim": -1.6859324329533454,
+        "dnll": NaN,
+        "dnll_per_dim": NaN,
+        "direction_cosine": NaN,
+        "logmag_mse": NaN,
+        "logmag_r2": NaN
+      },
+      "gap_nll": NaN,
+      "gap_dnll": NaN
+    },
+    "final_checkpoint": "outputs/tier1/exp1_vmf/stage1/checkpoints/vmf_k4_final.pt"
+  },
+  {
+    "horizon_k": 8,
+    "slice_name": "all",
+    "model_type": "vmf",
+    "train": {
+      "n": 200000,
+      "nll": -860.8463547070312,
+      "nll_per_dim": -1.6813405365371703,
+      "nll_baseline": -863.1323673828125,
+      "nll_baseline_per_dim": -1.6858054050445557,
+      "dnll": 2.2860126757813077,
+      "dnll_per_dim": 0.004464868507385367,
+      "direction_cosine": 0.05154363669395447,
+      "logmag_mse": 750.207487109375,
+      "logmag_r2": -3663.2800234143406
+    },
+    "eval": {
+      "n": 200000,
+      "nll": -860.874454375,
+      "nll_per_dim": -1.681395418701172,
+      "nll_baseline": -863.164900625,
+      "nll_baseline_per_dim": -1.685868946533203,
+      "dnll": 2.2904462499999454,
+      "dnll_per_dim": 0.004473527832031143,
+      "direction_cosine": 0.05811639130473137,
+      "logmag_mse": 750.0508231640625,
+      "logmag_r2": -3695.162257911468
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2214,
+        "nll": -860.8644596640872,
+        "nll_per_dim": -1.6813758977814204,
+        "nll_baseline": -863.3177893000244,
+        "nll_baseline_per_dim": -1.6861675572266102,
+        "dnll": 2.453329635937166,
+        "dnll_per_dim": 0.004791659445189778,
+        "direction_cosine": 0.059284843038579435,
+        "logmag_mse": 750.0309466712628,
+        "logmag_r2": -5333.932567882541
+      },
+      "rollout_context": {
+        "n": 2214,
+        "nll": NaN,
+        "nll_per_dim": NaN,
+        "nll_baseline": -863.3177893000244,
+        "nll_baseline_per_dim": -1.6861675572266102,
+        "dnll": NaN,
+        "dnll_per_dim": NaN,
+        "direction_cosine": NaN,
+        "logmag_mse": NaN,
+        "logmag_r2": NaN
+      },
+      "gap_nll": NaN,
+      "gap_dnll": NaN
+    },
+    "final_checkpoint": "outputs/tier1/exp1_vmf/stage1/checkpoints/vmf_k8_final.pt"
+  }
+]

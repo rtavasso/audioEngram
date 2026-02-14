@@ -1,0 +1,299 @@
+2026-02-07 06:42:53 | INFO     | phase0 | [tracking] Registered run: experiment=exp10_direction_ar run_id=20260207_064253 git=a1a1bc2 out=outputs/tier3/exp10_direction_ar/20260207_064253
+2026-02-07 06:42:53 | INFO     | phase0 | [exp10] Loaded codebook: outputs/tier3/exp8_direction_codebook/20260206_233223/codebook_K0256.npy shape=(256, 32)
+2026-02-07 06:42:53 | INFO     | phase0 | [exp10] Codebook norm range: [1.000000, 1.000000]
+2026-02-07 06:42:53 | INFO     | phase0 | [exp10] Near-zero threshold: 0.007291 (frac=0.01, median=0.729121)
+2026-02-07 06:42:53 | INFO     | phase0 | [exp10] Model: 1,577,218 parameters, K=256, D=32, input_dim=256
+2026-02-07 06:42:54 | INFO     | phase0 | [exp10] Training: K=256 D=32 hidden=1024 layers=2 batch=256 steps=20000 lr=0.0003
+2026-02-07 06:42:58 | INFO     | phase0 | [exp10] step=100/20000 train_nll=5.7528
+2026-02-07 06:43:00 | INFO     | phase0 | [exp10] step=200/20000 train_nll=5.2052
+2026-02-07 06:43:02 | INFO     | phase0 | [exp10] step=300/20000 train_nll=5.1382
+2026-02-07 06:43:04 | INFO     | phase0 | [exp10] step=400/20000 train_nll=5.1078
+2026-02-07 06:43:06 | INFO     | phase0 | [exp10] step=500/20000 train_nll=5.0439
+2026-02-07 06:43:08 | INFO     | phase0 | [exp10] step=600/20000 train_nll=4.9524
+2026-02-07 06:43:10 | INFO     | phase0 | [exp10] step=700/20000 train_nll=4.8694
+2026-02-07 06:43:13 | INFO     | phase0 | [exp10] step=800/20000 train_nll=4.8074
+2026-02-07 06:43:15 | INFO     | phase0 | [exp10] step=900/20000 train_nll=4.7240
+2026-02-07 06:43:17 | INFO     | phase0 | [exp10] step=1000/20000 train_nll=4.6944
+2026-02-07 06:43:19 | INFO     | phase0 | [exp10] step=1100/20000 train_nll=4.6615
+2026-02-07 06:43:21 | INFO     | phase0 | [exp10] step=1200/20000 train_nll=4.6291
+2026-02-07 06:43:23 | INFO     | phase0 | [exp10] step=1300/20000 train_nll=4.5987
+2026-02-07 06:43:26 | INFO     | phase0 | [exp10] step=1400/20000 train_nll=4.5841
+2026-02-07 06:43:27 | INFO     | phase0 | [exp10] step=1500/20000 train_nll=4.6094
+2026-02-07 06:43:29 | INFO     | phase0 | [exp10] step=1600/20000 train_nll=4.6256
+2026-02-07 06:43:32 | INFO     | phase0 | [exp10] step=1700/20000 train_nll=4.6181
+2026-02-07 06:43:34 | INFO     | phase0 | [exp10] step=1800/20000 train_nll=4.5524
+2026-02-07 06:43:36 | INFO     | phase0 | [exp10] step=1900/20000 train_nll=4.5333
+2026-02-07 06:43:38 | INFO     | phase0 | [exp10] step=2000/20000 train_nll=4.5296
+2026-02-07 06:43:38 | INFO     | phase0 | [exp10] step=2000 eval: dir_acc=0.1134 dir_top5_acc=0.3598 mag_nll=0.4919 total_nll=4.3831
+2026-02-07 06:43:39 | INFO     | phase0 | [exp10] step=2100/20000 train_nll=4.5190
+2026-02-07 06:43:40 | INFO     | phase0 | [exp10] step=2200/20000 train_nll=4.5102
+2026-02-07 06:43:41 | INFO     | phase0 | [exp10] step=2300/20000 train_nll=4.4984
+2026-02-07 06:43:44 | INFO     | phase0 | [exp10] step=2400/20000 train_nll=4.4462
+2026-02-07 06:43:46 | INFO     | phase0 | [exp10] step=2500/20000 train_nll=4.4183
+2026-02-07 06:43:48 | INFO     | phase0 | [exp10] step=2600/20000 train_nll=4.4515
+2026-02-07 06:43:50 | INFO     | phase0 | [exp10] step=2700/20000 train_nll=4.4436
+2026-02-07 06:43:53 | INFO     | phase0 | [exp10] step=2800/20000 train_nll=4.4608
+2026-02-07 06:43:55 | INFO     | phase0 | [exp10] step=2900/20000 train_nll=4.4569
+2026-02-07 06:43:57 | INFO     | phase0 | [exp10] step=3000/20000 train_nll=4.4615
+2026-02-07 06:44:00 | INFO     | phase0 | [exp10] step=3100/20000 train_nll=4.4590
+2026-02-07 06:44:02 | INFO     | phase0 | [exp10] step=3200/20000 train_nll=4.4494
+2026-02-07 06:44:04 | INFO     | phase0 | [exp10] step=3300/20000 train_nll=4.3765
+2026-02-07 06:44:06 | INFO     | phase0 | [exp10] step=3400/20000 train_nll=4.3930
+2026-02-07 06:44:08 | INFO     | phase0 | [exp10] step=3500/20000 train_nll=4.3595
+2026-02-07 06:44:10 | INFO     | phase0 | [exp10] step=3600/20000 train_nll=4.3760
+2026-02-07 06:44:12 | INFO     | phase0 | [exp10] step=3700/20000 train_nll=4.3282
+2026-02-07 06:44:15 | INFO     | phase0 | [exp10] step=3800/20000 train_nll=4.3289
+2026-02-07 06:44:17 | INFO     | phase0 | [exp10] step=3900/20000 train_nll=4.3930
+2026-02-07 06:44:19 | INFO     | phase0 | [exp10] step=4000/20000 train_nll=4.4084
+2026-02-07 06:44:19 | INFO     | phase0 | [exp10] step=4000 eval: dir_acc=0.1178 dir_top5_acc=0.4070 mag_nll=0.4442 total_nll=4.1770
+2026-02-07 06:44:22 | INFO     | phase0 | [exp10] step=4100/20000 train_nll=4.3825
+2026-02-07 06:44:24 | INFO     | phase0 | [exp10] step=4200/20000 train_nll=4.3453
+2026-02-07 06:44:27 | INFO     | phase0 | [exp10] step=4300/20000 train_nll=4.3366
+2026-02-07 06:44:28 | INFO     | phase0 | [exp10] step=4400/20000 train_nll=4.3575
+2026-02-07 06:44:29 | INFO     | phase0 | [exp10] step=4500/20000 train_nll=4.3450
+2026-02-07 06:44:30 | INFO     | phase0 | [exp10] step=4600/20000 train_nll=4.3249
+2026-02-07 06:44:32 | INFO     | phase0 | [exp10] step=4700/20000 train_nll=4.3388
+2026-02-07 06:44:35 | INFO     | phase0 | [exp10] step=4800/20000 train_nll=4.2570
+2026-02-07 06:44:37 | INFO     | phase0 | [exp10] step=4900/20000 train_nll=4.2825
+2026-02-07 06:44:39 | INFO     | phase0 | [exp10] step=5000/20000 train_nll=4.3231
+2026-02-07 06:44:41 | INFO     | phase0 | [exp10] step=5100/20000 train_nll=4.3575
+2026-02-07 06:44:43 | INFO     | phase0 | [exp10] step=5200/20000 train_nll=4.3578
+2026-02-07 06:44:46 | INFO     | phase0 | [exp10] step=5300/20000 train_nll=4.3510
+2026-02-07 06:44:48 | INFO     | phase0 | [exp10] step=5400/20000 train_nll=4.3435
+2026-02-07 06:44:50 | INFO     | phase0 | [exp10] step=5500/20000 train_nll=4.3809
+2026-02-07 06:44:52 | INFO     | phase0 | [exp10] step=5600/20000 train_nll=4.3306
+2026-02-07 06:44:55 | INFO     | phase0 | [exp10] step=5700/20000 train_nll=4.2835
+2026-02-07 06:44:56 | INFO     | phase0 | [exp10] step=5800/20000 train_nll=4.2746
+2026-02-07 06:44:59 | INFO     | phase0 | [exp10] step=5900/20000 train_nll=4.2581
+2026-02-07 06:45:01 | INFO     | phase0 | [exp10] step=6000/20000 train_nll=4.2616
+2026-02-07 06:45:01 | INFO     | phase0 | [exp10] step=6000 eval: dir_acc=0.1360 dir_top5_acc=0.4164 mag_nll=0.4252 total_nll=4.0888
+2026-02-07 06:45:03 | INFO     | phase0 | [exp10] step=6100/20000 train_nll=4.2545
+2026-02-07 06:45:05 | INFO     | phase0 | [exp10] step=6200/20000 train_nll=4.2773
+2026-02-07 06:45:07 | INFO     | phase0 | [exp10] step=6300/20000 train_nll=4.3073
+2026-02-07 06:45:10 | INFO     | phase0 | [exp10] step=6400/20000 train_nll=4.3157
+2026-02-07 06:45:12 | INFO     | phase0 | [exp10] step=6500/20000 train_nll=4.2963
+2026-02-07 06:45:14 | INFO     | phase0 | [exp10] step=6600/20000 train_nll=4.2617
+2026-02-07 06:45:16 | INFO     | phase0 | [exp10] step=6700/20000 train_nll=4.2873
+2026-02-07 06:45:17 | INFO     | phase0 | [exp10] step=6800/20000 train_nll=4.2814
+2026-02-07 06:45:17 | INFO     | phase0 | [exp10] step=6900/20000 train_nll=4.2704
+2026-02-07 06:45:19 | INFO     | phase0 | [exp10] step=7000/20000 train_nll=4.2764
+2026-02-07 06:45:22 | INFO     | phase0 | [exp10] step=7100/20000 train_nll=4.2301
+2026-02-07 06:45:24 | INFO     | phase0 | [exp10] step=7200/20000 train_nll=4.2256
+2026-02-07 06:45:26 | INFO     | phase0 | [exp10] step=7300/20000 train_nll=4.2366
+2026-02-07 06:45:29 | INFO     | phase0 | [exp10] step=7400/20000 train_nll=4.2617
+2026-02-07 06:45:31 | INFO     | phase0 | [exp10] step=7500/20000 train_nll=4.3092
+2026-02-07 06:45:33 | INFO     | phase0 | [exp10] step=7600/20000 train_nll=4.2884
+2026-02-07 06:45:36 | INFO     | phase0 | [exp10] step=7700/20000 train_nll=4.2951
+2026-02-07 06:45:38 | INFO     | phase0 | [exp10] step=7800/20000 train_nll=4.2931
+2026-02-07 06:45:40 | INFO     | phase0 | [exp10] step=7900/20000 train_nll=4.3037
+2026-02-07 06:45:42 | INFO     | phase0 | [exp10] step=8000/20000 train_nll=4.2503
+2026-02-07 06:45:42 | INFO     | phase0 | [exp10] step=8000 eval: dir_acc=0.1408 dir_top5_acc=0.4246 mag_nll=0.4150 total_nll=4.0333
+2026-02-07 06:45:45 | INFO     | phase0 | [exp10] step=8100/20000 train_nll=4.2323
+2026-02-07 06:45:47 | INFO     | phase0 | [exp10] step=8200/20000 train_nll=4.2150
+2026-02-07 06:45:49 | INFO     | phase0 | [exp10] step=8300/20000 train_nll=4.2067
+2026-02-07 06:45:51 | INFO     | phase0 | [exp10] step=8400/20000 train_nll=4.2005
+2026-02-07 06:45:53 | INFO     | phase0 | [exp10] step=8500/20000 train_nll=4.2086
+2026-02-07 06:45:55 | INFO     | phase0 | [exp10] step=8600/20000 train_nll=4.2678
+2026-02-07 06:45:58 | INFO     | phase0 | [exp10] step=8700/20000 train_nll=4.2765
+2026-02-07 06:46:00 | INFO     | phase0 | [exp10] step=8800/20000 train_nll=4.2534
+2026-02-07 06:46:02 | INFO     | phase0 | [exp10] step=8900/20000 train_nll=4.2236
+2026-02-07 06:46:04 | INFO     | phase0 | [exp10] step=9000/20000 train_nll=4.2474
+2026-02-07 06:46:05 | INFO     | phase0 | [exp10] step=9100/20000 train_nll=4.2440
+2026-02-07 06:46:06 | INFO     | phase0 | [exp10] step=9200/20000 train_nll=4.2292
+2026-02-07 06:46:07 | INFO     | phase0 | [exp10] step=9300/20000 train_nll=4.2403
+2026-02-07 06:46:10 | INFO     | phase0 | [exp10] step=9400/20000 train_nll=4.2102
+2026-02-07 06:46:12 | INFO     | phase0 | [exp10] step=9500/20000 train_nll=4.1605
+2026-02-07 06:46:14 | INFO     | phase0 | [exp10] step=9600/20000 train_nll=4.2091
+2026-02-07 06:46:16 | INFO     | phase0 | [exp10] step=9700/20000 train_nll=4.2292
+2026-02-07 06:46:19 | INFO     | phase0 | [exp10] step=9800/20000 train_nll=4.2474
+2026-02-07 06:46:21 | INFO     | phase0 | [exp10] step=9900/20000 train_nll=4.2571
+2026-02-07 06:46:23 | INFO     | phase0 | [exp10] step=10000/20000 train_nll=4.2556
+2026-02-07 06:46:23 | INFO     | phase0 | [exp10] step=10000 eval: dir_acc=0.1496 dir_top5_acc=0.4276 mag_nll=0.4168 total_nll=4.0207
+2026-02-07 06:46:26 | INFO     | phase0 | [exp10] step=10100/20000 train_nll=4.2665
+2026-02-07 06:46:28 | INFO     | phase0 | [exp10] step=10200/20000 train_nll=4.2852
+2026-02-07 06:46:30 | INFO     | phase0 | [exp10] step=10300/20000 train_nll=4.2237
+2026-02-07 06:46:32 | INFO     | phase0 | [exp10] step=10400/20000 train_nll=4.1882
+2026-02-07 06:46:34 | INFO     | phase0 | [exp10] step=10500/20000 train_nll=4.1761
+2026-02-07 06:46:37 | INFO     | phase0 | [exp10] step=10600/20000 train_nll=4.1831
+2026-02-07 06:46:39 | INFO     | phase0 | [exp10] step=10700/20000 train_nll=4.1753
+2026-02-07 06:46:41 | INFO     | phase0 | [exp10] step=10800/20000 train_nll=4.1790
+2026-02-07 06:46:43 | INFO     | phase0 | [exp10] step=10900/20000 train_nll=4.2187
+2026-02-07 06:46:45 | INFO     | phase0 | [exp10] step=11000/20000 train_nll=4.2317
+2026-02-07 06:46:47 | INFO     | phase0 | [exp10] step=11100/20000 train_nll=4.2449
+2026-02-07 06:46:49 | INFO     | phase0 | [exp10] step=11200/20000 train_nll=4.2160
+2026-02-07 06:46:51 | INFO     | phase0 | [exp10] step=11300/20000 train_nll=4.1706
+2026-02-07 06:46:53 | INFO     | phase0 | [exp10] step=11400/20000 train_nll=4.2215
+2026-02-07 06:46:54 | INFO     | phase0 | [exp10] step=11500/20000 train_nll=4.2068
+2026-02-07 06:46:55 | INFO     | phase0 | [exp10] step=11600/20000 train_nll=4.2028
+2026-02-07 06:46:56 | INFO     | phase0 | [exp10] step=11700/20000 train_nll=4.1894
+2026-02-07 06:47:00 | INFO     | phase0 | [exp10] step=11800/20000 train_nll=4.1364
+2026-02-07 06:47:02 | INFO     | phase0 | [exp10] step=11900/20000 train_nll=4.1531
+2026-02-07 06:47:04 | INFO     | phase0 | [exp10] step=12000/20000 train_nll=4.1928
+2026-02-07 06:47:04 | INFO     | phase0 | [exp10] step=12000 eval: dir_acc=0.1386 dir_top5_acc=0.4308 mag_nll=0.4143 total_nll=4.0234
+2026-02-07 06:47:07 | INFO     | phase0 | [exp10] step=12100/20000 train_nll=4.1975
+2026-02-07 06:47:09 | INFO     | phase0 | [exp10] step=12200/20000 train_nll=4.2416
+2026-02-07 06:47:11 | INFO     | phase0 | [exp10] step=12300/20000 train_nll=4.2359
+2026-02-07 06:47:14 | INFO     | phase0 | [exp10] step=12400/20000 train_nll=4.2418
+2026-02-07 06:47:16 | INFO     | phase0 | [exp10] step=12500/20000 train_nll=4.2504
+2026-02-07 06:47:18 | INFO     | phase0 | [exp10] step=12600/20000 train_nll=4.2307
+2026-02-07 06:47:21 | INFO     | phase0 | [exp10] step=12700/20000 train_nll=4.1801
+2026-02-07 06:47:23 | INFO     | phase0 | [exp10] step=12800/20000 train_nll=4.1948
+2026-02-07 06:47:26 | INFO     | phase0 | [exp10] step=12900/20000 train_nll=4.1502
+2026-02-07 06:47:28 | INFO     | phase0 | [exp10] step=13000/20000 train_nll=4.1670
+2026-02-07 06:47:30 | INFO     | phase0 | [exp10] step=13100/20000 train_nll=4.1245
+2026-02-07 06:47:32 | INFO     | phase0 | [exp10] step=13200/20000 train_nll=4.1417
+2026-02-07 06:47:34 | INFO     | phase0 | [exp10] step=13300/20000 train_nll=4.2038
+2026-02-07 06:47:37 | INFO     | phase0 | [exp10] step=13400/20000 train_nll=4.2135
+2026-02-07 06:47:39 | INFO     | phase0 | [exp10] step=13500/20000 train_nll=4.1824
+2026-02-07 06:47:41 | INFO     | phase0 | [exp10] step=13600/20000 train_nll=4.1659
+2026-02-07 06:47:43 | INFO     | phase0 | [exp10] step=13700/20000 train_nll=4.1769
+2026-02-07 06:47:44 | INFO     | phase0 | [exp10] step=13800/20000 train_nll=4.1957
+2026-02-07 06:47:45 | INFO     | phase0 | [exp10] step=13900/20000 train_nll=4.1883
+2026-02-07 06:47:46 | INFO     | phase0 | [exp10] step=14000/20000 train_nll=4.1665
+2026-02-07 06:47:47 | INFO     | phase0 | [exp10] step=14000 eval: dir_acc=0.1470 dir_top5_acc=0.4326 mag_nll=0.3966 total_nll=3.9871
+2026-02-07 06:47:50 | INFO     | phase0 | [exp10] step=14100/20000 train_nll=4.1784
+2026-02-07 06:47:52 | INFO     | phase0 | [exp10] step=14200/20000 train_nll=4.1128
+2026-02-07 06:47:54 | INFO     | phase0 | [exp10] step=14300/20000 train_nll=4.1524
+2026-02-07 06:47:57 | INFO     | phase0 | [exp10] step=14400/20000 train_nll=4.1683
+2026-02-07 06:47:59 | INFO     | phase0 | [exp10] step=14500/20000 train_nll=4.1911
+2026-02-07 06:48:01 | INFO     | phase0 | [exp10] step=14600/20000 train_nll=4.2239
+2026-02-07 06:48:03 | INFO     | phase0 | [exp10] step=14700/20000 train_nll=4.2256
+2026-02-07 06:48:06 | INFO     | phase0 | [exp10] step=14800/20000 train_nll=4.2235
+2026-02-07 06:48:08 | INFO     | phase0 | [exp10] step=14900/20000 train_nll=4.2373
+2026-02-07 06:48:10 | INFO     | phase0 | [exp10] step=15000/20000 train_nll=4.1843
+2026-02-07 06:48:13 | INFO     | phase0 | [exp10] step=15100/20000 train_nll=4.1444
+2026-02-07 06:48:15 | INFO     | phase0 | [exp10] step=15200/20000 train_nll=4.1368
+2026-02-07 06:48:17 | INFO     | phase0 | [exp10] step=15300/20000 train_nll=4.1400
+2026-02-07 06:48:20 | INFO     | phase0 | [exp10] step=15400/20000 train_nll=4.1296
+2026-02-07 06:48:22 | INFO     | phase0 | [exp10] step=15500/20000 train_nll=4.1063
+2026-02-07 06:48:24 | INFO     | phase0 | [exp10] step=15600/20000 train_nll=4.1630
+2026-02-07 06:48:27 | INFO     | phase0 | [exp10] step=15700/20000 train_nll=4.1875
+2026-02-07 06:48:30 | INFO     | phase0 | [exp10] step=15800/20000 train_nll=4.1881
+2026-02-07 06:48:33 | INFO     | phase0 | [exp10] step=15900/20000 train_nll=4.1593
+2026-02-07 06:48:35 | INFO     | phase0 | [exp10] step=16000/20000 train_nll=4.1477
+2026-02-07 06:48:35 | INFO     | phase0 | [exp10] step=16000 eval: dir_acc=0.1470 dir_top5_acc=0.4382 mag_nll=0.4010 total_nll=3.9857
+2026-02-07 06:48:37 | INFO     | phase0 | [exp10] step=16100/20000 train_nll=4.1728
+2026-02-07 06:48:38 | INFO     | phase0 | [exp10] step=16200/20000 train_nll=4.1588
+2026-02-07 06:48:39 | INFO     | phase0 | [exp10] step=16300/20000 train_nll=4.1549
+2026-02-07 06:48:40 | INFO     | phase0 | [exp10] step=16400/20000 train_nll=4.1571
+2026-02-07 06:48:44 | INFO     | phase0 | [exp10] step=16500/20000 train_nll=4.0814
+2026-02-07 06:48:46 | INFO     | phase0 | [exp10] step=16600/20000 train_nll=4.1070
+2026-02-07 06:48:48 | INFO     | phase0 | [exp10] step=16700/20000 train_nll=4.1502
+2026-02-07 06:48:51 | INFO     | phase0 | [exp10] step=16800/20000 train_nll=4.1871
+2026-02-07 06:48:53 | INFO     | phase0 | [exp10] step=16900/20000 train_nll=4.1962
+2026-02-07 06:48:56 | INFO     | phase0 | [exp10] step=17000/20000 train_nll=4.1810
+2026-02-07 06:48:58 | INFO     | phase0 | [exp10] step=17100/20000 train_nll=4.2105
+2026-02-07 06:49:00 | INFO     | phase0 | [exp10] step=17200/20000 train_nll=4.2099
+2026-02-07 06:49:02 | INFO     | phase0 | [exp10] step=17300/20000 train_nll=4.1865
+2026-02-07 06:49:04 | INFO     | phase0 | [exp10] step=17400/20000 train_nll=4.1367
+2026-02-07 06:49:07 | INFO     | phase0 | [exp10] step=17500/20000 train_nll=4.1241
+2026-02-07 06:49:09 | INFO     | phase0 | [exp10] step=17600/20000 train_nll=4.1257
+2026-02-07 06:49:11 | INFO     | phase0 | [exp10] step=17700/20000 train_nll=4.1182
+2026-02-07 06:49:14 | INFO     | phase0 | [exp10] step=17800/20000 train_nll=4.1027
+2026-02-07 06:49:16 | INFO     | phase0 | [exp10] step=17900/20000 train_nll=4.0979
+2026-02-07 06:49:19 | INFO     | phase0 | [exp10] step=18000/20000 train_nll=4.1616
+2026-02-07 06:49:19 | INFO     | phase0 | [exp10] step=18000 eval: dir_acc=0.1490 dir_top5_acc=0.4418 mag_nll=0.4046 total_nll=3.9759
+2026-02-07 06:49:21 | INFO     | phase0 | [exp10] step=18100/20000 train_nll=4.1778
+2026-02-07 06:49:24 | INFO     | phase0 | [exp10] step=18200/20000 train_nll=4.1429
+2026-02-07 06:49:26 | INFO     | phase0 | [exp10] step=18300/20000 train_nll=4.1397
+2026-02-07 06:49:28 | INFO     | phase0 | [exp10] step=18400/20000 train_nll=4.1444
+2026-02-07 06:49:29 | INFO     | phase0 | [exp10] step=18500/20000 train_nll=4.1620
+2026-02-07 06:49:30 | INFO     | phase0 | [exp10] step=18600/20000 train_nll=4.1431
+2026-02-07 06:49:31 | INFO     | phase0 | [exp10] step=18700/20000 train_nll=4.1470
+2026-02-07 06:49:34 | INFO     | phase0 | [exp10] step=18800/20000 train_nll=4.1061
+2026-02-07 06:49:36 | INFO     | phase0 | [exp10] step=18900/20000 train_nll=4.0665
+2026-02-07 06:49:39 | INFO     | phase0 | [exp10] step=19000/20000 train_nll=4.1080
+2026-02-07 06:49:41 | INFO     | phase0 | [exp10] step=19100/20000 train_nll=4.1319
+2026-02-07 06:49:43 | INFO     | phase0 | [exp10] step=19200/20000 train_nll=4.1773
+2026-02-07 06:49:46 | INFO     | phase0 | [exp10] step=19300/20000 train_nll=4.1845
+2026-02-07 06:49:48 | INFO     | phase0 | [exp10] step=19400/20000 train_nll=4.1832
+2026-02-07 06:49:50 | INFO     | phase0 | [exp10] step=19500/20000 train_nll=4.1966
+2026-02-07 06:49:52 | INFO     | phase0 | [exp10] step=19600/20000 train_nll=4.1947
+2026-02-07 06:49:54 | INFO     | phase0 | [exp10] step=19700/20000 train_nll=4.1243
+2026-02-07 06:49:57 | INFO     | phase0 | [exp10] step=19800/20000 train_nll=4.1177
+2026-02-07 06:49:59 | INFO     | phase0 | [exp10] step=19900/20000 train_nll=4.1017
+2026-02-07 06:50:02 | INFO     | phase0 | [exp10] step=20000/20000 train_nll=4.0955
+2026-02-07 06:50:02 | INFO     | phase0 | [exp10] step=20000 eval: dir_acc=0.1540 dir_top5_acc=0.4356 mag_nll=0.3966 total_nll=3.9634
+2026-02-07 06:50:03 | INFO     | phase0 | [exp10] Final eval: dir_acc=0.1540 dir_top5_acc=0.4356 mag_nll=0.3966 total_nll=3.9634
+2026-02-07 06:50:03 | INFO     | phase0 | [exp10] Running rollout evaluation...
+2026-02-07 06:50:03 | INFO     | phase0 | [exp10] Rollout: 100 segments from 20 utterances
+2026-02-07 06:50:03 | INFO     | phase0 | [exp10] Rollout argmax_k1: n=100 mean_dir_acc=0.1200 final_state_err=0.7891
+2026-02-07 06:50:03 | INFO     | phase0 | [exp10] Rollout argmax_k2: n=200 mean_dir_acc=0.1750 final_state_err=1.0506
+2026-02-07 06:50:04 | INFO     | phase0 | [exp10] Rollout argmax_k4: n=400 mean_dir_acc=0.1025 final_state_err=1.6102
+2026-02-07 06:50:04 | INFO     | phase0 | [exp10] Rollout argmax_k8: n=800 mean_dir_acc=0.0537 final_state_err=1.6674
+2026-02-07 06:50:05 | INFO     | phase0 | [exp10] Rollout argmax_k16: n=1600 mean_dir_acc=0.0375 final_state_err=4727.1982
+2026-02-07 06:50:05 | INFO     | phase0 | [exp10] Rollout categorical_k1: n=100 mean_dir_acc=0.0800 final_state_err=0.8865
+2026-02-07 06:50:06 | INFO     | phase0 | [exp10] Rollout categorical_k2: n=200 mean_dir_acc=0.0600 final_state_err=1.3008
+2026-02-07 06:50:06 | INFO     | phase0 | [exp10] Rollout categorical_k4: n=400 mean_dir_acc=0.0400 final_state_err=7.4603
+2026-02-07 06:50:07 | INFO     | phase0 | [exp10] Rollout categorical_k8: n=800 mean_dir_acc=0.0312 final_state_err=26320.6641
+2026-02-07 06:50:08 | INFO     | phase0 | [exp10] Rollout categorical_k16: n=1600 mean_dir_acc=0.0181 final_state_err=57462.7758
+2026-02-07 06:50:08 | INFO     | phase0 | [exp10] Rollout top_p_k1: n=100 mean_dir_acc=0.0900 final_state_err=0.9035
+2026-02-07 06:50:09 | INFO     | phase0 | [exp10] Rollout top_p_k2: n=200 mean_dir_acc=0.0650 final_state_err=1.3028
+2026-02-07 06:50:09 | INFO     | phase0 | [exp10] Rollout top_p_k4: n=400 mean_dir_acc=0.0350 final_state_err=1643.8402
+2026-02-07 06:50:10 | INFO     | phase0 | [exp10] Rollout top_p_k8: n=800 mean_dir_acc=0.0275 final_state_err=4343.9051
+2026-02-07 06:50:12 | INFO     | phase0 | [exp10] Rollout top_p_k16: n=1600 mean_dir_acc=0.0175 final_state_err=55658.0445
+2026-02-07 06:50:12 | INFO     | phase0 | [exp10] Running perceptual rollout evaluation (audio decode)...
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Loaded VAE decoder (latent_dim=32)
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6529-62556-0000 k=1: mel_dist=0.0231
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6529-62556-0000 k=2: mel_dist=0.0633
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6529-62556-0000 k=4: mel_dist=0.3617
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6529-62556-0000 k=8: mel_dist=0.5182
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6367-74004-0034 k=1: mel_dist=0.0339
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6367-74004-0034 k=2: mel_dist=0.1378
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6367-74004-0034 k=4: mel_dist=0.9532
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6367-74004-0034 k=8: mel_dist=1.0187
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6529-62554-0021 k=1: mel_dist=0.0796
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6529-62554-0021 k=2: mel_dist=0.0699
+2026-02-07 06:50:13 | INFO     | phase0 | [exp10] Audio utt=6529-62554-0021 k=4: mel_dist=0.1394
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=6529-62554-0021 k=8: mel_dist=0.2822
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=374-180299-0027 k=1: mel_dist=0.0371
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=374-180299-0027 k=2: mel_dist=0.0616
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=374-180299-0027 k=4: mel_dist=0.4413
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=374-180299-0027 k=8: mel_dist=1.3065
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=374-180298-0043 k=1: mel_dist=0.1260
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=374-180298-0043 k=2: mel_dist=0.3836
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=374-180298-0043 k=4: mel_dist=0.1865
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=374-180298-0043 k=8: mel_dist=0.5958
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=6367-74004-0003 k=1: mel_dist=0.0451
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=6367-74004-0003 k=2: mel_dist=0.0891
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=6367-74004-0003 k=4: mel_dist=0.2286
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=6367-74004-0003 k=8: mel_dist=0.2888
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=4297-13006-0042 k=1: mel_dist=0.0883
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=4297-13006-0042 k=2: mel_dist=0.4245
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=4297-13006-0042 k=4: mel_dist=0.4461
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=4297-13006-0042 k=8: mel_dist=0.6527
+2026-02-07 06:50:14 | INFO     | phase0 | [exp10] Audio utt=6367-65536-0048 k=1: mel_dist=0.0267
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=6367-65536-0048 k=2: mel_dist=0.1163
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=6367-65536-0048 k=4: mel_dist=0.3558
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=6367-65536-0048 k=8: mel_dist=0.6888
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=6367-65536-0018 k=1: mel_dist=0.0180
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=6367-65536-0018 k=2: mel_dist=0.0726
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=6367-65536-0018 k=4: mel_dist=0.1935
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=6367-65536-0018 k=8: mel_dist=0.1902
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=7113-86041-0041 k=1: mel_dist=0.0899
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=7113-86041-0041 k=2: mel_dist=0.2071
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=7113-86041-0041 k=4: mel_dist=0.2860
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Audio utt=7113-86041-0041 k=8: mel_dist=0.4854
+2026-02-07 06:50:15 | INFO     | phase0 | [exp10] Summary:
+      condition  dir_top1_acc  dir_top5_acc   dir_ce  mag_nll  total_nll    strategy  k_max      n  mean_dir_acc  mean_state_err  mean_direction_cosine  final_dir_acc  final_state_err  mel_distance_mean  mel_distance_std  n_audio
+ teacher_forced         0.154        0.4356 3.566788 0.396638   3.963426         NaN    NaN    NaN           NaN             NaN                    NaN            NaN              NaN                NaN               NaN      NaN
+      argmax_k1           NaN           NaN      NaN      NaN        NaN      argmax    1.0  100.0      0.120000        0.789150               0.654067           0.12         0.789150                NaN               NaN      NaN
+      argmax_k2           NaN           NaN      NaN      NaN        NaN      argmax    2.0  200.0      0.175000        0.903060               0.639674           0.23         1.050557                NaN               NaN      NaN
+      argmax_k4           NaN           NaN      NaN      NaN        NaN      argmax    4.0  400.0      0.102500        1.235434               0.371863           0.02         1.610240                NaN               NaN      NaN
+      argmax_k8           NaN           NaN      NaN      NaN        NaN      argmax    8.0  800.0      0.053750        1.423547               0.194602           0.03         1.667422                NaN               NaN      NaN
+     argmax_k16           NaN           NaN      NaN      NaN        NaN      argmax   16.0 1600.0      0.037500     2419.810751               0.095306           0.03      4727.198152                NaN               NaN      NaN
+ categorical_k1           NaN           NaN      NaN      NaN        NaN categorical    1.0  100.0      0.080000        0.886530               0.557570           0.08         0.886530                NaN               NaN      NaN
+ categorical_k2           NaN           NaN      NaN      NaN        NaN categorical    2.0  200.0      0.060000        1.076763               0.490362           0.07         1.300841                NaN               NaN      NaN
+ categorical_k4           NaN           NaN      NaN      NaN        NaN categorical    4.0  400.0      0.040000        2.922254               0.265325           0.00         7.460256                NaN               NaN      NaN
+ categorical_k8           NaN           NaN      NaN      NaN        NaN categorical    8.0  800.0      0.031250     6886.752318               0.146141           0.00     26320.664085                NaN               NaN      NaN
+categorical_k16           NaN           NaN      NaN      NaN        NaN categorical   16.0 1600.0      0.018125    28905.510976               0.078763           0.01     57462.775773                NaN               NaN      NaN
+       top_p_k1           NaN           NaN      NaN      NaN        NaN       top_p    1.0  100.0      0.090000        0.903550               0.510235           0.09         0.903550                NaN               NaN      NaN
+       top_p_k2           NaN           NaN      NaN      NaN        NaN       top_p    2.0  200.0      0.065000        1.128961               0.488437           0.05         1.302806                NaN               NaN      NaN
+       top_p_k4           NaN           NaN      NaN      NaN        NaN       top_p    4.0  400.0      0.035000      411.972468               0.312418           0.03      1643.840247                NaN               NaN      NaN
+       top_p_k8           NaN           NaN      NaN      NaN        NaN       top_p    8.0  800.0      0.027500     1988.649842               0.144053           0.00      4343.905126                NaN               NaN      NaN
+      top_p_k16           NaN           NaN      NaN      NaN        NaN       top_p   16.0 1600.0      0.017500    21138.510359               0.106596           0.01     55658.044463                NaN               NaN      NaN
+       audio_k1           NaN           NaN      NaN      NaN        NaN         NaN    NaN    NaN           NaN             NaN                    NaN            NaN              NaN           0.056765          0.036507     10.0
+       audio_k2           NaN           NaN      NaN      NaN        NaN         NaN    NaN    NaN           NaN             NaN                    NaN            NaN              NaN           0.162585          0.135128     10.0
+       audio_k4           NaN           NaN      NaN      NaN        NaN         NaN    NaN    NaN           NaN             NaN                    NaN            NaN              NaN           0.359214          0.234548     10.0
+       audio_k8           NaN           NaN      NaN      NaN        NaN         NaN    NaN    NaN           NaN             NaN                    NaN            NaN              NaN           0.602737          0.344908     10.0
+2026-02-07 06:50:15 | INFO     | phase0 | [tracking] Finalized run: experiment=exp10_direction_ar run_id=20260207_064253 status=completed duration=442s dir_top1_acc=0.154 dir_top5_acc=0.4356 total_nll=3.9634263107299805 n_params=1577218 K=256 D=32 rollout_k4_dir_acc=0.02 rollout_k4_state_err=1.6102398572862149 audio_mel_mean=0.29532554363831875

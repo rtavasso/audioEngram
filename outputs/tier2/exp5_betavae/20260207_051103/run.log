@@ -1,0 +1,9 @@
+2026-02-07 05:11:03 | INFO     | phase0 | [tracking] Registered run: experiment=exp5_betavae run_id=20260207_051103 git=a1a1bc2 out=outputs/tier2/exp5_betavae/20260207_051103
+2026-02-07 05:12:43 | INFO     | phase0 | [exp5] Run id: 20260207_051103, device: cuda, utterances: 5000
+2026-02-07 05:12:43 | INFO     | phase0 | [exp5] === Variant: baseline_betavae ===
+2026-02-07 05:12:43 | INFO     | phase0 | [exp5] Training VAE for baseline_betavae...
+2026-02-07 05:12:45 | INFO     | phase0 | [vae_train] latent_dim=96 beta=0.01 lambda_smooth=0.0 lambda_pred=0.0 batch=32 lr=0.0001 steps=50000 amp=True
+2026-02-07 05:14:20 | INFO     | phase0 | [vae_train] step=100/50000 loss=35.1496 recon=8.4079 kl=2674.1680 smooth=0.0000 pred=0.0000
+2026-02-07 05:15:59 | INFO     | phase0 | [vae_train] step=200/50000 loss=33.4535 recon=7.9618 kl=2549.1752 smooth=0.0000 pred=0.0000
+2026-02-07 05:17:39 | INFO     | phase0 | [vae_train] step=300/50000 loss=32.1036 recon=7.6869 kl=2441.6658 smooth=0.0000 pred=0.0000
+2026-02-07 05:19:19 | INFO     | phase0 | [vae_train] step=400/50000 loss=30.7873 recon=7.4585 kl=2332.8810 smooth=0.0000 pred=0.0000

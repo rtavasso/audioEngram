@@ -1,0 +1,32 @@
+{
+  "64": {
+    "k": 64,
+    "angular_error_mean_deg": 19.56715202331543,
+    "angular_error_median_deg": 13.10971736907959,
+    "angular_error_p95_deg": 55.51483917236328,
+    "codebook_utilization": 64,
+    "codebook_utilization_frac": 1.0,
+    "entropy": 3.9015483119369954,
+    "max_entropy": 4.1588830833596715,
+    "entropy_ratio": 0.9381240669033684,
+    "centroid_magnitude_mean": 1.3266189098358154,
+    "centroid_magnitude_std": 0.8488931655883789,
+    "centroid_magnitude_min": 0.03580780327320099,
+    "centroid_magnitude_max": 3.7535109519958496
+  },
+  "256": {
+    "k": 256,
+    "angular_error_mean_deg": 15.11245346069336,
+    "angular_error_median_deg": 10.458624839782715,
+    "angular_error_p95_deg": 41.97079086303711,
+    "codebook_utilization": 239,
+    "codebook_utilization_frac": 0.93359375,
+    "entropy": 5.303889424426886,
+    "max_entropy": 5.545177444479562,
+    "entropy_ratio": 0.9564868712555109,
+    "centroid_magnitude_mean": 1.2794783115386963,
+    "centroid_magnitude_std": 0.8512170314788818,
+    "centroid_magnitude_min": 0.027713008224964142,
+    "centroid_magnitude_max": 4.601046562194824
+  }
+}

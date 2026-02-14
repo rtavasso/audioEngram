@@ -1,0 +1,238 @@
+[
+  {
+    "horizon_k": 1,
+    "slice_name": "all",
+    "model_type": "mdn",
+    "train": {
+      "n": 200000,
+      "nll": -58.07039359619141,
+      "nll_per_dim": -1.8146997998809815,
+      "nll_baseline": -13.380722966918945,
+      "nll_baseline_per_dim": -0.41814759271621704,
+      "dnll": -44.68967062927246,
+      "dnll_per_dim": -1.3965522071647645,
+      "direction_cosine": 0.5765919414329529,
+      "logmag_mse": 0.7683430323410034,
+      "logmag_r2": -0.017108110373722285
+    },
+    "eval": {
+      "n": 146851,
+      "nll": -58.07505600782213,
+      "nll_per_dim": -1.8148455002444415,
+      "nll_baseline": -13.353558173716271,
+      "nll_baseline_per_dim": -0.4172986929286335,
+      "dnll": -44.721497834105854,
+      "dnll_per_dim": -1.397546807315808,
+      "direction_cosine": 0.555665215084032,
+      "logmag_mse": 0.788867223171138,
+      "logmag_r2": -0.0017091451839821303
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2350,
+        "nll": -56.59272822522102,
+        "nll_per_dim": -1.768522757038157,
+        "nll_baseline": -10.527576273096368,
+        "nll_baseline_per_dim": -0.3289867585342615,
+        "dnll": -46.06515195212465,
+        "dnll_per_dim": -1.4395359985038954,
+        "direction_cosine": 0.5843879897376285,
+        "logmag_mse": 0.7968717545611228,
+        "logmag_r2": -0.040080604202864745
+      },
+      "rollout_context": {
+        "n": 2350,
+        "nll": -1.3631550582704393,
+        "nll_per_dim": -0.04259859557095123,
+        "nll_baseline": -10.527576273096368,
+        "nll_baseline_per_dim": -0.3289867585342615,
+        "dnll": 9.164421214825929,
+        "dnll_per_dim": 0.28638816296331027,
+        "direction_cosine": 0.052125265467681293,
+        "logmag_mse": 86.7750889408355,
+        "logmag_r2": -112.25923703375382
+      },
+      "gap_nll": 55.22957316695059,
+      "gap_dnll": 55.22957316695058
+    },
+    "final_checkpoint": "outputs/tier2/exp5_betavae/20260206_174326/betavae_smooth/phase1/checkpoints/mdn_k1_final.pt"
+  },
+  {
+    "horizon_k": 2,
+    "slice_name": "all",
+    "model_type": "mdn",
+    "train": {
+      "n": 200000,
+      "nll": -48.309585161132816,
+      "nll_per_dim": -1.5096745362854005,
+      "nll_baseline": -13.380722966918945,
+      "nll_baseline_per_dim": -0.41814759271621704,
+      "dnll": -34.92886219421387,
+      "dnll_per_dim": -1.0915269435691834,
+      "direction_cosine": 0.31508919337272645,
+      "logmag_mse": 1.5859385791015626,
+      "logmag_r2": -1.0994151355079493
+    },
+    "eval": {
+      "n": 146851,
+      "nll": -49.0635280137265,
+      "nll_per_dim": -1.533235250428953,
+      "nll_baseline": -13.353558173716271,
+      "nll_baseline_per_dim": -0.4172986929286335,
+      "dnll": -35.709969840010224,
+      "dnll_per_dim": -1.1159365575003195,
+      "direction_cosine": 0.3132626313700369,
+      "logmag_mse": 1.5718036048978987,
+      "logmag_r2": -0.9958872662121032
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2490,
+        "nll": -48.37629773529419,
+        "nll_per_dim": -1.5117593042279434,
+        "nll_baseline": -12.583911815441278,
+        "nll_baseline_per_dim": -0.3932472442325399,
+        "dnll": -35.79238591985291,
+        "dnll_per_dim": -1.1185120599954035,
+        "direction_cosine": 0.3385336742580711,
+        "logmag_mse": 1.6667881145988186,
+        "logmag_r2": -1.127147147399194
+      },
+      "rollout_context": {
+        "n": 2490,
+        "nll": 1.3595956486528117e+35,
+        "nll_per_dim": 4.2487364020400365e+33,
+        "nll_baseline": -12.583911815441278,
+        "nll_baseline_per_dim": -0.3932472442325399,
+        "dnll": 1.3595956486528117e+35,
+        "dnll_per_dim": 4.2487364020400365e+33,
+        "direction_cosine": -0.004328047460806276,
+        "logmag_mse": Infinity,
+        "logmag_r2": -Infinity
+      },
+      "gap_nll": 1.3595956486528117e+35,
+      "gap_dnll": 1.3595956486528117e+35
+    },
+    "final_checkpoint": "outputs/tier2/exp5_betavae/20260206_174326/betavae_smooth/phase1/checkpoints/mdn_k2_final.pt"
+  },
+  {
+    "horizon_k": 4,
+    "slice_name": "all",
+    "model_type": "mdn",
+    "train": {
+      "n": 200000,
+      "nll": -43.87926285522461,
+      "nll_per_dim": -1.371226964225769,
+      "nll_baseline": -13.380722966918945,
+      "nll_baseline_per_dim": -0.41814759271621704,
+      "dnll": -30.498539888305665,
+      "dnll_per_dim": -0.953079371509552,
+      "direction_cosine": 0.07939305279105902,
+      "logmag_mse": 7.351136180419922,
+      "logmag_r2": -8.731200667995955
+    },
+    "eval": {
+      "n": 146851,
+      "nll": -44.31321607113141,
+      "nll_per_dim": -1.3847880022228565,
+      "nll_baseline": -13.353558173716271,
+      "nll_baseline_per_dim": -0.4172986929286335,
+      "dnll": -30.959657897415134,
+      "dnll_per_dim": -0.9674893092942229,
+      "direction_cosine": 0.09996142871594922,
+      "logmag_mse": 6.75468919376081,
+      "logmag_r2": -7.577151819118926
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2534,
+        "nll": -42.47524986801274,
+        "nll_per_dim": -1.327351558375398,
+        "nll_baseline": -11.890123513545591,
+        "nll_baseline_per_dim": -0.3715663597982997,
+        "dnll": -30.58512635446715,
+        "dnll_per_dim": -0.9557851985770984,
+        "direction_cosine": 0.08549717822658937,
+        "logmag_mse": 6.986291078982467,
+        "logmag_r2": -8.096081290388756
+      },
+      "rollout_context": {
+        "n": 2534,
+        "nll": NaN,
+        "nll_per_dim": NaN,
+        "nll_baseline": -11.890123513545591,
+        "nll_baseline_per_dim": -0.3715663597982997,
+        "dnll": NaN,
+        "dnll_per_dim": NaN,
+        "direction_cosine": NaN,
+        "logmag_mse": NaN,
+        "logmag_r2": NaN
+      },
+      "gap_nll": NaN,
+      "gap_dnll": NaN
+    },
+    "final_checkpoint": "outputs/tier2/exp5_betavae/20260206_174326/betavae_smooth/phase1/checkpoints/mdn_k4_final.pt"
+  },
+  {
+    "horizon_k": 8,
+    "slice_name": "all",
+    "model_type": "mdn",
+    "train": {
+      "n": 200000,
+      "nll": -43.38297751708984,
+      "nll_per_dim": -1.3557180474090575,
+      "nll_baseline": -13.380722966918945,
+      "nll_baseline_per_dim": -0.41814759271621704,
+      "dnll": -30.002254550170896,
+      "dnll_per_dim": -0.9375704546928405,
+      "direction_cosine": 0.004790551144778729,
+      "logmag_mse": 10.783157603149414,
+      "logmag_r2": -13.274401656490479
+    },
+    "eval": {
+      "n": 146851,
+      "nll": -43.824249503030494,
+      "nll_per_dim": -1.369507796969703,
+      "nll_baseline": -13.353558173716271,
+      "nll_baseline_per_dim": -0.4172986929286335,
+      "dnll": -30.47069132931422,
+      "dnll_per_dim": -0.9522091040410694,
+      "direction_cosine": 0.0053636826754254385,
+      "logmag_mse": 10.071445115260323,
+      "logmag_r2": -11.788791802782459
+    },
+    "rollout": {
+      "n_utterances": 16,
+      "teacher_forced": {
+        "n": 2196,
+        "nll": -44.090767125397214,
+        "nll_per_dim": -1.377836472668663,
+        "nll_baseline": -13.548851960425168,
+        "nll_baseline_per_dim": -0.4234016237632865,
+        "dnll": -30.541915164972046,
+        "dnll_per_dim": -0.9544348489053764,
+        "direction_cosine": -0.0011997254319804532,
+        "logmag_mse": 9.409685169170762,
+        "logmag_r2": -9.66058560112687
+      },
+      "rollout_context": {
+        "n": 2196,
+        "nll": 1.5997101821604486e+16,
+        "nll_per_dim": 499909431925140.2,
+        "nll_baseline": -13.548851960425168,
+        "nll_baseline_per_dim": -0.4234016237632865,
+        "dnll": 1.59971018216045e+16,
+        "dnll_per_dim": 499909431925140.6,
+        "direction_cosine": -0.014518090052392761,
+        "logmag_mse": 25.904075687250277,
+        "logmag_r2": -28.34769987701269
+      },
+      "gap_nll": 1.599710182160453e+16,
+      "gap_dnll": 1.599710182160453e+16
+    },
+    "final_checkpoint": "outputs/tier2/exp5_betavae/20260206_174326/betavae_smooth/phase1/checkpoints/mdn_k8_final.pt"
+  }
+]

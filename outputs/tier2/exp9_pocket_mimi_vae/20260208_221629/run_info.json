@@ -1,0 +1,20 @@
+{
+  "experiment": "exp9_pocket_mimi_vae",
+  "run_id": "20260208_221629",
+  "config_path": "configs/tier2_exp9_pocket_mimi_vae.yaml",
+  "cli_args": [
+    "--config",
+    "configs/tier2_exp9_pocket_mimi_vae.yaml"
+  ],
+  "git_commit": "a1a1bc2",
+  "start_time": "2026-02-08T22:16:29+00:00",
+  "status": "started",
+  "environment": {
+    "python_version": "3.11.14",
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA TITAN X (Pascal)",
+    "platform": "Linux-6.8.0-94-generic-x86_64-with-glibc2.39"
+  },
+  "output_dir": "outputs/tier2/exp9_pocket_mimi_vae/20260208_221629"
+}

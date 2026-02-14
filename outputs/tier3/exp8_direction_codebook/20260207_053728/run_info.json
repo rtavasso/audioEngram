@@ -1,0 +1,34 @@
+{
+  "experiment": "exp8_direction_codebook",
+  "run_id": "20260207_053728",
+  "config_path": "configs/tier2_exp8_direction_codebook.yaml",
+  "cli_args": [
+    "--config",
+    "configs/tier2_exp8_direction_codebook.yaml",
+    "--k",
+    "64",
+    "--vae-dir",
+    "outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae"
+  ],
+  "git_commit": "a1a1bc2",
+  "start_time": "2026-02-07T05:37:28+00:00",
+  "status": "completed",
+  "environment": {
+    "python_version": "3.11.14",
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA TITAN X (Pascal)",
+    "platform": "Linux-6.8.0-94-generic-x86_64-with-glibc2.39"
+  },
+  "output_dir": "outputs/tier3/exp8_direction_codebook/20260207_053728",
+  "end_time": "2026-02-07T05:37:36+00:00",
+  "duration_sec": 8.0,
+  "key_metrics": {
+    "best_method": "state_vq",
+    "best_angular_error_deg": 0.0,
+    "best_mel_distance": 0.09460969865322114,
+    "near_zero_frac_001": 6.087483221374371e-06,
+    "exp9_recommendation": "floor_clamp_sufficient",
+    "latent_dim": 32
+  }
+}

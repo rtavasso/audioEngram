@@ -1,0 +1,19 @@
+# Tier 1 - Experiment 3B: Synthetic trajectory perceptual validation
+# Generates synthetic latent trajectories (varying direction/magnitude) and decodes via Mimi.
+
+device: auto
+
+data:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: ./outputs/phase0/latents_index.parquet
+  splits_dir: ./outputs/phase0/splits
+
+n_utterances: 10
+max_frames: 200            # ~16 sec at 12.5 Hz
+alphas: [0.25, 0.5, 0.75]
+
+# Mimi decoder checkpoint (null = download from HF)
+mimi_checkpoint: null
+
+output:
+  out_dir: ./outputs/tier1/exp3b_synthetic_audio

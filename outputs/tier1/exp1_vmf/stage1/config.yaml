@@ -1,0 +1,47 @@
+data:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: null
+  frames_index: ./outputs/phase0/phase0_frames.parquet
+  splits_dir: ./outputs/phase0/splits
+slice: all
+context:
+  window_size: 8
+  horizons_k:
+  - 1
+  - 2
+  - 4
+  - 8
+model:
+  hidden_dim: 1024
+  n_hidden_layers: 2
+  dropout: 0.0
+  min_log_kappa: -2.0
+  max_log_kappa: 12.0
+  min_log_sigma_logm: -5.0
+  max_log_sigma_logm: 2.0
+train:
+  device: auto
+  seed: 42
+  batch_size: 256
+  num_workers: 0
+  compile: false
+  compile_mode: default
+  amp: false
+  amp_dtype: bf16
+  max_steps: 25000
+  lr: 0.001
+  weight_decay: 0.0001
+  grad_clip_norm: 1.0
+  log_every: 200
+  eval_every: 2000
+  save_every: 5000
+  max_train_samples: null
+  max_eval_samples: 200000
+  shuffle_buffer: 8192
+rollout:
+  enabled: true
+  n_eval_utterances: 16
+  max_frames_per_utterance: 2000
+  sample_from_model: false
+output:
+  out_dir: ./outputs/tier1/exp1_vmf

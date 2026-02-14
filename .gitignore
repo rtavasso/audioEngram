@@ -1,0 +1,41 @@
+# Raw data (auto-downloaded via 00_download_librispeech.sh)
+data/
+
+# PyTorch checkpoints
+*.pt
+*.pth
+*.safetensors
+
+# Audio files
+*.wav
+*.flac
+*.mp3
+
+# Latent stores and data files
+*.zarr/
+*.parquet
+*.npy
+*.npz
+*.h5
+*.hdf5
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environment
+.venv/
+
+# Test artifacts
+vae_decode_test/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~

@@ -1,0 +1,350 @@
+{
+  "n_utterances": 16,
+  "horizon_k": 1,
+  "window_size": 8,
+  "k_steps": 16,
+  "modes": {
+    "A_teacher": {
+      "n": 2048,
+      "nll": NaN,
+      "nll_baseline": -863.2842354774475,
+      "dnll": NaN,
+      "cos": NaN,
+      "mag_ratio": NaN,
+      "state_err": 0.0,
+      "per_step": [
+        {
+          "step": 1,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2323722839355,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 2,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2214050292969,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 3,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3545265197754,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 4,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.279670715332,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 5,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.1902732849121,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 6,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2545280456543,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 7,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2545204162598,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 8,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3553848266602,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 9,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3028907775879,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 10,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2096328735352,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 11,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2519645690918,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 12,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.264965057373,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 13,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2585754394531,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 14,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3284378051758,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 15,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3518486022949,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 16,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.4367713928223,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        }
+      ]
+    },
+    "D_rollout": {
+      "n": 2048,
+      "nll": NaN,
+      "nll_baseline": -863.2842354774475,
+      "dnll": NaN,
+      "cos": NaN,
+      "mag_ratio": NaN,
+      "state_err": NaN,
+      "per_step": [
+        {
+          "step": 1,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2323722839355,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": 0.0
+        },
+        {
+          "step": 2,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2214050292969,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 3,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3545265197754,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 4,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.279670715332,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 5,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.1902732849121,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 6,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2545280456543,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 7,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2545204162598,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 8,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3553848266602,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 9,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3028907775879,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 10,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2096328735352,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 11,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2519645690918,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 12,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.264965057373,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 13,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.2585754394531,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 14,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3284378051758,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 15,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.3518486022949,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        },
+        {
+          "step": 16,
+          "n": 128,
+          "nll": NaN,
+          "nll_baseline": -863.4367713928223,
+          "dnll": NaN,
+          "cos": NaN,
+          "mag_ratio": NaN,
+          "state_err": NaN
+        }
+      ]
+    }
+  }
+}

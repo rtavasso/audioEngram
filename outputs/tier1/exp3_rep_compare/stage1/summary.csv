@@ -1,0 +1,3 @@
+representation,best_eval_dnll,phase1_dir
+mimi12,-184.4466583203125,outputs/tier1/exp3_rep_compare/stage1/mimi12/phase1
+encodec_encoder,-93.5953357928467,outputs/tier1/exp3_rep_compare/stage1/encodec_encoder/phase1

@@ -1,0 +1,23 @@
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | [tracking] Registered run: experiment=exp1_vmf run_id=stage1 git=a1a1bc2 out=outputs/tier1/exp1_vmf/stage1
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | Config: configs/tier1_exp1_vmf.yaml
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | Run id: stage1
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | Device: cuda
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | Slice: all
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | Horizons k: [1, 2, 4, 8]
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | Frames: ./outputs/phase0/phase0_frames.parquet
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | Latents: ./outputs/phase0/latents.zarr
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | Latents index: outputs/phase0/latents_index.parquet
+2026-02-05 23:01:15 | INFO     | tier1-exp1-vmf | Outputs: outputs/tier1/exp1_vmf/stage1
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | [tracking] Registered run: experiment=exp1_vmf run_id=stage1 git=a1a1bc2 out=outputs/tier1/exp1_vmf/stage1
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | Config: configs/tier1_exp1_vmf.yaml
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | Run id: stage1
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | Device: cuda
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | Slice: all
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | Horizons k: [1, 2, 4, 8]
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | Frames: ./outputs/phase0/phase0_frames.parquet
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | Latents: ./outputs/phase0/latents.zarr
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | Latents index: outputs/phase0/latents_index.parquet
+2026-02-05 23:03:37 | INFO     | tier1-exp1-vmf | Outputs: outputs/tier1/exp1_vmf/stage1
+2026-02-06 01:17:29 | INFO     | tier1-exp1-vmf | Wrote metrics to: outputs/tier1/exp1_vmf/stage1/metrics.json
+2026-02-06 01:17:29 | INFO     | tier1-exp1-vmf | Wrote table to: outputs/tier1/exp1_vmf/stage1/tables.csv
+2026-02-06 01:17:29 | INFO     | tier1-exp1-vmf | [tracking] Finalized run: experiment=exp1_vmf run_id=stage1 status=completed duration=8032s eval_dnll=2.198286757812525 rollout_gap_nll=nan

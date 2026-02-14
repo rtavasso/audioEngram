@@ -277,6 +277,86 @@ def iter_phase1_deltas(
                 return
 
 
+def iter_rollout_segments(
+    *,
+    latents_dir: str | Path,
+    latents_index_path: str | Path,
+    splits_dir: str | Path,
+    split: str,
+    window_size: int,
+    horizon_k: int,
+    k_steps: int,
+    segments_per_utt: int,
+    seed: int,
+    max_segments: Optional[int] = None,
+    min_duration_sec: float = 3.0,
+) -> Iterator[dict]:
+    """
+    Yield rollout training segments: {z_window: [W,D], z_seq: [K+1,D], dz_seq: [K,D]}.
+
+    Each segment is a contiguous run of (K+1) frames from a single utterance,
+    with the preceding W frames as the initial context window.
+    """
+    import pandas as pd
+
+    latent_store = LatentStore(latents_dir)
+    rng = get_rng(int(seed))
+
+    splits_dir = Path(splits_dir)
+    if split == "train":
+        speaker_file = splits_dir / "train_speakers.txt"
+    else:
+        speaker_file = splits_dir / "eval_speakers.txt"
+    speakers = set()
+    with open(speaker_file) as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                speakers.add(int(line))
+
+    df = pd.read_parquet(str(latents_index_path), columns=["utterance_id", "speaker_id", "n_frames", "duration_sec"])
+    df = df[df["speaker_id"].isin(speakers)]
+    df = df[df["duration_sec"] >= float(min_duration_sec)]
+    utt_ids = df["utterance_id"].astype(str).tolist()
+    rng.shuffle(utt_ids)
+
+    min_len = int(window_size) + int(k_steps) + 1
+    n_yielded = 0
+
+    for utt_id in utt_ids:
+        if utt_id not in latent_store:
+            continue
+        x = latent_store.get_latents(utt_id).astype(np.float32, copy=False)
+        t_total = int(x.shape[0])
+        if t_total < min_len:
+            continue
+
+        # Valid start positions: t0 such that x[t0:t0+W+K+1] is valid
+        max_t0 = t_total - int(window_size) - int(k_steps) - 1
+        if max_t0 < 0:
+            continue
+
+        n_segs = int(min(segments_per_utt, max_t0 + 1))
+        starts = rng.choice(np.arange(0, max_t0 + 1, dtype=np.int64), size=n_segs, replace=False)
+
+        for t0 in starts:
+            t0 = int(t0)
+            z_window = x[t0 : t0 + int(window_size)]  # [W, D]
+            z_seq = x[t0 + int(window_size) : t0 + int(window_size) + int(k_steps) + 1]  # [K+1, D]
+            dz_seq = z_seq[1:] - z_seq[:-1]  # [K, D]
+
+            yield {
+                "z_window": z_window,
+                "z_seq": z_seq,
+                "dz_seq": dz_seq,
+            }
+            n_yielded += 1
+            if max_segments is not None and n_yielded >= int(max_segments):
+                return
+
+    return
+
+
 def sample_eval_utterances(
     *,
     splits_dir: str | Path,

@@ -1,0 +1,2 @@
+experiment,latent_dim,best_eval_dnll,recon_l1,recon_mel,rollout_state_err,rollout_cos
+exp9_pocket_mimi_vae,32,-19.682839973239247,0.04300412718206644,0.829592365026474,5.131080912426114,0.07474109292888897

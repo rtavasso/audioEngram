@@ -1,0 +1,30 @@
+{
+  "64": {
+    "k": 64,
+    "angular_error_mean_deg": 13.483657836914062,
+    "angular_error_median_deg": 10.26937198638916,
+    "angular_error_p95_deg": 33.9862060546875,
+    "codebook_utilization": 64,
+    "codebook_utilization_frac": 1.0,
+    "entropy": 3.821089254378803,
+    "max_entropy": 4.1588830833596715,
+    "entropy_ratio": 0.9187777530144011,
+    "cluster_sizes_min": 874,
+    "cluster_sizes_max": 32677,
+    "cluster_sizes_mean": 10266.90625
+  },
+  "256": {
+    "k": 256,
+    "angular_error_mean_deg": 11.731343269348145,
+    "angular_error_median_deg": 8.775421142578125,
+    "angular_error_p95_deg": 30.26922035217285,
+    "codebook_utilization": 187,
+    "codebook_utilization_frac": 0.73046875,
+    "entropy": 5.0530177823170455,
+    "max_entropy": 5.545177444479562,
+    "entropy_ratio": 0.9112454620090686,
+    "cluster_sizes_min": 201,
+    "cluster_sizes_max": 14328,
+    "cluster_sizes_mean": 2566.7265625
+  }
+}

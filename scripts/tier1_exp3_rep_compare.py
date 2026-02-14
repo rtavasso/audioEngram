@@ -35,6 +35,7 @@ from phase0.data.librispeech import get_utterances
 from phase0.data.splits import load_splits
 from phase0.features.context import get_valid_frame_range
 from phase0.features.energy import compute_median_energy
+from experiment import register_run, finalize_run
 from phase0.utils.logging import setup_logging
 from phase0.utils.seed import set_seed
 from phase1.train_eval import _device_from_config, train_and_eval_for_k, write_results
@@ -196,7 +197,7 @@ def _extract_encodec_latents(
                 if representation == "encoder":
                     if not hasattr(model, "encoder"):
                         raise RuntimeError("EncodecModel missing .encoder; cannot extract encoder features.")
-                    enc_out = model.encoder(input_values, padding_mask) if padding_mask is not None else model.encoder(input_values)
+                    enc_out = model.encoder(input_values)
                     if hasattr(enc_out, "last_hidden_state"):
                         enc = enc_out.last_hidden_state
                     elif torch.is_tensor(enc_out):
@@ -274,6 +275,11 @@ def main() -> int:
     out_root = Path(cfg["output"]["out_dir"])
     out_dir = out_root / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    run = register_run(
+        experiment="exp3_rep_compare", run_id=run_id, config_path=args.config,
+        config=cfg, cli_args=sys.argv[1:], out_dir=out_dir, log_name="tier1-exp3-rep-compare",
+    )
 
     set_seed(int(cfg.get("seed", 42)))
 
@@ -418,6 +424,52 @@ def main() -> int:
 
         write_results(results, metrics_path=str(rep_phase1_dir / "metrics.json"), tables_path=str(rep_phase1_dir / "tables.csv"))
 
+        # Run injection diagnostic on k=1 checkpoint if available
+        if cfg.get("run_injection", True):
+            ckpt_path = rep_phase1_dir / "checkpoints" / "mdn_k1_final.pt"
+            if ckpt_path.exists():
+                from phase1.checkpoints import load_phase1_checkpoint
+                from phase1.injection_diag import run_injection_diagnostic
+                from phase1.train_eval import fit_unconditional_baseline
+                import json as _json
+
+                inj_model, _ckpt = load_phase1_checkpoint(ckpt_path, device=device)
+                inj_baseline = fit_unconditional_baseline(
+                    frames_index_path=frames_index,
+                    latents_dir=latents_zarr,
+                    window_size=window_size,
+                    horizon_k=1,
+                    slice_name=str(cfg.get("slice", "all")),
+                    max_samples=cfg["train"].get("max_train_samples"),
+                )
+                inj_cfg = cfg.get("injection", {})
+                inj_result = run_injection_diagnostic(
+                    model=inj_model,
+                    baseline=inj_baseline,
+                    latents_dir=latents_zarr,
+                    latents_index_path=latents_index,
+                    splits_dir=splits_dir,
+                    horizon_k=1,
+                    window_size=window_size,
+                    k_steps=int(inj_cfg.get("k_steps", 16)),
+                    n_eval_utterances=int(inj_cfg.get("n_eval_utterances", 16)),
+                    segments_per_utt=int(inj_cfg.get("segments_per_utt", 8)),
+                    max_frames_per_utt=int(inj_cfg.get("max_frames_per_utterance", 2000)),
+                    seed=42,
+                    device=device,
+                    mode_inject_after_steps={
+                        "A_teacher": None,
+                        "B_periodic": [int(x) for x in inj_cfg.get("inject_after_steps_periodic", [4, 8, 12])],
+                        "C_one_shot": [int(x) for x in inj_cfg.get("inject_after_steps_one_shot", [1])],
+                        "D_rollout": [],
+                    },
+                    sample_from_model=False,
+                )
+                inj_path = rep_phase1_dir / "injection_diag.json"
+                with open(inj_path, "w") as _f:
+                    _json.dump(inj_result, _f, indent=2)
+                logger.info(f"[exp3] Wrote injection diagnostic: {inj_path}")
+
         # Summary row: best eval ΔNLL across horizons (more negative is better)
         best = min((float(r.eval.get("dnll")) for r in results if r.eval.get("dnll") is not None), default=float("nan"))
         rep_rows.append({"representation": name, "best_eval_dnll": best, "phase1_dir": str(rep_phase1_dir)})
@@ -426,6 +478,11 @@ def main() -> int:
     summary_path = out_dir / "summary.csv"
     summary.to_csv(str(summary_path), index=False)
     logger.info(f"Wrote summary: {summary_path}")
+
+    km = {}
+    for row in rep_rows:
+        km[f"{row['representation']}_best_dnll"] = row["best_eval_dnll"]
+    finalize_run(run, key_metrics=km)
     return 0
 
 

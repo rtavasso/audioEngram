@@ -1,0 +1,61 @@
+2026-02-06 02:06:09 | INFO     | tier1-exp1b-vmf-rollout | [tracking] Registered run: experiment=exp1b_vmf_rollout run_id=20260206_020609 git=a1a1bc2 out=outputs/tier1/exp1b_vmf_rollout/20260206_020609
+2026-02-06 02:06:10 | INFO     | tier1-exp1b-vmf-rollout | Run id: 20260206_020609
+2026-02-06 02:06:10 | INFO     | tier1-exp1b-vmf-rollout | Checkpoint: outputs/tier1/exp1_vmf/stage1/checkpoints/vmf_k1_final.pt
+2026-02-06 02:06:10 | INFO     | tier1-exp1b-vmf-rollout | Device: cuda
+2026-02-06 02:06:10 | INFO     | tier1-exp1b-vmf-rollout | K=16 batch=256 steps=5000 lr=0.0002
+2026-02-06 02:06:10 | INFO     | tier1-exp1b-vmf-rollout | w_rollout=1 w_teacher=0.1
+2026-02-06 02:06:10 | INFO     | tier1-exp1b-vmf-rollout | sched_p=0.2->0@2000
+2026-02-06 02:06:52 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=100/5000 loss=-947.0002 L_roll=-860.9096 L_tf=-860.9063 p_teacher=0.190
+2026-02-06 02:07:23 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=200/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.180
+2026-02-06 02:08:03 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=300/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.170
+2026-02-06 02:08:36 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=400/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.160
+2026-02-06 02:09:12 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=500/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.150
+2026-02-06 02:09:51 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=600/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.140
+2026-02-06 02:10:23 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=700/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.130
+2026-02-06 02:11:07 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=800/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.120
+2026-02-06 02:11:46 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=900/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.110
+2026-02-06 02:12:20 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1000/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.100
+2026-02-06 02:13:04 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1100/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.090
+2026-02-06 02:13:48 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1200/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.080
+2026-02-06 02:14:28 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1300/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.070
+2026-02-06 02:15:13 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1400/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.060
+2026-02-06 02:15:51 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1500/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.050
+2026-02-06 02:16:33 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1600/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.040
+2026-02-06 02:17:12 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1700/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.030
+2026-02-06 02:17:46 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1800/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.020
+2026-02-06 02:18:26 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=1900/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.010
+2026-02-06 02:19:09 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2000/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:19:51 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2100/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:20:29 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2200/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:21:18 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2300/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:21:55 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2400/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:22:42 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2500/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:23:21 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2600/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:23:59 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2700/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:24:40 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2800/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:25:19 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=2900/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:26:07 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3000/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:26:54 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3100/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:27:37 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3200/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:28:28 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3300/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:29:17 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3400/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:30:06 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3500/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:30:46 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3600/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:31:29 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3700/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:32:04 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3800/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:32:40 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=3900/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:33:22 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4000/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:34:05 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4100/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:34:48 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4200/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:35:33 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4300/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:36:12 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4400/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:36:39 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4500/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:37:13 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4600/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:37:45 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4700/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:38:17 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4800/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:38:46 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=4900/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:39:21 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] step=5000/5000 loss=nan L_roll=nan L_tf=nan p_teacher=0.000
+2026-02-06 02:39:21 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] Saved final checkpoint: outputs/tier1/exp1b_vmf_rollout/20260206_020609/checkpoints/vmf_rollout_final.pt
+2026-02-06 02:40:32 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] Wrote injection diagnostic: outputs/tier1/exp1b_vmf_rollout/20260206_020609/injection_diag.json
+2026-02-06 02:40:32 | INFO     | tier1-exp1b-vmf-rollout | [exp1b] Wrote summary: outputs/tier1/exp1b_vmf_rollout/20260206_020609/summary.json
+2026-02-06 02:40:32 | INFO     | tier1-exp1b-vmf-rollout | [tracking] Finalized run: experiment=exp1b_vmf_rollout run_id=20260206_020609 status=completed duration=2063s final_loss=nan D_rollout_cos_final=nan

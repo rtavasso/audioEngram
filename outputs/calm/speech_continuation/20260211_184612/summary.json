@@ -1,0 +1,51 @@
+{
+  "experiment": "calm_speech_continuation",
+  "run_id": "20260211_184612",
+  "steps": 10000,
+  "final_checkpoint": "outputs/calm/speech_continuation/20260211_184612/checkpoints/calm_final.pt",
+  "param_counts": {
+    "backbone": 3233280,
+    "short_ctx": 1653760,
+    "head": 1281568,
+    "w_psi": 193,
+    "total_trainable": 6168801
+  },
+  "rollout_metrics": {
+    "k=1": {
+      "mse_mean": 0.04600176269450458,
+      "mse_std": 0.029076384252081276,
+      "cos_mean": 0.9620180539786816,
+      "cos_std": 0.03731419686166978,
+      "n_samples": 320
+    },
+    "k=2": {
+      "mse_mean": 0.11014616714965086,
+      "mse_std": 0.07220932432840127,
+      "cos_mean": 0.8703087191213854,
+      "cos_std": 0.1374318981184339,
+      "n_samples": 320
+    },
+    "k=4": {
+      "mse_mean": 0.2307442463526968,
+      "mse_std": 0.12112812970910063,
+      "cos_mean": 0.7001652947161346,
+      "cos_std": 0.23135982807022384,
+      "n_samples": 320
+    },
+    "k=8": {
+      "mse_mean": 0.32063904767856,
+      "mse_std": 0.1144533277217907,
+      "cos_mean": 0.6802393687306904,
+      "cos_std": 0.2094650851012188,
+      "n_samples": 320
+    },
+    "k=16": {
+      "mse_mean": 0.3788269968004897,
+      "mse_std": 0.10426649007019273,
+      "cos_mean": 0.6792124936764594,
+      "cos_std": 0.19053022512078166,
+      "n_samples": 320
+    }
+  },
+  "n_audio_samples": 10
+}

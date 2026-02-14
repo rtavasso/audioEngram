@@ -1,0 +1,248 @@
+2026-02-07 07:29:12 | INFO     | phase0 | [tracking] Registered run: experiment=exp9_pocket_mimi_vae run_id=20260207_072912 git=a1a1bc2 out=outputs/tier2/exp9_pocket_mimi_vae/20260207_072912
+2026-02-07 07:31:00 | INFO     | phase0 | [exp9] Run id: 20260207_072912, device: cuda, utterances: 5000
+2026-02-07 07:31:00 | INFO     | phase0 | [exp9] Building PocketMimiVAE...
+2026-02-07 07:31:01 | INFO     | phase0 | Loading Mimi weights from full TTS model: hf://kyutai/pocket-tts/tts_b6369a24.safetensors@427e3d61b276ed69fdd03de0d185fa8a8d97fc5b
+2026-02-07 07:31:01 | INFO     | phase0 | Mimi weights loaded successfully
+2026-02-07 07:31:01 | INFO     | phase0 | [exp9] VAE built. Trainable params: 10,461,793
+2026-02-07 07:31:01 | INFO     | phase0 | [exp9] Discriminator built. Params: 1,708,676
+2026-02-07 07:31:04 | INFO     | phase0 | [exp9] WavLM distillation loaded (device=cpu, layer=7)
+2026-02-07 07:31:04 | INFO     | phase0 | [exp9] Training VAE-GAN...
+2026-02-07 07:31:04 | INFO     | phase0 | [exp9] latent_dim=32 beta_kl=0.01 lambda_adv=1.0 lambda_feat=2.0 lambda_distill=1.0 batch=4 lr_g=0.0001 lr_d=0.0001 steps=1000 amp=True
+2026-02-07 07:47:29 | INFO     | phase0 | [exp9] step=100/1000 g=18.6816 recon=8.0038 kl=906.11 adv_g=1.2433 feat=0.0606 distill=0.2523 d=1.8577
+2026-02-07 08:03:57 | INFO     | phase0 | [exp9] step=200/1000 g=18.9760 recon=7.6511 kl=900.54 adv_g=1.8171 feat=0.1270 distill=0.2485 d=1.5884
+2026-02-07 08:20:20 | INFO     | phase0 | [exp9] step=300/1000 g=18.8617 recon=7.5995 kl=893.75 adv_g=1.7477 feat=0.1611 distill=0.2548 d=1.5575
+2026-02-07 08:36:41 | INFO     | phase0 | [exp9] step=400/1000 g=18.5879 recon=7.4070 kl=886.80 adv_g=1.6793 feat=0.1910 distill=0.2516 d=1.5560
+2026-02-07 08:52:55 | INFO     | phase0 | [exp9] step=500/1000 g=18.5711 recon=7.4949 kl=879.33 adv_g=1.5742 feat=0.2426 distill=0.2235 d=1.6192
+2026-02-07 09:09:05 | INFO     | phase0 | [exp9] step=600/1000 g=18.5058 recon=7.5093 kl=871.63 adv_g=1.5351 feat=0.2646 distill=0.2159 d=1.6100
+2026-02-07 09:25:24 | INFO     | phase0 | [exp9] step=700/1000 g=18.5232 recon=7.5373 kl=864.53 adv_g=1.5674 feat=0.2788 distill=0.2155 d=1.5752
+2026-02-07 09:41:47 | INFO     | phase0 | [exp9] step=800/1000 g=18.4840 recon=7.4611 kl=857.73 adv_g=1.5845 feat=0.3232 distill=0.2148 d=1.5562
+2026-02-07 09:58:03 | INFO     | phase0 | [exp9] step=900/1000 g=18.5053 recon=7.5132 kl=850.47 adv_g=1.5936 feat=0.3398 distill=0.2143 d=1.5823
+2026-02-07 10:14:20 | INFO     | phase0 | [exp9] step=1000/1000 g=18.4117 recon=7.4844 kl=843.09 adv_g=1.5655 feat=0.3584 distill=0.2141 d=1.5807
+2026-02-07 10:14:21 | INFO     | phase0 | [exp9] Training done. Final checkpoint: outputs/tier2/exp9_pocket_mimi_vae/20260207_072912/checkpoints/vae_gan_final.pt
+2026-02-07 10:14:21 | INFO     | phase0 | [exp9] VAE-GAN training done: outputs/tier2/exp9_pocket_mimi_vae/20260207_072912/checkpoints/vae_gan_final.pt
+2026-02-07 10:14:21 | INFO     | phase0 | [exp9] Extracting VAE latents...
+2026-02-07 10:14:23 | INFO     | phase0 | [exp9] 50/5000 utterances extracted
+2026-02-07 10:14:25 | INFO     | phase0 | [exp9] 100/5000 utterances extracted
+2026-02-07 10:14:27 | INFO     | phase0 | [exp9] 150/5000 utterances extracted
+2026-02-07 10:14:29 | INFO     | phase0 | [exp9] 200/5000 utterances extracted
+2026-02-07 10:14:31 | INFO     | phase0 | [exp9] 250/5000 utterances extracted
+2026-02-07 10:14:33 | INFO     | phase0 | [exp9] 300/5000 utterances extracted
+2026-02-07 10:14:36 | INFO     | phase0 | [exp9] 350/5000 utterances extracted
+2026-02-07 10:14:37 | INFO     | phase0 | [exp9] 400/5000 utterances extracted
+2026-02-07 10:14:39 | INFO     | phase0 | [exp9] 450/5000 utterances extracted
+2026-02-07 10:14:42 | INFO     | phase0 | [exp9] 500/5000 utterances extracted
+2026-02-07 10:14:44 | INFO     | phase0 | [exp9] 550/5000 utterances extracted
+2026-02-07 10:14:46 | INFO     | phase0 | [exp9] 600/5000 utterances extracted
+2026-02-07 10:14:48 | INFO     | phase0 | [exp9] 650/5000 utterances extracted
+2026-02-07 10:14:49 | INFO     | phase0 | [exp9] 700/5000 utterances extracted
+2026-02-07 10:14:52 | INFO     | phase0 | [exp9] 750/5000 utterances extracted
+2026-02-07 10:14:54 | INFO     | phase0 | [exp9] 800/5000 utterances extracted
+2026-02-07 10:14:56 | INFO     | phase0 | [exp9] 850/5000 utterances extracted
+2026-02-07 10:14:58 | INFO     | phase0 | [exp9] 900/5000 utterances extracted
+2026-02-07 10:15:00 | INFO     | phase0 | [exp9] 950/5000 utterances extracted
+2026-02-07 10:15:02 | INFO     | phase0 | [exp9] 1000/5000 utterances extracted
+2026-02-07 10:15:04 | INFO     | phase0 | [exp9] 1050/5000 utterances extracted
+2026-02-07 10:15:07 | INFO     | phase0 | [exp9] 1100/5000 utterances extracted
+2026-02-07 10:15:09 | INFO     | phase0 | [exp9] 1150/5000 utterances extracted
+2026-02-07 10:15:11 | INFO     | phase0 | [exp9] 1200/5000 utterances extracted
+2026-02-07 10:15:13 | INFO     | phase0 | [exp9] 1250/5000 utterances extracted
+2026-02-07 10:15:15 | INFO     | phase0 | [exp9] 1300/5000 utterances extracted
+2026-02-07 10:15:18 | INFO     | phase0 | [exp9] 1350/5000 utterances extracted
+2026-02-07 10:15:20 | INFO     | phase0 | [exp9] 1400/5000 utterances extracted
+2026-02-07 10:15:22 | INFO     | phase0 | [exp9] 1450/5000 utterances extracted
+2026-02-07 10:15:24 | INFO     | phase0 | [exp9] 1500/5000 utterances extracted
+2026-02-07 10:15:26 | INFO     | phase0 | [exp9] 1550/5000 utterances extracted
+2026-02-07 10:15:28 | INFO     | phase0 | [exp9] 1600/5000 utterances extracted
+2026-02-07 10:15:31 | INFO     | phase0 | [exp9] 1650/5000 utterances extracted
+2026-02-07 10:15:33 | INFO     | phase0 | [exp9] 1700/5000 utterances extracted
+2026-02-07 10:15:35 | INFO     | phase0 | [exp9] 1750/5000 utterances extracted
+2026-02-07 10:15:37 | INFO     | phase0 | [exp9] 1800/5000 utterances extracted
+2026-02-07 10:15:39 | INFO     | phase0 | [exp9] 1850/5000 utterances extracted
+2026-02-07 10:15:41 | INFO     | phase0 | [exp9] 1900/5000 utterances extracted
+2026-02-07 10:15:43 | INFO     | phase0 | [exp9] 1950/5000 utterances extracted
+2026-02-07 10:15:45 | INFO     | phase0 | [exp9] 2000/5000 utterances extracted
+2026-02-07 10:15:47 | INFO     | phase0 | [exp9] 2050/5000 utterances extracted
+2026-02-07 10:15:49 | INFO     | phase0 | [exp9] 2100/5000 utterances extracted
+2026-02-07 10:15:52 | INFO     | phase0 | [exp9] 2150/5000 utterances extracted
+2026-02-07 10:15:54 | INFO     | phase0 | [exp9] 2200/5000 utterances extracted
+2026-02-07 10:15:56 | INFO     | phase0 | [exp9] 2250/5000 utterances extracted
+2026-02-07 10:15:58 | INFO     | phase0 | [exp9] 2300/5000 utterances extracted
+2026-02-07 10:16:00 | INFO     | phase0 | [exp9] 2350/5000 utterances extracted
+2026-02-07 10:16:03 | INFO     | phase0 | [exp9] 2400/5000 utterances extracted
+2026-02-07 10:16:05 | INFO     | phase0 | [exp9] 2450/5000 utterances extracted
+2026-02-07 10:16:07 | INFO     | phase0 | [exp9] 2500/5000 utterances extracted
+2026-02-07 10:16:09 | INFO     | phase0 | [exp9] 2550/5000 utterances extracted
+2026-02-07 10:16:11 | INFO     | phase0 | [exp9] 2600/5000 utterances extracted
+2026-02-07 10:16:13 | INFO     | phase0 | [exp9] 2650/5000 utterances extracted
+2026-02-07 10:16:15 | INFO     | phase0 | [exp9] 2700/5000 utterances extracted
+2026-02-07 10:16:18 | INFO     | phase0 | [exp9] 2750/5000 utterances extracted
+2026-02-07 10:16:20 | INFO     | phase0 | [exp9] 2800/5000 utterances extracted
+2026-02-07 10:16:22 | INFO     | phase0 | [exp9] 2850/5000 utterances extracted
+2026-02-07 10:16:24 | INFO     | phase0 | [exp9] 2900/5000 utterances extracted
+2026-02-07 10:16:26 | INFO     | phase0 | [exp9] 2950/5000 utterances extracted
+2026-02-07 10:16:29 | INFO     | phase0 | [exp9] 3000/5000 utterances extracted
+2026-02-07 10:16:31 | INFO     | phase0 | [exp9] 3050/5000 utterances extracted
+2026-02-07 10:16:33 | INFO     | phase0 | [exp9] 3100/5000 utterances extracted
+2026-02-07 10:16:35 | INFO     | phase0 | [exp9] 3150/5000 utterances extracted
+2026-02-07 10:16:37 | INFO     | phase0 | [exp9] 3200/5000 utterances extracted
+2026-02-07 10:16:39 | INFO     | phase0 | [exp9] 3250/5000 utterances extracted
+2026-02-07 10:16:41 | INFO     | phase0 | [exp9] 3300/5000 utterances extracted
+2026-02-07 10:16:44 | INFO     | phase0 | [exp9] 3350/5000 utterances extracted
+2026-02-07 10:16:46 | INFO     | phase0 | [exp9] 3400/5000 utterances extracted
+2026-02-07 10:16:48 | INFO     | phase0 | [exp9] 3450/5000 utterances extracted
+2026-02-07 10:16:50 | INFO     | phase0 | [exp9] 3500/5000 utterances extracted
+2026-02-07 10:16:52 | INFO     | phase0 | [exp9] 3550/5000 utterances extracted
+2026-02-07 10:16:55 | INFO     | phase0 | [exp9] 3600/5000 utterances extracted
+2026-02-07 10:16:57 | INFO     | phase0 | [exp9] 3650/5000 utterances extracted
+2026-02-07 10:16:59 | INFO     | phase0 | [exp9] 3700/5000 utterances extracted
+2026-02-07 10:17:01 | INFO     | phase0 | [exp9] 3750/5000 utterances extracted
+2026-02-07 10:17:03 | INFO     | phase0 | [exp9] 3800/5000 utterances extracted
+2026-02-07 10:17:05 | INFO     | phase0 | [exp9] 3850/5000 utterances extracted
+2026-02-07 10:17:07 | INFO     | phase0 | [exp9] 3900/5000 utterances extracted
+2026-02-07 10:17:09 | INFO     | phase0 | [exp9] 3950/5000 utterances extracted
+2026-02-07 10:17:11 | INFO     | phase0 | [exp9] 4000/5000 utterances extracted
+2026-02-07 10:17:14 | INFO     | phase0 | [exp9] 4050/5000 utterances extracted
+2026-02-07 10:17:16 | INFO     | phase0 | [exp9] 4100/5000 utterances extracted
+2026-02-07 10:17:18 | INFO     | phase0 | [exp9] 4150/5000 utterances extracted
+2026-02-07 10:17:20 | INFO     | phase0 | [exp9] 4200/5000 utterances extracted
+2026-02-07 10:17:22 | INFO     | phase0 | [exp9] 4250/5000 utterances extracted
+2026-02-07 10:17:24 | INFO     | phase0 | [exp9] 4300/5000 utterances extracted
+2026-02-07 10:17:26 | INFO     | phase0 | [exp9] 4350/5000 utterances extracted
+2026-02-07 10:17:29 | INFO     | phase0 | [exp9] 4400/5000 utterances extracted
+2026-02-07 10:17:31 | INFO     | phase0 | [exp9] 4450/5000 utterances extracted
+2026-02-07 10:17:33 | INFO     | phase0 | [exp9] 4500/5000 utterances extracted
+2026-02-07 10:17:35 | INFO     | phase0 | [exp9] 4550/5000 utterances extracted
+2026-02-07 10:17:37 | INFO     | phase0 | [exp9] 4600/5000 utterances extracted
+2026-02-07 10:17:39 | INFO     | phase0 | [exp9] 4650/5000 utterances extracted
+2026-02-07 10:17:41 | INFO     | phase0 | [exp9] 4700/5000 utterances extracted
+2026-02-07 10:17:43 | INFO     | phase0 | [exp9] 4750/5000 utterances extracted
+2026-02-07 10:17:45 | INFO     | phase0 | [exp9] 4800/5000 utterances extracted
+2026-02-07 10:17:48 | INFO     | phase0 | [exp9] 4850/5000 utterances extracted
+2026-02-07 10:17:50 | INFO     | phase0 | [exp9] 4900/5000 utterances extracted
+2026-02-07 10:17:52 | INFO     | phase0 | [exp9] 4950/5000 utterances extracted
+2026-02-07 10:17:54 | INFO     | phase0 | [exp9] 5000/5000 utterances extracted
+2026-02-07 10:17:54 | INFO     | phase0 | [exp9] Done. 5000 utterances -> outputs/tier2/exp9_pocket_mimi_vae/20260207_072912/latents.zarr
+2026-02-07 10:18:00 | INFO     | phase0 | [vae_extract] Built frames index: 747279 frames -> outputs/tier2/exp9_pocket_mimi_vae/20260207_072912/phase0_frames.parquet
+2026-02-07 10:18:00 | INFO     | phase0 | [exp9] Phase 1 diagnostic battery...
+2026-02-07 10:18:07 | INFO     | phase0 | [phase1] model=mdn k=1 slice=all device=cuda batch=256 steps=5000
+2026-02-07 10:18:09 | INFO     | phase0 | [phase1] k=1 step=200/5000 train_nll=3433.8682
+2026-02-07 10:18:11 | INFO     | phase0 | [phase1] k=1 step=400/5000 train_nll=-78.4426
+2026-02-07 10:18:12 | INFO     | phase0 | [phase1] k=1 step=600/5000 train_nll=-118.7205
+2026-02-07 10:18:14 | INFO     | phase0 | [phase1] k=1 step=800/5000 train_nll=-112.3326
+2026-02-07 10:18:16 | INFO     | phase0 | [phase1] k=1 step=1000/5000 train_nll=-104.9038
+2026-02-07 10:18:17 | INFO     | phase0 | [phase1] k=1 step=1200/5000 train_nll=-126.3439
+2026-02-07 10:18:19 | INFO     | phase0 | [phase1] k=1 step=1400/5000 train_nll=-114.2954
+2026-02-07 10:18:20 | INFO     | phase0 | [phase1] k=1 step=1600/5000 train_nll=-136.8322
+2026-02-07 10:18:22 | INFO     | phase0 | [phase1] k=1 step=1800/5000 train_nll=-132.6855
+2026-02-07 10:18:24 | INFO     | phase0 | [phase1] k=1 step=2000/5000 train_nll=-114.3550
+2026-02-07 10:18:31 | INFO     | phase0 | [phase1] k=1 step=2000 eval_dnll=74.3637 nll=-117.2784 baseline=-191.6421
+2026-02-07 10:18:32 | INFO     | phase0 | [phase1] k=1 step=2200/5000 train_nll=-137.4221
+2026-02-07 10:18:34 | INFO     | phase0 | [phase1] k=1 step=2400/5000 train_nll=-140.8438
+2026-02-07 10:18:36 | INFO     | phase0 | [phase1] k=1 step=2600/5000 train_nll=-153.8945
+2026-02-07 10:18:37 | INFO     | phase0 | [phase1] k=1 step=2800/5000 train_nll=-159.5243
+2026-02-07 10:18:39 | INFO     | phase0 | [phase1] k=1 step=3000/5000 train_nll=-141.1187
+2026-02-07 10:18:40 | INFO     | phase0 | [phase1] k=1 step=3200/5000 train_nll=-154.7121
+2026-02-07 10:18:42 | INFO     | phase0 | [phase1] k=1 step=3400/5000 train_nll=-143.2421
+2026-02-07 10:18:44 | INFO     | phase0 | [phase1] k=1 step=3600/5000 train_nll=-155.1605
+2026-02-07 10:18:45 | INFO     | phase0 | [phase1] k=1 step=3800/5000 train_nll=-154.5279
+2026-02-07 10:18:47 | INFO     | phase0 | [phase1] k=1 step=4000/5000 train_nll=-158.2634
+2026-02-07 10:18:54 | INFO     | phase0 | [phase1] k=1 step=4000 eval_dnll=23.6649 nll=-167.9773 baseline=-191.6421
+2026-02-07 10:18:55 | INFO     | phase0 | [phase1] k=1 step=4200/5000 train_nll=-165.4475
+2026-02-07 10:18:57 | INFO     | phase0 | [phase1] k=1 step=4400/5000 train_nll=-152.2594
+2026-02-07 10:18:59 | INFO     | phase0 | [phase1] k=1 step=4600/5000 train_nll=-156.0731
+2026-02-07 10:19:00 | INFO     | phase0 | [phase1] k=1 step=4800/5000 train_nll=-147.6313
+2026-02-07 10:19:02 | INFO     | phase0 | [phase1] k=1 step=5000/5000 train_nll=-149.8365
+2026-02-07 10:19:15 | INFO     | phase0 | [phase1-rollout] k=1 teacher_nll=-161.5700 rollout_nll=-70.7699 gap=90.8001
+2026-02-07 10:19:22 | INFO     | phase0 | [phase1] model=mdn k=2 slice=all device=cuda batch=256 steps=5000
+2026-02-07 10:19:24 | INFO     | phase0 | [phase1] k=2 step=200/5000 train_nll=3433.8682
+2026-02-07 10:19:25 | INFO     | phase0 | [phase1] k=2 step=400/5000 train_nll=-78.4426
+2026-02-07 10:19:27 | INFO     | phase0 | [phase1] k=2 step=600/5000 train_nll=-118.7205
+2026-02-07 10:19:28 | INFO     | phase0 | [phase1] k=2 step=800/5000 train_nll=-112.3326
+2026-02-07 10:19:30 | INFO     | phase0 | [phase1] k=2 step=1000/5000 train_nll=-104.9038
+2026-02-07 10:19:31 | INFO     | phase0 | [phase1] k=2 step=1200/5000 train_nll=-126.3439
+2026-02-07 10:19:33 | INFO     | phase0 | [phase1] k=2 step=1400/5000 train_nll=-114.2954
+2026-02-07 10:19:34 | INFO     | phase0 | [phase1] k=2 step=1600/5000 train_nll=-136.8322
+2026-02-07 10:19:36 | INFO     | phase0 | [phase1] k=2 step=1800/5000 train_nll=-132.6855
+2026-02-07 10:19:38 | INFO     | phase0 | [phase1] k=2 step=2000/5000 train_nll=-114.3550
+2026-02-07 10:19:45 | INFO     | phase0 | [phase1] k=2 step=2000 eval_dnll=74.3637 nll=-117.2784 baseline=-191.6421
+2026-02-07 10:19:46 | INFO     | phase0 | [phase1] k=2 step=2200/5000 train_nll=-137.4221
+2026-02-07 10:19:48 | INFO     | phase0 | [phase1] k=2 step=2400/5000 train_nll=-140.8438
+2026-02-07 10:19:50 | INFO     | phase0 | [phase1] k=2 step=2600/5000 train_nll=-153.8945
+2026-02-07 10:19:51 | INFO     | phase0 | [phase1] k=2 step=2800/5000 train_nll=-159.5243
+2026-02-07 10:19:53 | INFO     | phase0 | [phase1] k=2 step=3000/5000 train_nll=-141.1187
+2026-02-07 10:19:55 | INFO     | phase0 | [phase1] k=2 step=3200/5000 train_nll=-154.7121
+2026-02-07 10:19:56 | INFO     | phase0 | [phase1] k=2 step=3400/5000 train_nll=-143.2421
+2026-02-07 10:19:58 | INFO     | phase0 | [phase1] k=2 step=3600/5000 train_nll=-155.1605
+2026-02-07 10:19:59 | INFO     | phase0 | [phase1] k=2 step=3800/5000 train_nll=-154.5279
+2026-02-07 10:20:01 | INFO     | phase0 | [phase1] k=2 step=4000/5000 train_nll=-158.2634
+2026-02-07 10:20:08 | INFO     | phase0 | [phase1] k=2 step=4000 eval_dnll=23.6649 nll=-167.9773 baseline=-191.6421
+2026-02-07 10:20:10 | INFO     | phase0 | [phase1] k=2 step=4200/5000 train_nll=-165.4475
+2026-02-07 10:20:11 | INFO     | phase0 | [phase1] k=2 step=4400/5000 train_nll=-152.2594
+2026-02-07 10:20:13 | INFO     | phase0 | [phase1] k=2 step=4600/5000 train_nll=-156.0731
+2026-02-07 10:20:15 | INFO     | phase0 | [phase1] k=2 step=4800/5000 train_nll=-147.6313
+2026-02-07 10:20:16 | INFO     | phase0 | [phase1] k=2 step=5000/5000 train_nll=-149.8365
+2026-02-07 10:20:30 | INFO     | phase0 | [phase1-rollout] k=2 teacher_nll=-161.5700 rollout_nll=67363704.8030 gap=67363866.3730
+2026-02-07 10:20:37 | INFO     | phase0 | [phase1] model=mdn k=4 slice=all device=cuda batch=256 steps=5000
+2026-02-07 10:20:39 | INFO     | phase0 | [phase1] k=4 step=200/5000 train_nll=3433.8682
+2026-02-07 10:20:40 | INFO     | phase0 | [phase1] k=4 step=400/5000 train_nll=-78.4426
+2026-02-07 10:20:42 | INFO     | phase0 | [phase1] k=4 step=600/5000 train_nll=-118.7205
+2026-02-07 10:20:43 | INFO     | phase0 | [phase1] k=4 step=800/5000 train_nll=-112.3326
+2026-02-07 10:20:45 | INFO     | phase0 | [phase1] k=4 step=1000/5000 train_nll=-104.9038
+2026-02-07 10:20:46 | INFO     | phase0 | [phase1] k=4 step=1200/5000 train_nll=-126.3439
+2026-02-07 10:20:48 | INFO     | phase0 | [phase1] k=4 step=1400/5000 train_nll=-114.2954
+2026-02-07 10:20:49 | INFO     | phase0 | [phase1] k=4 step=1600/5000 train_nll=-136.8322
+2026-02-07 10:20:51 | INFO     | phase0 | [phase1] k=4 step=1800/5000 train_nll=-132.6855
+2026-02-07 10:20:53 | INFO     | phase0 | [phase1] k=4 step=2000/5000 train_nll=-114.3550
+2026-02-07 10:21:00 | INFO     | phase0 | [phase1] k=4 step=2000 eval_dnll=74.3637 nll=-117.2784 baseline=-191.6421
+2026-02-07 10:21:01 | INFO     | phase0 | [phase1] k=4 step=2200/5000 train_nll=-137.4221
+2026-02-07 10:21:03 | INFO     | phase0 | [phase1] k=4 step=2400/5000 train_nll=-140.8438
+2026-02-07 10:21:05 | INFO     | phase0 | [phase1] k=4 step=2600/5000 train_nll=-153.8945
+2026-02-07 10:21:06 | INFO     | phase0 | [phase1] k=4 step=2800/5000 train_nll=-159.5243
+2026-02-07 10:21:08 | INFO     | phase0 | [phase1] k=4 step=3000/5000 train_nll=-141.1187
+2026-02-07 10:21:10 | INFO     | phase0 | [phase1] k=4 step=3200/5000 train_nll=-154.7121
+2026-02-07 10:21:11 | INFO     | phase0 | [phase1] k=4 step=3400/5000 train_nll=-143.2421
+2026-02-07 10:21:13 | INFO     | phase0 | [phase1] k=4 step=3600/5000 train_nll=-155.1605
+2026-02-07 10:21:14 | INFO     | phase0 | [phase1] k=4 step=3800/5000 train_nll=-154.5279
+2026-02-07 10:21:16 | INFO     | phase0 | [phase1] k=4 step=4000/5000 train_nll=-158.2634
+2026-02-07 10:21:23 | INFO     | phase0 | [phase1] k=4 step=4000 eval_dnll=23.6649 nll=-167.9773 baseline=-191.6421
+2026-02-07 10:21:25 | INFO     | phase0 | [phase1] k=4 step=4200/5000 train_nll=-165.4475
+2026-02-07 10:21:27 | INFO     | phase0 | [phase1] k=4 step=4400/5000 train_nll=-152.2594
+2026-02-07 10:21:28 | INFO     | phase0 | [phase1] k=4 step=4600/5000 train_nll=-156.0731
+2026-02-07 10:21:30 | INFO     | phase0 | [phase1] k=4 step=4800/5000 train_nll=-147.6313
+2026-02-07 10:21:31 | INFO     | phase0 | [phase1] k=4 step=5000/5000 train_nll=-149.8365
+2026-02-07 10:21:45 | INFO     | phase0 | [phase1-rollout] k=4 teacher_nll=-161.5700 rollout_nll=13966971495.4616 gap=13966971657.0316
+2026-02-07 10:21:52 | INFO     | phase0 | [phase1] model=mdn k=8 slice=all device=cuda batch=256 steps=5000
+2026-02-07 10:21:54 | INFO     | phase0 | [phase1] k=8 step=200/5000 train_nll=3433.8682
+2026-02-07 10:21:55 | INFO     | phase0 | [phase1] k=8 step=400/5000 train_nll=-78.4426
+2026-02-07 10:21:57 | INFO     | phase0 | [phase1] k=8 step=600/5000 train_nll=-118.7205
+2026-02-07 10:21:59 | INFO     | phase0 | [phase1] k=8 step=800/5000 train_nll=-112.3326
+2026-02-07 10:22:00 | INFO     | phase0 | [phase1] k=8 step=1000/5000 train_nll=-104.9038
+2026-02-07 10:22:02 | INFO     | phase0 | [phase1] k=8 step=1200/5000 train_nll=-126.3439
+2026-02-07 10:22:03 | INFO     | phase0 | [phase1] k=8 step=1400/5000 train_nll=-114.2954
+2026-02-07 10:22:05 | INFO     | phase0 | [phase1] k=8 step=1600/5000 train_nll=-136.8322
+2026-02-07 10:22:07 | INFO     | phase0 | [phase1] k=8 step=1800/5000 train_nll=-132.6855
+2026-02-07 10:22:08 | INFO     | phase0 | [phase1] k=8 step=2000/5000 train_nll=-114.3550
+2026-02-07 10:22:16 | INFO     | phase0 | [phase1] k=8 step=2000 eval_dnll=74.3637 nll=-117.2784 baseline=-191.6421
+2026-02-07 10:22:17 | INFO     | phase0 | [phase1] k=8 step=2200/5000 train_nll=-137.4221
+2026-02-07 10:22:19 | INFO     | phase0 | [phase1] k=8 step=2400/5000 train_nll=-140.8438
+2026-02-07 10:22:20 | INFO     | phase0 | [phase1] k=8 step=2600/5000 train_nll=-153.8945
+2026-02-07 10:22:22 | INFO     | phase0 | [phase1] k=8 step=2800/5000 train_nll=-159.5243
+2026-02-07 10:22:23 | INFO     | phase0 | [phase1] k=8 step=3000/5000 train_nll=-141.1187
+2026-02-07 10:22:25 | INFO     | phase0 | [phase1] k=8 step=3200/5000 train_nll=-154.7121
+2026-02-07 10:22:27 | INFO     | phase0 | [phase1] k=8 step=3400/5000 train_nll=-143.2421
+2026-02-07 10:22:29 | INFO     | phase0 | [phase1] k=8 step=3600/5000 train_nll=-155.1605
+2026-02-07 10:22:30 | INFO     | phase0 | [phase1] k=8 step=3800/5000 train_nll=-154.5279
+2026-02-07 10:22:32 | INFO     | phase0 | [phase1] k=8 step=4000/5000 train_nll=-158.2634
+2026-02-07 10:22:39 | INFO     | phase0 | [phase1] k=8 step=4000 eval_dnll=23.6649 nll=-167.9773 baseline=-191.6421
+2026-02-07 10:22:40 | INFO     | phase0 | [phase1] k=8 step=4200/5000 train_nll=-165.4475
+2026-02-07 10:22:42 | INFO     | phase0 | [phase1] k=8 step=4400/5000 train_nll=-152.2594
+2026-02-07 10:22:43 | INFO     | phase0 | [phase1] k=8 step=4600/5000 train_nll=-156.0731
+2026-02-07 10:22:45 | INFO     | phase0 | [phase1] k=8 step=4800/5000 train_nll=-147.6313
+2026-02-07 10:22:46 | INFO     | phase0 | [phase1] k=8 step=5000/5000 train_nll=-149.8365
+2026-02-07 10:22:59 | INFO     | phase0 | [phase1-rollout] k=8 teacher_nll=-161.5700 rollout_nll=33819738832.2085 gap=33819738993.7785
+2026-02-07 10:23:07 | INFO     | phase0 | [exp9] Injection diagnostic written
+2026-02-07 10:23:09 | INFO     | phase0 | [exp9] Summary written: outputs/tier2/exp9_pocket_mimi_vae/20260207_072912/summary.csv
+2026-02-07 10:23:09 | INFO     | phase0 | 
+          experiment  latent_dim  best_eval_dnll  recon_l1  recon_mel  rollout_state_err  rollout_cos
+exp9_pocket_mimi_vae          32       30.072189  0.036806   3.169332           0.174062          0.0
+2026-02-07 10:23:09 | INFO     | phase0 | [tracking] Finalized run: experiment=exp9_pocket_mimi_vae run_id=20260207_072912 status=completed duration=10437s best_dnll=30.072189296038175 recon_mel=3.169332056045532 recon_l1=0.03680634349584579

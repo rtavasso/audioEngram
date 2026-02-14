@@ -1,0 +1,62 @@
+seed: 42
+seeds:
+- 11
+- 22
+- 33
+data:
+  latents_dir: ./outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/latents.zarr
+  latents_index: ./outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/latents_index.parquet
+  splits_dir: ./outputs/phase0/splits
+preprocess:
+  eps_mult: 0.0001
+  min_deltas_per_cluster: 50
+  max_utterances: null
+  max_deltas: null
+exp1_global:
+  k_global:
+  - 16
+  - 32
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  hist_bin_deg: 5
+exp2_states:
+  k1:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  - 2048
+exp3_conditional:
+  k2:
+  - 4
+  - 8
+  - 16
+  - 32
+  - 64
+  shuffled_null_repeats: 5
+exp4_bigram:
+  enabled: true
+exp5_perceptual:
+  enabled: true
+  vae_checkpoint: ./outputs/tier2/exp9_pocket_mimi_vae/20260209_010912/checkpoints/vae_gan_final.pt
+  n_utterances: 20
+  output_sample_rate: 48000
+  metrics_sample_rate: 16000
+  mel_n_mels: 80
+  global_k: 1024
+  save_audio: true
+exp6_scaling:
+  enabled: true
+kmeans:
+  n_init: 3
+  max_iter: 300
+  batch_size: 8192
+compute:
+  omp_num_threads: 1
+  n_workers: 8
+output:
+  out_dir: ./outputs/tier4/exp12_state_conditioned_directions

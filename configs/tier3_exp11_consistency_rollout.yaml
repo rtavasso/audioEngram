@@ -1,0 +1,65 @@
+seed: 42
+
+data:
+  latents_dir: ./outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/latents.zarr
+  latents_index: ./outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/latents_index.parquet
+  frames_index: ./outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/phase0_frames.parquet
+  splits_dir: ./outputs/phase0/splits
+
+# Pre-trained model paths
+checkpoints:
+  direction_ar: ./outputs/tier3/exp10_direction_ar/20260207_064253/checkpoints/direction_ar_final.pt
+  mdn: ./outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/phase1/checkpoints/mdn_k1_final.pt
+  codebook: ./outputs/tier3/exp8_direction_codebook/20260206_233223/codebook_K0256.npy
+
+context:
+  window_size: 8
+  horizon_k: 1
+
+score_model:
+  latent_dim: 32
+  hidden_dim: 512
+  n_layers: 4
+  sigma_min: 0.01
+  sigma_max: 1.0
+
+score_train:
+  batch_size: 512
+  num_workers: 0
+  max_steps: 20000
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+  log_every: 100
+  save_every: 5000
+
+joint_train:
+  max_steps: 5000
+  unroll_k: 4
+  batch_size: 64
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+  sigma: 0.1
+  log_every: 100
+  save_every: 1000
+
+rollout:
+  k_values: [1, 2, 4, 8, 16]
+  sigma_sweep: [0.01, 0.05, 0.1, 0.25, 0.5, 1.0]
+  n_eval_utterances: 20
+  segments_per_utt: 5
+  max_frames_per_utt: 500
+
+eval:
+  n_utterances: 10
+  output_sample_rate: 48000
+  mimi_checkpoint: null
+  vae_checkpoint: ./outputs/tier2/exp5_betavae/20260206_174326/baseline_betavae/checkpoints/vae_final.pt
+  rollout_audio_k_values: [1, 2, 4, 8]
+
+train:
+  device: auto
+
+output:
+  out_dir: ./outputs/tier3/exp11_consistency_rollout

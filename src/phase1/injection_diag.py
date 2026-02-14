@@ -151,6 +151,8 @@ def run_injection_diagnostic(
                 else:
                     if sample_from_model and hasattr(model, "sample_delta"):
                         dx_hat = model.sample_delta(ctx_flat)  # [B,D]
+                    elif hasattr(model, "rollout_mean"):
+                        dx_hat = model.rollout_mean(ctx_flat)  # [B,D]
                     else:
                         dx_hat = pred_hat  # [B,D]
                     x_curr = x_prev + dx_hat

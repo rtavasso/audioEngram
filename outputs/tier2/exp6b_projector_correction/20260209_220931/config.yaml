@@ -1,0 +1,42 @@
+seed: 42
+data:
+  latents_dir: ./outputs/phase0/latents.zarr
+  latents_index: ./outputs/phase0/latents_index.parquet
+  frames_index: ./outputs/phase0/phase0_frames.parquet
+  splits_dir: ./outputs/phase0/splits
+  phase1_checkpoint: null
+projector_model:
+  hidden_dim: 2048
+  n_layers: 3
+  dropout: 0.0
+projector_train:
+  batch_size: 64
+  num_workers: 0
+  max_steps: 10000
+  unroll_k: 4
+  lr: 0.0001
+  weight_decay: 0.0001
+  grad_clip_norm: 1.0
+  log_every: 100
+  save_every: 2000
+  segments_per_utt: 2
+  max_segments: null
+  min_duration_sec: 3.0
+projector_sweep:
+  scale:
+  - 0.0
+  - 0.25
+  - 0.5
+  - 1.0
+  - 2.0
+injection:
+  window_size: 8
+  horizon_k: 1
+  k_steps: 16
+  n_eval_utterances: 16
+  segments_per_utt: 8
+  max_frames_per_utterance: 2000
+train:
+  device: auto
+output:
+  out_dir: ./outputs/tier2/exp6b_projector_correction

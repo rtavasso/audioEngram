@@ -1,0 +1,352 @@
+[
+  {
+    "utterance_id": "5393-19218-0044",
+    "rollout_length": 1,
+    "rollout_start": 73,
+    "total_frames": 195,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_000_5393-19218-0044/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "5393-19218-0044",
+    "rollout_length": 2,
+    "rollout_start": 73,
+    "total_frames": 195,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_000_5393-19218-0044/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "5393-19218-0044",
+    "rollout_length": 4,
+    "rollout_start": 73,
+    "total_frames": 195,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_000_5393-19218-0044/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "5393-19218-0044",
+    "rollout_length": 8,
+    "rollout_start": 73,
+    "total_frames": 195,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_000_5393-19218-0044/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "5393-19218-0044",
+    "rollout_length": 16,
+    "rollout_start": 73,
+    "total_frames": 195,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_000_5393-19218-0044/rollout_k16.wav"
+  },
+  {
+    "utterance_id": "8324-286682-0037",
+    "rollout_length": 1,
+    "rollout_start": 54,
+    "total_frames": 140,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_001_8324-286682-0037/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "8324-286682-0037",
+    "rollout_length": 2,
+    "rollout_start": 54,
+    "total_frames": 140,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_001_8324-286682-0037/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "8324-286682-0037",
+    "rollout_length": 4,
+    "rollout_start": 54,
+    "total_frames": 140,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_001_8324-286682-0037/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "8324-286682-0037",
+    "rollout_length": 8,
+    "rollout_start": 54,
+    "total_frames": 140,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_001_8324-286682-0037/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "8324-286682-0037",
+    "rollout_length": 16,
+    "rollout_start": 54,
+    "total_frames": 140,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_001_8324-286682-0037/rollout_k16.wav"
+  },
+  {
+    "utterance_id": "8770-295463-0025",
+    "rollout_length": 1,
+    "rollout_start": 72,
+    "total_frames": 193,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_002_8770-295463-0025/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "8770-295463-0025",
+    "rollout_length": 2,
+    "rollout_start": 72,
+    "total_frames": 193,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_002_8770-295463-0025/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "8770-295463-0025",
+    "rollout_length": 4,
+    "rollout_start": 72,
+    "total_frames": 193,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_002_8770-295463-0025/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "8770-295463-0025",
+    "rollout_length": 8,
+    "rollout_start": 72,
+    "total_frames": 193,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_002_8770-295463-0025/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "8770-295463-0025",
+    "rollout_length": 16,
+    "rollout_start": 72,
+    "total_frames": 193,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_002_8770-295463-0025/rollout_k16.wav"
+  },
+  {
+    "utterance_id": "4830-25898-0053",
+    "rollout_length": 1,
+    "rollout_start": 47,
+    "total_frames": 117,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_003_4830-25898-0053/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "4830-25898-0053",
+    "rollout_length": 2,
+    "rollout_start": 47,
+    "total_frames": 117,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_003_4830-25898-0053/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "4830-25898-0053",
+    "rollout_length": 4,
+    "rollout_start": 47,
+    "total_frames": 117,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_003_4830-25898-0053/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "4830-25898-0053",
+    "rollout_length": 8,
+    "rollout_start": 47,
+    "total_frames": 117,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_003_4830-25898-0053/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "4830-25898-0053",
+    "rollout_length": 16,
+    "rollout_start": 47,
+    "total_frames": 117,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_003_4830-25898-0053/rollout_k16.wav"
+  },
+  {
+    "utterance_id": "1447-17506-0008",
+    "rollout_length": 1,
+    "rollout_start": 71,
+    "total_frames": 189,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_004_1447-17506-0008/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "1447-17506-0008",
+    "rollout_length": 2,
+    "rollout_start": 71,
+    "total_frames": 189,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_004_1447-17506-0008/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "1447-17506-0008",
+    "rollout_length": 4,
+    "rollout_start": 71,
+    "total_frames": 189,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_004_1447-17506-0008/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "1447-17506-0008",
+    "rollout_length": 8,
+    "rollout_start": 71,
+    "total_frames": 189,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_004_1447-17506-0008/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "1447-17506-0008",
+    "rollout_length": 16,
+    "rollout_start": 71,
+    "total_frames": 189,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_004_1447-17506-0008/rollout_k16.wav"
+  },
+  {
+    "utterance_id": "6078-54013-0032",
+    "rollout_length": 1,
+    "rollout_start": 63,
+    "total_frames": 167,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_005_6078-54013-0032/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "6078-54013-0032",
+    "rollout_length": 2,
+    "rollout_start": 63,
+    "total_frames": 167,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_005_6078-54013-0032/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "6078-54013-0032",
+    "rollout_length": 4,
+    "rollout_start": 63,
+    "total_frames": 167,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_005_6078-54013-0032/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "6078-54013-0032",
+    "rollout_length": 8,
+    "rollout_start": 63,
+    "total_frames": 167,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_005_6078-54013-0032/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "6078-54013-0032",
+    "rollout_length": 16,
+    "rollout_start": 63,
+    "total_frames": 167,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_005_6078-54013-0032/rollout_k16.wav"
+  },
+  {
+    "utterance_id": "8098-278278-0031",
+    "rollout_length": 1,
+    "rollout_start": 69,
+    "total_frames": 183,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_006_8098-278278-0031/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "8098-278278-0031",
+    "rollout_length": 2,
+    "rollout_start": 69,
+    "total_frames": 183,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_006_8098-278278-0031/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "8098-278278-0031",
+    "rollout_length": 4,
+    "rollout_start": 69,
+    "total_frames": 183,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_006_8098-278278-0031/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "8098-278278-0031",
+    "rollout_length": 8,
+    "rollout_start": 69,
+    "total_frames": 183,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_006_8098-278278-0031/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "8098-278278-0031",
+    "rollout_length": 16,
+    "rollout_start": 69,
+    "total_frames": 183,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_006_8098-278278-0031/rollout_k16.wav"
+  },
+  {
+    "utterance_id": "3235-28452-0009",
+    "rollout_length": 1,
+    "rollout_start": 74,
+    "total_frames": 200,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_007_3235-28452-0009/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "3235-28452-0009",
+    "rollout_length": 2,
+    "rollout_start": 74,
+    "total_frames": 200,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_007_3235-28452-0009/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "3235-28452-0009",
+    "rollout_length": 4,
+    "rollout_start": 74,
+    "total_frames": 200,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_007_3235-28452-0009/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "3235-28452-0009",
+    "rollout_length": 8,
+    "rollout_start": 74,
+    "total_frames": 200,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_007_3235-28452-0009/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "3235-28452-0009",
+    "rollout_length": 16,
+    "rollout_start": 74,
+    "total_frames": 200,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_007_3235-28452-0009/rollout_k16.wav"
+  },
+  {
+    "utterance_id": "298-126791-0033",
+    "rollout_length": 1,
+    "rollout_start": 74,
+    "total_frames": 199,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_008_298-126791-0033/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "298-126791-0033",
+    "rollout_length": 2,
+    "rollout_start": 74,
+    "total_frames": 199,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_008_298-126791-0033/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "298-126791-0033",
+    "rollout_length": 4,
+    "rollout_start": 74,
+    "total_frames": 199,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_008_298-126791-0033/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "298-126791-0033",
+    "rollout_length": 8,
+    "rollout_start": 74,
+    "total_frames": 199,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_008_298-126791-0033/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "298-126791-0033",
+    "rollout_length": 16,
+    "rollout_start": 74,
+    "total_frames": 199,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_008_298-126791-0033/rollout_k16.wav"
+  },
+  {
+    "utterance_id": "83-9960-0046",
+    "rollout_length": 1,
+    "rollout_start": 60,
+    "total_frames": 158,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_009_83-9960-0046/rollout_k01.wav"
+  },
+  {
+    "utterance_id": "83-9960-0046",
+    "rollout_length": 2,
+    "rollout_start": 60,
+    "total_frames": 158,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_009_83-9960-0046/rollout_k02.wav"
+  },
+  {
+    "utterance_id": "83-9960-0046",
+    "rollout_length": 4,
+    "rollout_start": 60,
+    "total_frames": 158,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_009_83-9960-0046/rollout_k04.wav"
+  },
+  {
+    "utterance_id": "83-9960-0046",
+    "rollout_length": 8,
+    "rollout_start": 60,
+    "total_frames": 158,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_009_83-9960-0046/rollout_k08.wav"
+  },
+  {
+    "utterance_id": "83-9960-0046",
+    "rollout_length": 16,
+    "rollout_start": 60,
+    "total_frames": 158,
+    "wav_path": "outputs/tier2/exp7_perceptual_rollout/20260206_172050/utt_009_83-9960-0046/rollout_k16.wav"
+  }
+]
